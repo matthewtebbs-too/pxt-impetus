@@ -1,0 +1,72 @@
+{
+  "id": "impetus",
+  "name": "Impetus",
+  "title": "Microsoft MakeCode for 3D worlds",
+  "description": "A Blocks / JavaScript code editor for 3D worlds powered by Microsoft MakeCode.",
+  "corepkg": "core",
+  "cloud": {
+    "workspace": false,
+    "packages": true
+  },
+  "compile": {
+    "isNative": false,
+    "floatingPoint": true
+  },
+  "serial": {
+    "useEditor": true
+  },
+  "runtime": {
+    "functionBlocks": true,
+    "listsBlocks": true,
+    "logicBlocks": true,
+    "loopsBlocks": true,
+    "mathBlocks": true,
+    "textBlocks": true,
+    "variablesBlocks": true
+  },
+  "simulator": {
+    "autoRun": true
+  },
+  "blocksprj": {
+    "id": "blocksprj",
+    "config": {
+      "name": "{0}",
+      "dependencies": {
+        "core": "*"
+      },
+      "description": "",
+      "files": [
+        "main.blocks",
+        "main.ts",
+        "README.md"
+      ]
+    },
+    "files": {
+      "README.md": " ",
+      "main.blocks": "<xml xmlns=\"http://www.w3.org/1999/xhtml\">\n</xml>",
+      "main.ts": " "
+    }
+  },
+  "tsprj": {
+    "id": "tsprj",
+    "config": {
+      "name": "{0}",
+      "dependencies": {
+        "core": "*"
+      },
+      "description": "",
+      "files": [
+        "main.ts",
+        "README.md"
+      ]
+    },
+    "files": {
+      "README.md": " ",
+      "main.ts": " "
+    }
+  },
+  "versions": {
+    "target": "0.1.0",
+    "pxt": "3.5.11"
+  }
+}
