@@ -1,0 +1,90 @@
+{
+  "id": "impetus",
+  "name": "Impetus",
+  "title": "Microsoft MakeCode for 3D worlds",
+  "description": "A Blocks / JavaScript code editor for 3D worlds powered by Microsoft MakeCode.",
+  "corepkg": "core",
+  "cloud": {
+    "workspace": false,
+    "packages": true
+  },
+  "compile": {
+    "isNative": false
+  },
+  "bundleddirs": [
+    "libs/core"
+  ],
+  "serial": {
+    "useEditor": true
+  },
+  "runtime": {
+    "functionBlocks": true,
+    "listsBlocks": true,
+    "logicBlocks": true,
+    "loopsBlocks": true,
+    "mathBlocks": true,
+    "textBlocks": true,
+    "variablesBlocks": true
+  },
+  "simulator": {
+    "autoRun": true
+  },
+  "appTheme": {
+    "boardName": "Impetus",
+    "appLogo": "./static/icons/android-chrome-192x192.png",
+    "logo": "./static/logo.wide.white.svg",
+    "cardLogo": "./static/icons/android-chrome-192x192.png",
+    "docsLogo": "./static/logo.square.white.svg",
+    "portraitLogo": "./static/logo.square.white.svg",    
+    "logoUrl": "https://github.com/muddytummy/pxt-Impetus#readme",
+    "homeUrl": "https://muddytummy.github.io/pxt-Impetus/",
+    "betaUrl": "https://github.com/muddytummy/pxt-Impetus#readme",
+    "privacyUrl": "https://makecode.com/privacy",
+    "termsOfUseUrl": "https://makecode.com/termsofuse",
+    "docMenu": [
+      {
+        "name": "About",
+        "path": "/about"
+      },
+      {
+        "name": "Docs",
+        "path": "/docs"
+      }
+    ],
+    "coloredToolbox": true,
+    "monacoToolbox": true,
+    "invertedMenu": true,
+    "showHomeScreen": true,
+    "blocklyOptions": {
+      "grid": {
+        "spacing": 20,
+        "length": 2,
+        "colour": "rgba(189, 195, 199, 0.20)",
+        "snap": true
+      }
+    },
+    "blockColors": {
+      "design": "#2680d9",
+      "object3d": "#2626d9",
+      "light": "#7f26d9",
+      "material": "#d926d9",
+      "scene": "#d92680",
+      "world": "#d92626",
+      "loops": "#80d926",
+      "logic": "#2699d9",
+      "variables": "#FF6680",
+      "math": "#9966ff",
+      "advanced": "#00272B",
+      "functions": "#d97f26",
+      "arrays": "#26d926",
+      "text": "#2699d9",
+      "console": "#002050"
+    },
+    "simAnimationEnter": "fly right in",
+    "simAnimationExit": "fly right out",
+    "extendEditor": true,
+    "monacoColors": {
+      "editor.background": "#ecf0f1"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "extends": "tslint:recommended",
+  "rules": {
+    "adjacent-overload-signatures": false,
+    "arrow-parens": false,
+    "comment-format": [
+      true
+    ],
+    "max-classes-per-file": false,
+    "max-line-length": false,
+    "no-bitwise": false,
+    "no-namespace": false,
+    "no-reference": false,
+    "no-var-requires": false,
+    "one-variable-per-declaration": false,
+    "only-arrow-functions": false,
+    "quotemark": [
+      true,
+      "single",
+      "jsx-single"
+    ],
+    "variable-name": [
+        true,
+        "allow-leading-underscore",
+        "ban-keywords",
+        "check-format"
+    ]
+  }
+}

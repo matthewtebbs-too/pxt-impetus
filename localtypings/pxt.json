@@ -1,0 +1,10 @@
+{
+  "name": "localtypings",
+  "description": "Typings for Impetus target for PXT",
+  "files": [
+    "impetus.enums.d.ts",
+    "impetus.api.d.ts"
+  ],
+  "public": true,
+  "dependencies": {}
+}

@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.base.json",
+
+  "compilerOptions": {
+    "out": "../built/sim.js"
+  },
+
+  "include": [
+    "../localtypings/ammo.d.ts",
+    "../localtypings/impetus.enums.d.ts",
+
+    "./**/*"
+  ]
+}

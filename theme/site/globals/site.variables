@@ -1,0 +1,37 @@
+/*******************************
+     User Global Variables
+*******************************/
+
+/*-------------------
+    Brand Colors
+--------------------*/
+
+@darkGrey: #2F2F2F;
+
+@primaryColor        : @grey;
+@secondaryColor      : #2680d9;
+
+@lightPrimaryColor   : lighten(@primaryColor, 50%);
+@lightSecondaryColor : lighten(@secondaryColor, 50%);
+
+/*-------------------
+   Menu
+--------------------*/
+
+@mainMenuBackground: @white;
+@mainMenuInvertedBackground: @secondaryColor;
+@mainMenuTutorialBackground: @primaryColor;
+
+/*-------------------
+   Layout
+--------------------*/
+
+@simulatorWidth: 34rem;
+@simulatorWidthSmall: 34rem;
+
+/*-------------------
+   Icons
+--------------------*/
+
+@poweredBySmallUrl: '../docs/static/icons/1x1-transparent.png';
+@poweredByLargeUrl: @poweredBySmallUrl;

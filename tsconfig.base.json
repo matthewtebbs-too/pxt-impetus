@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+
+    "rootDir": ".",
+    "outDir": "../built",
+    
+    "newLine": "lf",
+
+    "sourceMap": false,
+
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": true,
+    "noUnusedLocals": false,
+    "removeComments": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "suppressImplicitAnyIndexErrors": true
+  }
+}
+    

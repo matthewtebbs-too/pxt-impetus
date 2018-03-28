@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" data-manifest="" data-framework="typescript">
+
+<head>
+    <meta charset="utf-8">
+    <title>Impetus simulator</title>
+    <link rel="stylesheet" type="text/css" href="/sim/sim.css">
+    <style>
+        html {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            height: 100%;
+            width:100%;
+            padding: 0;
+            margin: 0;
+            background: transparent;
+            overflow: hidden;
+        }
+    </style>
+
+    <script src="/sim/libs/es6-shim.min.js" type="text/javascript"></script>
+
+    <script src="/cdn/bluebird.min.js" type="text/javascript"></script>
+    <script src="/cdn/pxtsim.js" type="text/javascript"></script>
+
+    <script src="/sim/libs/ammo.js" type="text/javascript"></script>
+    <script src="/sim/libs/stats.min.js" type="text/javascript"></script>
+	<script src="/sim/libs/three.min.js" type="text/javascript"></script>
+    <script src="/sim/libs/Detector.js" type="text/javascript"></script>
+    <script src="/sim/libs/OrbitControls.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        var Ammo = Ammo();
+    </script>
+
+    <script src="/sim/sim.js" type="text/javascript"></script>
+</head>
+
+<body>
+    <div id="container"/>
+</body>
