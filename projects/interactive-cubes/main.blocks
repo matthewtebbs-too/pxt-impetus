@@ -1,0 +1,349 @@
+<xml xmlns="http://www.w3.org/1999/xhtml">
+  <variables>
+    <variable type="" id="8H,VJ$?t.*o=im-+|2DT">msec</variable>
+    <variable type="" id=")OMF-kxG)`{dg=wS8K}r">theta</variable>
+    <variable type="" id="zMQ|wrlfMlffFDwz-):[">boxgeometry</variable>
+    <variable type="" id="ss?|?KM864ajOr+XagZ;">object</variable>
+  </variables>
+  <block type="scene_on_animate" id="WZITw^dVd2Sj556D4+4_" x="20" y="20">
+    <field name="HANDLER_msec" id="8H,VJ$?t.*o=im-+|2DT" variabletype="">msec</field>
+    <statement name="HANDLER">
+      <block type="variables_change" id="L8dkx;K~nI/s,G-HTtOM">
+        <field name="VAR" id=")OMF-kxG)`{dg=wS8K}r" variabletype="">theta</field>
+        <value name="VALUE">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+          <block type="math_arithmetic" id="_prrOAk~Lfjl8%l,.!N[">
+            <field name="OP">DIVIDE</field>
+            <value name="A">
+              <shadow type="math_number">
+                <field name="NUM">0</field>
+              </shadow>
+              <block type="math_arithmetic" id=")OaaBfr_8,*NLIw7L%?#">
+                <field name="OP">MULTIPLY</field>
+                <value name="A">
+                  <shadow type="math_number" id="T9[5`6?kK@Tq4LM`XQ/R">
+                    <field name="NUM">0.1</field>
+                  </shadow>
+                </value>
+                <value name="B">
+                  <shadow type="math_number">
+                    <field name="NUM">0</field>
+                  </shadow>
+                  <block type="variables_get" id="ma+_q83F~~G]T-*XoO,H">
+                    <field name="VAR" id="8H,VJ$?t.*o=im-+|2DT" variabletype="">msec</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <value name="B">
+              <shadow type="math_number">
+                <field name="NUM">0</field>
+              </shadow>
+              <block type="math_arithmetic" id="JeMAKg6F-8;axsz^#]F*">
+                <field name="OP">DIVIDE</field>
+                <value name="A">
+                  <shadow type="math_number" id="L%tOyME=H?7Wsh[f7#YZ">
+                    <field name="NUM">1</field>
+                  </shadow>
+                </value>
+                <value name="B">
+                  <shadow type="math_number" id="RpF+z0~qn7,@fLek*B_D">
+                    <field name="NUM">60</field>
+                  </shadow>
+                </value>
+              </block>
+            </value>
+          </block>
+        </value>
+        <next>
+          <block type="set_object_position" id="0GnF=uJymb8G|N9Z}vlX">
+            <value name="object">
+              <block type="world_active_camera" id="m`Ff8ci;/qr4;UBiIV{n"></block>
+            </value>
+            <value name="position">
+              <shadow type="math_vector" id="1cKc=G_zGae[icU7X^O3">
+                <value name="x">
+                  <block type="math_arithmetic" id="kT*P/X*a/dYWe-*V_agq">
+                    <field name="OP">MULTIPLY</field>
+                    <value name="A">
+                      <shadow type="math_number" id="@VZkCE,fVkt;AL`U6G9m">
+                        <field name="NUM">100</field>
+                      </shadow>
+                    </value>
+                    <value name="B">
+                      <shadow type="math_number">
+                        <field name="NUM">0</field>
+                      </shadow>
+                      <block type="math_js_op" id="`ZICRa#IgP@+N_/s4d]}">
+                        <mutation op-type="unary"></mutation>
+                        <field name="OP">sin</field>
+                        <value name="ARG0">
+                          <shadow type="math_number">
+                            <field name="NUM">0</field>
+                          </shadow>
+                          <block type="math_deg_to_rad" id="xs:P`!}8XN_g|+B5:I7g">
+                            <value name="degrees">
+                              <block type="variables_get" id="1e7s]Omf)S(-|j-.].W3">
+                                <field name="VAR" id=")OMF-kxG)`{dg=wS8K}r" variabletype="">theta</field>
+                              </block>
+                            </value>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <value name="y">
+                  <block type="math_arithmetic" id="5~_WhX*+~54gDr_^QHQx">
+                    <field name="OP">MULTIPLY</field>
+                    <value name="A">
+                      <shadow type="math_number" id="ld^c#?BAKTY:-X*~R*}+">
+                        <field name="NUM">100</field>
+                      </shadow>
+                    </value>
+                    <value name="B">
+                      <shadow type="math_number">
+                        <field name="NUM">0</field>
+                      </shadow>
+                      <block type="math_js_op" id="BP}jGN9:(V{wzfX?v%UA">
+                        <mutation op-type="unary"></mutation>
+                        <field name="OP">sin</field>
+                        <value name="ARG0">
+                          <shadow type="math_number">
+                            <field name="NUM">0</field>
+                          </shadow>
+                          <block type="math_deg_to_rad" id="F%y#1j--76tnYtI97DI/">
+                            <value name="degrees">
+                              <block type="variables_get" id="-z9;zxRwOD`UXAk;?XU8">
+                                <field name="VAR" id=")OMF-kxG)`{dg=wS8K}r" variabletype="">theta</field>
+                              </block>
+                            </value>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <value name="z">
+                  <block type="math_arithmetic" id="1%[@-IHq!ik(hW6:xm2y">
+                    <field name="OP">MULTIPLY</field>
+                    <value name="A">
+                      <shadow type="math_number" id="?G@gRGw#-uJ8c*vhRb^I">
+                        <field name="NUM">100</field>
+                      </shadow>
+                    </value>
+                    <value name="B">
+                      <shadow type="math_number">
+                        <field name="NUM">0</field>
+                      </shadow>
+                      <block type="math_js_op" id="4+;!p.%X3q4mzC7c98_w">
+                        <mutation op-type="unary"></mutation>
+                        <field name="OP">cos</field>
+                        <value name="ARG0">
+                          <shadow type="math_number">
+                            <field name="NUM">0</field>
+                          </shadow>
+                          <block type="math_deg_to_rad" id="Z)x@U-@iSE=Enz6t/|^F">
+                            <value name="degrees">
+                              <block type="variables_get" id=".Q1udgbvlH~K~Yd3q]vQ">
+                                <field name="VAR" id=")OMF-kxG)`{dg=wS8K}r" variabletype="">theta</field>
+                              </block>
+                            </value>
+                          </block>
+                        </value>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+              </shadow>
+            </value>
+            <next>
+              <block type="look_at" id="Pyk[G,(24]o0(Wg_xPb2">
+                <value name="object">
+                  <shadow type="world_active_camera" id=".`7w:WnsZi[?I96x4+3s"></shadow>
+                </value>
+                <value name="position">
+                  <shadow type="math_vector"></shadow>
+                  <block type="world_origin" id="Sg.r]s$OLSFvTgvo2PRb"></block>
+                </value>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+  <block type="pxt-on-start" id="cJB!)CwwA#F(D*FB-v;2" x="20" y="308">
+    <statement name="HANDLER">
+      <block type="variables_set" id=":qwA4uW|kZ|N()KYCdDg">
+        <field name="VAR" id=")OMF-kxG)`{dg=wS8K}r" variabletype="">theta</field>
+        <value name="VALUE">
+          <shadow type="math_number" id="+F/r+8JS^kua`~ggL!%~">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+        <next>
+          <block type="set_background_color" id="D+M?Vm:$)#;c%OuklMI?">
+            <value name="current">
+              <shadow type="world_current_scene" id="2i$*@CriNJ3OAZ{kqD($"></shadow>
+            </value>
+            <value name="color">
+              <shadow type="color_chooser"></shadow>
+              <block type="color_standard" id="N=D9YhjIHWuGZq`!rCc~">
+                <field name="color">Palette.lightcyan</field>
+              </block>
+            </value>
+            <next>
+              <block type="add_object" id="2)nFkfEbdkqqx{d//!r8">
+                <value name="current">
+                  <shadow type="world_current_scene" id="MZ9x4EUO-R!bfSyYsNQ{"></shadow>
+                </value>
+                <value name="object">
+                  <block type="directional_light" id="MFeMrqTN5^q?d0afEJt]">
+                    <value name="color">
+                      <shadow type="color_chooser" id="*jb.?g+@Y8M)44Na[aN4">
+                        <field name="color">0xffffff</field>
+                      </shadow>
+                    </value>
+                    <value name="intensity">
+                      <shadow type="math_number" id="Tqi%EdX`^^Etko}a9H1{">
+                        <field name="NUM">1</field>
+                      </shadow>
+                    </value>
+                  </block>
+                </value>
+                <value name="position">
+                  <shadow type="world_origin"></shadow>
+                  <block type="math_unit_vector" id="YR~h}1v9$xY}/goiF}R]"></block>
+                </value>
+                <next>
+                  <block type="variables_set" id="z]}/cNaau{W-4O=gBb)-">
+                    <field name="VAR" id="zMQ|wrlfMlffFDwz-):[" variabletype="">boxgeometry</field>
+                    <value name="VALUE">
+                      <shadow type="math_number">
+                        <field name="NUM">0</field>
+                      </shadow>
+                      <block type="geometry_box" id="JzuCp?{9S0j;ithL?~vP">
+                        <value name="width">
+                          <shadow type="math_number" id="D6#s?.-X8(EtT[8$7|ID">
+                            <field name="NUM">20</field>
+                          </shadow>
+                        </value>
+                        <value name="height">
+                          <shadow type="math_number" id="..fg0bD0Cg9mqO3XJ9s8">
+                            <field name="NUM">20</field>
+                          </shadow>
+                        </value>
+                        <value name="depth">
+                          <shadow type="math_number" id="1P{?*cAR{*,ebJWb?$Zi">
+                            <field name="NUM">20</field>
+                          </shadow>
+                        </value>
+                      </block>
+                    </value>
+                    <next>
+                      <block type="controls_repeat_ext" id="co8otJB+|/v8AQcyzVzL">
+                        <value name="TIMES">
+                          <shadow type="math_whole_number" id="z@NeR/Y9KJa!*+}KrRHH">
+                            <field name="NUM">2000</field>
+                          </shadow>
+                        </value>
+                        <statement name="DO">
+                          <block type="variables_set" id="RTAkpYCowjjB]G}iPK$I">
+                            <field name="VAR" id="ss?|?KM864ajOr+XagZ;" variabletype="">object</field>
+                            <value name="VALUE">
+                              <shadow type="math_number">
+                                <field name="NUM">0</field>
+                              </shadow>
+                              <block type="mesh" id="Xl28m{^R|XVp!s@ESu@{">
+                                <value name="geometry">
+                                  <shadow type="geometry_box"></shadow>
+                                  <block type="variables_get" id="6ftfIs4/)1E{i{Wa0%1K">
+                                    <field name="VAR" id="zMQ|wrlfMlffFDwz-):[" variabletype="">boxgeometry</field>
+                                  </block>
+                                </value>
+                                <value name="material">
+                                  <shadow type="material_with_color" id="*,rXk4Vpma4arC_@A@fJ">
+                                    <value name="color">
+                                      <shadow type="color_chooser"></shadow>
+                                      <block type="color_random" id="14+Req.IWI%X]/hjG*Hj"></block>
+                                    </value>
+                                  </shadow>
+                                </value>
+                              </block>
+                            </value>
+                            <next>
+                              <block type="add_object" id="a1,t]5G9ImOr-8d7bcO(">
+                                <value name="current">
+                                  <shadow type="world_current_scene" id="-=6@;rQ=1vns##r%LpO("></shadow>
+                                </value>
+                                <value name="object">
+                                  <block type="variables_get" id="vmQoXb!DGWr$P,m:}M~8">
+                                    <field name="VAR" id="ss?|?KM864ajOr+XagZ;" variabletype="">object</field>
+                                  </block>
+                                </value>
+                                <value name="position">
+                                  <shadow type="world_origin"></shadow>
+                                  <block type="math_vector" id="~.$$]lo)K=#QzB3NRzvM">
+                                    <value name="x">
+                                      <block type="device_random" id="imcun{_6=`5e,3,WC[5x">
+                                        <value name="min">
+                                          <shadow type="math_number" id="Q`T2x5%18pE}B3zjZmu|">
+                                            <field name="NUM">-400</field>
+                                          </shadow>
+                                        </value>
+                                        <value name="limit">
+                                          <shadow type="math_number" id=";rVpDy]w%RqK.+*wl=^m">
+                                            <field name="NUM">400</field>
+                                          </shadow>
+                                        </value>
+                                      </block>
+                                    </value>
+                                    <value name="y">
+                                      <block type="device_random" id="71j]o8_qk|[d5qp?qr:U">
+                                        <value name="min">
+                                          <shadow type="math_number" id="[rm72-bm6:)HB~qF,Qm,">
+                                            <field name="NUM">-400</field>
+                                          </shadow>
+                                        </value>
+                                        <value name="limit">
+                                          <shadow type="math_number" id="?/PyCtEq|a0Lqn]EGgHv">
+                                            <field name="NUM">400</field>
+                                          </shadow>
+                                        </value>
+                                      </block>
+                                    </value>
+                                    <value name="z">
+                                      <block type="device_random" id="N]DWwp6P:m|2T5!ut^=.">
+                                        <value name="min">
+                                          <shadow type="math_number" id="rE4jG4GCa;+Lv!#xq}Mv">
+                                            <field name="NUM">-400</field>
+                                          </shadow>
+                                        </value>
+                                        <value name="limit">
+                                          <shadow type="math_number" id="EabGuW/Oa2.vZtc8-pBM">
+                                            <field name="NUM">400</field>
+                                          </shadow>
+                                        </value>
+                                      </block>
+                                    </value>
+                                  </block>
+                                </value>
+                              </block>
+                            </next>
+                          </block>
+                        </statement>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>
