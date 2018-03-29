@@ -42,12 +42,12 @@ namespace pxsim {
             Helper.safeAmmoDestroy(btvecGravity);
         }
 
-        public addRigidBody(btbody: Ammo.btRigidBody) {
-            this._btworld.addRigidBody(btbody);
+        public addRigidBody(body: RigidBody) {
+            this._btworld.addRigidBody(body.btRigidBody);
         }
 
-        public removeRigidBody(btbody: Ammo.btRigidBody) {
-            this._btworld.removeRigidBody(btbody);
+        public removeRigidBody(body: RigidBody) {
+            this._btworld.removeRigidBody(body.btRigidBody);
         }
 
         protected _onDispose() {

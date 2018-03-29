@@ -8,9 +8,13 @@
 
 namespace pxsim {
     export class Scene extends Object3D<THREE.Scene> {
+        private _physicsworld: PhysicsWorld = new PhysicsWorld();
+
         private _ambientlight: AmbientLight = new AmbientLight();
 
-        private _physicsworld: PhysicsWorld = new PhysicsWorld();
+        public get physicsWorld(): PhysicsWorld {
+            return this._physicsworld;
+        }
 
         public get ambientLight(): AmbientLight {
             return this._ambientlight;

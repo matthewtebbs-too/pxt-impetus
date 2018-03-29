@@ -14,7 +14,7 @@ namespace pxsim {
         private _volume = 0;
         private _ctorCollisionShape: (() => Ammo.btCollisionShape) | null = null;
 
-        public getShapeVolume(): number {
+        public get volume(): number {
             return this._volume;
         }
 
