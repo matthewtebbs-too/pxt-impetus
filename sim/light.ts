@@ -26,7 +26,7 @@ namespace pxsim {
 
     export class AmbientLight extends Light<THREE.AmbientLight> {
         constructor(color?: Color, intensity?: number, id?: rt.ObjId) {
-            super(new THREE.AmbientLight(color || Palette.white, intensity || 1), id);
+            super(new THREE.AmbientLight(color || Palette.softwhite, intensity || 1), id);
         }
     }
 
@@ -80,7 +80,15 @@ namespace pxsim {
 }
 
 namespace pxsim.light {
+    export function ambientLight(color?: Color, intensity?: number): DirectionalLight  {
+        return new DirectionalLight(color, intensity);
+    }
+
     export function directionalLight(color?: Color, intensity?: number): DirectionalLight  {
         return new DirectionalLight(color, intensity);
+    }
+
+    export function hemisphereLight(colorSky?: Color, colorGround?: Color, intensity?: number): HemisphereLight  {
+        return new HemisphereLight(colorSky, colorGround, intensity);
     }
 }
