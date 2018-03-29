@@ -145,6 +145,7 @@ declare const enum Palette {
     slateblue = 0x6a5acd,
     slategray = 0x708090,
     snow = 0xfffafa,
+    softwhite = 0x404040,
     springgreen = 0x00ff7f,
     steelblue = 0x4682b4,
     tan = 0xd2b48c,
