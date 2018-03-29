@@ -203,7 +203,7 @@ declare namespace design { /* paint-brush icon */
     //% block="%color"
     //% group="Color"
     //% shim=color::colorStandard
-    function colorStandard(color: Palette): Color;
+    function colorStandard(rgb: number): Color;
 
     /**
      * Random color.

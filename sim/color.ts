@@ -12,8 +12,8 @@ namespace pxsim {
 }
 
 namespace pxsim.color {
-    export function colorStandard(color: Palette): Color {
-        return new Color(color);
+    export function colorStandard(rgb: number): Color {
+        return new Color(rgb);
     }
 
     export function colorRandom(): Color {
