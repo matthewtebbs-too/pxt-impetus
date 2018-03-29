@@ -11,63 +11,44 @@ namespace pxsim {
         public static radialSegments = 32;
         public static collisionMargin = 0.05;
 
-        protected _btshape: Ammo.btCollisionShape | null = null;
-        protected _volume: number = 1;
+        private _volume = 0;
+        private _ctorCollisionShape: (() => Ammo.btCollisionShape) | null = null;
 
-        public get btCollisionShape(): Ammo.btCollisionShape | null {
-            return this._btshape;
-        }
-
-        public get volumeOfShape(): number {
+        public getShapeVolume(): number {
             return this._volume;
         }
 
-        protected _onDispose() {
-            Helper.safeAmmoDestroy(this._btshape);
+        public createCollisionShape(): Ammo.btCollisionShape | null {
+            return this._ctorCollisionShape ? this._ctorCollisionShape() : null;
         }
 
-        protected get _halfExtents(): THREE.Vector3 {
+        public _onDispose() {
+            /* do nothing */
+        }
+
+        protected _setShapeVolume(volume: number) {
+            this._volume = volume;
+        }
+
+        protected _setCtorCollisionShape(ctor: () => Ammo.btCollisionShape) {
+            this._ctorCollisionShape = ctor;
+        }
+
+        protected _getBounds(target: THREE.Vector3): THREE.Vector3 {
             this.reference.computeBoundingBox();
 
-            const size: THREE.Vector3 = new THREE.Vector3();
-
-            return this.reference.boundingBox.getSize(size).divideScalar(2);
+            return this.reference.boundingBox.getSize(target);
         }
 
-        protected get _radius(): number {
-            this.reference.computeBoundingSphere();
+        protected _createCollisionShapeFromHalfExtents(ctor: (bthalfextents: Ammo.btVector3) => Ammo.btCollisionShape): Ammo.btCollisionShape {
+            const bthalfextents = Helper.btVector3FromThree(this._getBounds(new THREE.Vector3()).divideScalar(2));
 
-            return this.reference.boundingSphere.radius;
-        }
-
-        protected _initFrom(
-            btshape: Ammo.btCollisionShape,
-            volume: number,
-        ): Ammo.btCollisionShape {
+            const btshape = ctor(bthalfextents);
             btshape.setMargin(Geometry.collisionMargin);
 
-            this._volume = volume;
-            return this._btshape = btshape;
-        }
+            Helper.safeAmmoDestroy(bthalfextents);
 
-        protected _initFromRadius(
-            btshapeCtor: (r: number) => Ammo.btCollisionShape,
-            volumeCalc: (r: number) => number,
-        ): Ammo.btCollisionShape {
-            return this._initFrom(btshapeCtor(this._radius), volumeCalc(this._radius));
-        }
-
-        protected _initFromHalfExtents(
-            btshapeCtor: (h: Ammo.btVector3) => Ammo.btCollisionShape,
-            volumeCalc: (h: THREE.Vector3) => number,
-        ): Ammo.btCollisionShape {
-            let btvecHalfExtents;
-
-            const btshape = btshapeCtor(btvecHalfExtents = Helper.btVector3FromThree(this._halfExtents));
-
-            Helper.safeAmmoDestroy(btvecHalfExtents);
-
-            return this._initFrom(btshape, volumeCalc(this._halfExtents));
+            return btshape;
         }
     }
 
@@ -80,7 +61,7 @@ namespace pxsim {
 
             super(new THREE.PlaneGeometry(w, h).rotateX(-Math.PI / 2) as THREE.PlaneGeometry, id);
 
-            this._initFromHalfExtents(xts => new Ammo.btBoxShape(xts) /* btshape */, xts => 0 /* volume */);
+            this._setCtorCollisionShape(() => this._createCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btBoxShape(bthalfextents)));
         }
     }
 
@@ -92,13 +73,14 @@ namespace pxsim {
             openEnded?: boolean,
             id?: rt.ObjId,
         ) {
-            const w = width || 1;
-            const h = height || 1;
-            const d = depth || 1;
+            width = width || 1;
+            height = height || 1;
+            depth = depth || 1;
 
-            super(new THREE.BoxGeometry(w, h, d), id);
+            super(new THREE.BoxGeometry(width, height, depth), id);
 
-            this._initFromHalfExtents(xts => new Ammo.btBoxShape(xts) /* btshape */, xts => xts.x * xts.y * xts.z /* volume */);
+            this._setShapeVolume(width * height * depth);
+            this._setCtorCollisionShape(() => this._createCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btBoxShape(bthalfextents)));
         }
     }
 
@@ -109,33 +91,37 @@ namespace pxsim {
             openEnded?: boolean,
             id?: rt.ObjId,
         ) {
-            const r = radius || .5;
-            const h = height || 1;
+            radius = radius || .5;
+            height = height || 1;
 
-            super(new THREE.CylinderGeometry(r, r, h, Geometry.radialSegments, 1, openEnded || false), id);
+            super(new THREE.CylinderGeometry(radius, radius, height, Geometry.radialSegments, 1, openEnded || false), id);
 
-            this._initFromHalfExtents(xts => new Ammo.btCylinderShape(xts) /* btshape */, xts => Math.PI * Math.pow(r, 2) * xts.y /* volume */);
+            this._setShapeVolume(Math.PI * Math.pow(radius, 2) * height);
+            this._setCtorCollisionShape(() => this._createCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btCylinderShape(bthalfextents)));
         }
     }
 
     export class SphereGeometry extends Geometry<THREE.SphereGeometry> {
         constructor(radius?: number, id?: rt.ObjId) {
-            const r = radius || .5;
+            radius = radius || .5;
 
-            super(new THREE.SphereGeometry(r, Geometry.radialSegments, Geometry.radialSegments), id);
+            super(new THREE.SphereGeometry(radius, Geometry.radialSegments, Geometry.radialSegments), id);
 
-            this._initFromRadius(_r => new Ammo.btSphereShape(r) /* btshape */, _r => 4 / 3 * Math.PI * Math.pow(r, 3) /* volume */);
+            this._setShapeVolume(4 / 3 * Math.PI * Math.pow(radius, 3));
+            this._setCtorCollisionShape(() => new Ammo.btSphereShape(radius!));
         }
     }
 
     export class ConeGeometry extends Geometry<THREE.ConeGeometry> {
         constructor(radius?: number, height?: number, id?: rt.ObjId) {
-            const r = radius || .5;
-            const h = height || 1;
+            radius = radius || .5;
+            height = height || 1;
 
-            super(new THREE.ConeGeometry(r, h, Geometry.radialSegments), id);
+            super(new THREE.ConeGeometry(radius, height, Geometry.radialSegments), id);
 
-            this._initFrom(new Ammo.btConeShape(r, h) /* btshape */, Math.PI * Math.pow(r, 2) * h / 3 /* volume */);
+            this._setShapeVolume(Math.PI * Math.pow(radius, 2) * height / 3);
+            this._setCtorCollisionShape(() => new Ammo.btConeShape(radius!, height!));
+
         }
     }
 }

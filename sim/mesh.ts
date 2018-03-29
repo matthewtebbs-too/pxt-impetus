@@ -113,7 +113,13 @@ namespace pxsim {
         }
 
         private _configureRigidBody() {
-            const mass: number = Math.max(Mesh.minMass, Math.min(Mesh.maxMass, this._geometry.volumeOfShape * this._material.density));
+            this._removeRigidBody();
+            this._btshape = this._geometry.createCollisionShape();
+            if (!this._btshape) {
+                return;
+            }
+
+            const mass: number = Math.max(Mesh.minMass, Math.min(Mesh.maxMass, this._geometry.getShapeVolume() * this._material.density));
             const isDynamic = mass !== 0;
             const btvecLocalInertia = new Ammo.btVector3(0, 0, 0);
 
@@ -121,10 +127,10 @@ namespace pxsim {
             this._getMotionState(this._btmotionstate);
 
             if (isDynamic) {
-                this._geometry.btCollisionShape!.calculateLocalInertia(mass, btvecLocalInertia);
+                this._btshape.calculateLocalInertia(mass, btvecLocalInertia);
             }
 
-            this._btinfo = new Ammo.btRigidBodyConstructionInfo(mass, this._btmotionstate, this._geometry.btCollisionShape!, btvecLocalInertia);
+            this._btinfo = new Ammo.btRigidBodyConstructionInfo(mass, this._btmotionstate, this._btshape, btvecLocalInertia);
             this._btbody = new Ammo.btRigidBody(this._btinfo);
 
             this._setKinematicObject(true);
@@ -134,7 +140,6 @@ namespace pxsim {
 
         private _removeRigidBody() {
             Helper.safeAmmoDestroy(this._btbody);
-
             Helper.safeAmmoDestroy(this._btinfo);
             Helper.safeAmmoDestroy(this._btmotionstate);
             Helper.safeAmmoDestroy(this._btshape);
