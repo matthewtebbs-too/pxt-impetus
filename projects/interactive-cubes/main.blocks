@@ -5,7 +5,7 @@
     <variable type="" id="zMQ|wrlfMlffFDwz-):[">boxgeometry</variable>
     <variable type="" id="ss?|?KM864ajOr+XagZ;">object</variable>
   </variables>
-  <block type="scene_on_animate" id="WZITw^dVd2Sj556D4+4_" x="20" y="20">
+  <block type="scene_on_animate" id="WZITw^dVd2Sj556D4+4_" x="0" y="0">
     <field name="HANDLER_msec" id="8H,VJ$?t.*o=im-+|2DT" variabletype="">msec</field>
     <statement name="HANDLER">
       <block type="variables_change" id="L8dkx;K~nI/s,G-HTtOM">
@@ -175,7 +175,7 @@
       </block>
     </statement>
   </block>
-  <block type="pxt-on-start" id="cJB!)CwwA#F(D*FB-v;2" x="20" y="308">
+  <block type="pxt-on-start" id="cJB!)CwwA#F(D*FB-v;2" x="0" y="288">
     <statement name="HANDLER">
       <block type="variables_set" id=":qwA4uW|kZ|N()KYCdDg">
         <field name="VAR" id=")OMF-kxG)`{dg=wS8K}r" variabletype="">theta</field>

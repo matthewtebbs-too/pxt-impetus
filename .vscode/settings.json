@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "*.variables": "less",
+    "*.overrides": "less"
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
+}
