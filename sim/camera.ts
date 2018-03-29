@@ -13,13 +13,12 @@ namespace pxsim {
     export type GenericCamera = Camera<THREE.Camera>;
 
     export class PerspectiveCamera extends Camera<THREE.PerspectiveCamera> {
-        constructor(id: rt.ObjId) {
+        constructor(id?: rt.ObjId) {
             super(new THREE.PerspectiveCamera(), id);
 
             this.reference.fov = 60;
             this.reference.near = 0.2;
             this.reference.far = 2000;
-            this.reference.position.set(-40, 20, 15);
         }
 
         public resize(width: number, height: number) {
@@ -28,5 +27,11 @@ namespace pxsim {
             this.reference.aspect = width / height;
             this.reference.updateProjectionMatrix();
         }
+    }
+}
+
+namespace pxsim.camera {
+    export function perspectiveCamera() {
+        return new PerspectiveCamera();
     }
 }

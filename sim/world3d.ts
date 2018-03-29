@@ -31,6 +31,8 @@ namespace pxsim {
             this._renderer.currentScene = new Scene('default');
             this._renderer.activeCamera = new PerspectiveCamera('main');
 
+            this._renderer.activeCamera.setPosition(new Vector(-40, 20, 15));
+
             const container = document.getElementById(this._renderer.id as string);
             if (container) {
                 container.innerHTML = '';
