@@ -6,7 +6,7 @@ The editor is hosted on the GitHub pages [here](http://muddytummy.github.io/pxt-
 
 ## Latest Release Notes
 
-- Physics simulation is disabled by default.
+- Enabled physics.
 
 ## Open Source Software Usage and Licenses
 
