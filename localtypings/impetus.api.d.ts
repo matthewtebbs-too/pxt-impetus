@@ -390,7 +390,7 @@ declare class Mesh extends Object3D {
     //% block="set %mesh physics %enabled=toggleOnOff"
     //% group="Mesh"
     //% shim=.setPhysicsEnabled
-    public setPhysicsEnabled(enabled: boolean): boolean;
+    public setPhysicsEnabled(enabled: boolean): void;
 }
 
 //%
