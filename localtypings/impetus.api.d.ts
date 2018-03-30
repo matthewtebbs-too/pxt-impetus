@@ -261,7 +261,7 @@ declare namespace design { /* paint-brush icon */
 
     /**
      * Pick color from list.
-     * @param color color, eg: Palette.white
+     * @param color color, eg: 0xffffff
      */
     //% blockId=color_picker
     //% block="%color"
