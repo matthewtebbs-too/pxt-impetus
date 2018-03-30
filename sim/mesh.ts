@@ -20,24 +20,6 @@ namespace pxsim {
             return this._material;
         }
 
-        public get rigidbody(): RigidBody | null {
-            return this._rigidbody;
-        }
-
-        public get isRigidBody(): boolean {
-            return !!this._rigidbody;
-        }
-
-        public set isRigidBody(yes: boolean) {
-            if (yes !== this.isRigidBody) {
-                if (yes) {
-                    this._addRigidBody();
-                } else {
-                    this._removeRigidBody();
-                }
-            }
-        }
-
         constructor(
             geometry: GenericGeometry,
             material: Material,
@@ -47,39 +29,51 @@ namespace pxsim {
 
             this._geometry = geometry;
             this._material = material;
+
+            this._rigidbody = new RigidBody(this, this.geometry, this.geometry.volume * this.material.density);
+        }
+
+        public enablePhysics(enable: boolean) {
+            if (this._rigidbody) {
+                this._rigidbody.setKinematicObject(!enable);
+            }
         }
 
         public animate(timeStep: number) {
             super.animate(timeStep);
 
-            if (this.rigidbody) {
-                this.rigidbody!.syncMotionStateToObject3D(this);
+            if (this._rigidbody) {
+                this._rigidbody!.syncMotionStateToObject3D();
             }
+        }
+
+        public onAdded(scene: Scene) {
+            super.onAdded(scene);
+
+            if (this._rigidbody) {
+                this._rigidbody.addRigidBody(scene.physicsWorld);
+            }
+        }
+
+        public onRemoved(scene: Scene) {
+            if (this._rigidbody) {
+                this._rigidbody.removeRigidBody(scene.physicsWorld);
+            }
+
+            super.onRemoved(scene);
         }
 
         protected _onDispose() {
-            this._removeRigidBody();
-
-            super._onDispose();
-        }
-
-        protected _addRigidBody() {
-            this._removeRigidBody();
-
-            this._rigidbody = new RigidBody(this, this.geometry, this.geometry.volume * this.material.density);
-        }
-
-        protected _removeRigidBody() {
-            if (this.rigidbody) {
-                this.rigidbody.dispose();
+            if (this._rigidbody) {
+                this._rigidbody.dispose();
             }
 
-            this._rigidbody = null;
+            super._onDispose();
         }
     }
 
     export function isMesh(object: Mesh | any): object is Mesh {
-        return undefined !== (object as Mesh).rigidbody;
+        return undefined !== (object as Mesh).geometry;
     }
 }
 

@@ -56,6 +56,14 @@ namespace pxsim {
             });
         }
 
+        public onAdded(scene: Scene) {
+            /* do nothing */
+        }
+
+        public onRemoved(scene: Scene) {
+            /* do nothing */
+        }
+
         protected _onDispose() {
             this.reference.children.forEach(reference => {
                 const outer = outerObject(reference);

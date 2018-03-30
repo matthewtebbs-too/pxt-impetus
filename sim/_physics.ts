@@ -15,6 +15,10 @@ namespace pxsim {
 
         private _btworld: Ammo.btDiscreteDynamicsWorld;
 
+        public get btWorld() {
+            return this._btworld;
+        }
+
         constructor() {
             super();
 
@@ -24,10 +28,6 @@ namespace pxsim {
             this._btconstraintsolver = new Ammo.btSequentialImpulseConstraintSolver();
 
             this._btworld = new Ammo.btDiscreteDynamicsWorld(this._btdispatcher, this._btbroadphase, this._btconstraintsolver, this._btconfig);
-        }
-
-        public animate(timeStep: number) {
-            this._btworld.stepSimulation(timeStep, 10);
         }
 
         public getGravity(): number {
@@ -42,12 +42,8 @@ namespace pxsim {
             Helper.safeAmmoDestroy(btvecGravity);
         }
 
-        public addRigidBody(body: RigidBody) {
-            this._btworld.addRigidBody(body.btRigidBody);
-        }
-
-        public removeRigidBody(body: RigidBody) {
-            this._btworld.removeRigidBody(body.btRigidBody);
+        public animate(timeStep: number) {
+            this._btworld.stepSimulation(timeStep, 10);
         }
 
         protected _onDispose() {

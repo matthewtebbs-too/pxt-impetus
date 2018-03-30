@@ -51,23 +51,11 @@ namespace pxsim {
 
         public add(object: GenericObject3D, isRigidBody: boolean = false) {
             this.reference.add(object.reference);
-
-            if (isMesh(object)) {
-                object.isRigidBody = isRigidBody;
-                if (object.rigidbody) {
-                    this._physicsworld.addRigidBody(object.rigidbody);
-                }
-            }
+            object.onAdded(this);
         }
 
         public remove(object: GenericObject3D) {
-            if (isMesh(object)) {
-                if (object.rigidbody) {
-                    this._physicsworld.removeRigidBody(object.rigidbody);
-                }
-                object.isRigidBody = false;
-            }
-
+            object.onRemoved(this);
             this.reference.remove(object.reference);
         }
 

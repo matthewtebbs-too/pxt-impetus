@@ -1,6 +1,6 @@
 # Interactive Cubes
 
-Click a floating cube.
+Click a floating cube! (NYI)
 
 ```blocks
     let object: Mesh = null

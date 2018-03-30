@@ -4,10 +4,21 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-//@ts-ignore
-
 /// <reference path='impetus.enums.d.ts'/>
 
+declare namespace fieldeditors {
+    /**
+     * Render a boolean as a on/off toggle.
+     */
+    //% blockId=toggleOnOff
+    //% block="%on"
+    //% on.fieldEditor=toggleonoff
+    //% on.fieldOptions.decompileLiterals=true
+    //% shim=TD_ID blockHidden=1
+    function onOff(on: boolean): boolean;
+}
+
+//@ts-ignore
 //% color="#002050" icon="\uf120" block="Console" weight=0
 //% advanced=true
 declare namespace console {
@@ -203,7 +214,7 @@ declare namespace design { /* paint-brush icon */
     //% block="%color"
     //% group="Color"
     //% shim=color::colorStandard
-    function colorStandard(rgb: number): Color;
+    function colorStandard(rgb: Palette): Color;
 
     /**
      * Random color.
@@ -377,7 +388,17 @@ declare class Camera extends Object3D {
 declare namespace camera { /* camera icon */
 }
 
+//%
 declare class Mesh extends Object3D {
+    /**
+     * Enable/disable physics.
+     * @param color Color
+     */
+    //% blockId=enable_physics blockNamespace=scene
+    //% block="enable %mesh physics %enable=toggleOnOff"
+    //% group="Mesh"
+    //% shim=.enablePhysics
+    public enablePhysics(enable: boolean): void;
 }
 
 //%
