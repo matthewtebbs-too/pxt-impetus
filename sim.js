@@ -81,9 +81,9 @@ var rt;
 })(rt || (rt = {}));
 var pxsim;
 (function (pxsim) {
-    var Object3D = (function (_super) {
-        __extends(Object3D, _super);
-        function Object3D(reference, id) {
+    var Object3d = (function (_super) {
+        __extends(Object3d, _super);
+        function Object3d(reference, id) {
             var _this = _super.call(this, reference, id) || this;
             _this.reference.name = _this.id;
             _this.reference.userData = __assign({}, _this.reference.userData, { outer: _this });
@@ -95,24 +95,24 @@ var pxsim;
             }
             return _this;
         }
-        Object3D.prototype.lookAt = function (position) {
+        Object3d.prototype.lookAt = function (position) {
             this.reference.lookAt(position);
         };
-        Object3D.prototype.resize = function (width, height) {
+        Object3d.prototype.resize = function (width, height) {
         };
-        Object3D.prototype.setPosition = function (position) {
+        Object3d.prototype.setPosition = function (position) {
             this.reference.position.set(position.x, position.y, position.z);
         };
-        Object3D.prototype.setRotation = function (rotation) {
+        Object3d.prototype.setRotation = function (rotation) {
             this.reference.rotation.set(THREE.Math.degToRad(rotation.x), THREE.Math.degToRad(rotation.y), THREE.Math.degToRad(rotation.z));
         };
-        Object3D.prototype.setScale = function (scale) {
+        Object3d.prototype.setScale = function (scale) {
             this.reference.scale.set(scale.x, scale.y, scale.z);
         };
-        Object3D.prototype.setRotationFromAxisAngle = function (axis, angle) {
+        Object3d.prototype.setRotationFromAxisAngle = function (axis, angle) {
             this.reference.setRotationFromAxisAngle(axis, THREE.Math.degToRad(angle));
         };
-        Object3D.prototype.animate = function (timeStep) {
+        Object3d.prototype.animate = function (timeStep) {
             this.reference.children.forEach(function (reference) {
                 var outer = outerObject(reference);
                 if (outer) {
@@ -120,11 +120,11 @@ var pxsim;
                 }
             });
         };
-        Object3D.prototype.onAdded = function (scene) {
+        Object3d.prototype.onAdded = function (scene) {
         };
-        Object3D.prototype.onRemoved = function (scene) {
+        Object3d.prototype.onRemoved = function (scene) {
         };
-        Object3D.prototype._onDispose = function () {
+        Object3d.prototype._onDispose = function () {
             this.reference.children.forEach(function (reference) {
                 var outer = outerObject(reference);
                 if (outer) {
@@ -133,9 +133,9 @@ var pxsim;
             });
             this.reference.userData = __assign({}, this.reference.userData, { outer: null });
         };
-        return Object3D;
+        return Object3d;
     }(rt.WrappedObjectWithId));
-    pxsim.Object3D = Object3D;
+    pxsim.Object3d = Object3d;
     function outerObject(reference) {
         return reference.userData.outer || null;
     }
@@ -149,15 +149,16 @@ var pxsim;
             return _super !== null && _super.apply(this, arguments) || this;
         }
         return Camera;
-    }(pxsim.Object3D));
+    }(pxsim.Object3d));
     pxsim.Camera = Camera;
     var PerspectiveCamera = (function (_super) {
         __extends(PerspectiveCamera, _super);
-        function PerspectiveCamera(id) {
-            var _this = _super.call(this, new THREE.PerspectiveCamera(), id) || this;
-            _this.reference.fov = 60;
-            _this.reference.near = 0.2;
-            _this.reference.far = 2000;
+        function PerspectiveCamera(fov, near, far, id) {
+            var _this = this;
+            fov = fov || 60;
+            near = near || .2;
+            far = far || 2000;
+            _this = _super.call(this, new THREE.PerspectiveCamera(fov, 1, near, far), id) || this;
             return _this;
         }
         PerspectiveCamera.prototype.resize = function (width, height) {
@@ -172,10 +173,10 @@ var pxsim;
 (function (pxsim) {
     var camera;
     (function (camera) {
-        function perspectiveCamera() {
+        function perspective() {
             return new pxsim.PerspectiveCamera();
         }
-        camera.perspectiveCamera = perspectiveCamera;
+        camera.perspective = perspective;
     })(camera = pxsim.camera || (pxsim.camera = {}));
 })(pxsim || (pxsim = {}));
 var pxsim;
@@ -208,14 +209,14 @@ var pxsim;
             return new pxsim.Color().setHSL(hue / 255, sat / 255, val / 255);
         }
         color_1.colorFromHsv = colorFromHsv;
-        function colorWheelPicker(color) {
+        function colorWheel(color) {
             return new pxsim.Color(color);
         }
-        color_1.colorWheelPicker = colorWheelPicker;
-        function colorNumberPicker(color) {
+        color_1.colorWheel = colorWheel;
+        function colorPicker(color) {
             return new pxsim.Color(color);
         }
-        color_1.colorNumberPicker = colorNumberPicker;
+        color_1.colorPicker = colorPicker;
     })(color = pxsim.color || (pxsim.color = {}));
 })(pxsim || (pxsim = {}));
 var serial;
@@ -249,145 +250,6 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
-    var Geometry = (function (_super) {
-        __extends(Geometry, _super);
-        function Geometry() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this._volume = 0;
-            _this._ctorCollisionShape = null;
-            return _this;
-        }
-        Object.defineProperty(Geometry.prototype, "volume", {
-            get: function () {
-                return this._volume;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Geometry.prototype.createCollisionShape = function () {
-            return this._ctorCollisionShape ? this._ctorCollisionShape() : null;
-        };
-        Geometry.prototype._onDispose = function () {
-        };
-        Geometry.prototype._setShapeVolume = function (volume) {
-            this._volume = volume;
-        };
-        Geometry.prototype._setCtorCollisionShape = function (ctor) {
-            this._ctorCollisionShape = ctor;
-        };
-        Geometry.prototype._getBounds = function (target) {
-            this.reference.computeBoundingBox();
-            return this.reference.boundingBox.getSize(target);
-        };
-        Geometry.prototype._createCollisionShapeFromHalfExtents = function (ctor) {
-            var bthalfextents = pxsim.Helper.btVector3FromThree(this._getBounds(new THREE.Vector3()).divideScalar(2));
-            var btshape = ctor(bthalfextents);
-            btshape.setMargin(Geometry.collisionMargin);
-            pxsim.Helper.safeAmmoDestroy(bthalfextents);
-            return btshape;
-        };
-        Geometry.radialSegments = 32;
-        Geometry.collisionMargin = 0.05;
-        return Geometry;
-    }(rt.WrappedObjectWithId));
-    pxsim.Geometry = Geometry;
-    var PlaneGeometry = (function (_super) {
-        __extends(PlaneGeometry, _super);
-        function PlaneGeometry(width, height, id) {
-            var _this = this;
-            var w = width || 100;
-            var h = height || 100;
-            _this = _super.call(this, new THREE.PlaneGeometry(w, h).rotateX(-Math.PI / 2), id) || this;
-            _this._setCtorCollisionShape(function () { return _this._createCollisionShapeFromHalfExtents(function (bthalfextents) { return new Ammo.btBoxShape(bthalfextents); }); });
-            return _this;
-        }
-        return PlaneGeometry;
-    }(Geometry));
-    pxsim.PlaneGeometry = PlaneGeometry;
-    var BoxGeometry = (function (_super) {
-        __extends(BoxGeometry, _super);
-        function BoxGeometry(width, height, depth, openEnded, id) {
-            var _this = this;
-            width = width || 1;
-            height = height || 1;
-            depth = depth || 1;
-            _this = _super.call(this, new THREE.BoxGeometry(width, height, depth), id) || this;
-            _this._setShapeVolume(width * height * depth);
-            _this._setCtorCollisionShape(function () { return _this._createCollisionShapeFromHalfExtents(function (bthalfextents) { return new Ammo.btBoxShape(bthalfextents); }); });
-            return _this;
-        }
-        return BoxGeometry;
-    }(Geometry));
-    pxsim.BoxGeometry = BoxGeometry;
-    var CylinderGeometry = (function (_super) {
-        __extends(CylinderGeometry, _super);
-        function CylinderGeometry(radius, height, openEnded, id) {
-            var _this = this;
-            radius = radius || .5;
-            height = height || 1;
-            _this = _super.call(this, new THREE.CylinderGeometry(radius, radius, height, Geometry.radialSegments, 1, openEnded || false), id) || this;
-            _this._setShapeVolume(Math.PI * Math.pow(radius, 2) * height);
-            _this._setCtorCollisionShape(function () { return _this._createCollisionShapeFromHalfExtents(function (bthalfextents) { return new Ammo.btCylinderShape(bthalfextents); }); });
-            return _this;
-        }
-        return CylinderGeometry;
-    }(Geometry));
-    pxsim.CylinderGeometry = CylinderGeometry;
-    var SphereGeometry = (function (_super) {
-        __extends(SphereGeometry, _super);
-        function SphereGeometry(radius, id) {
-            var _this = this;
-            radius = radius || .5;
-            _this = _super.call(this, new THREE.SphereGeometry(radius, Geometry.radialSegments, Geometry.radialSegments), id) || this;
-            _this._setShapeVolume(4 / 3 * Math.PI * Math.pow(radius, 3));
-            _this._setCtorCollisionShape(function () { return new Ammo.btSphereShape(radius); });
-            return _this;
-        }
-        return SphereGeometry;
-    }(Geometry));
-    pxsim.SphereGeometry = SphereGeometry;
-    var ConeGeometry = (function (_super) {
-        __extends(ConeGeometry, _super);
-        function ConeGeometry(radius, height, id) {
-            var _this = this;
-            radius = radius || .5;
-            height = height || 1;
-            _this = _super.call(this, new THREE.ConeGeometry(radius, height, Geometry.radialSegments), id) || this;
-            _this._setShapeVolume(Math.PI * Math.pow(radius, 2) * height / 3);
-            _this._setCtorCollisionShape(function () { return new Ammo.btConeShape(radius, height); });
-            return _this;
-        }
-        return ConeGeometry;
-    }(Geometry));
-    pxsim.ConeGeometry = ConeGeometry;
-})(pxsim || (pxsim = {}));
-(function (pxsim) {
-    var geometry;
-    (function (geometry) {
-        function planeGeometry(width, height) {
-            return new pxsim.PlaneGeometry(width, height);
-        }
-        geometry.planeGeometry = planeGeometry;
-        function boxGeometry(width, height, depth) {
-            return new pxsim.BoxGeometry(width, height, depth);
-        }
-        geometry.boxGeometry = boxGeometry;
-        function cylinderGeometry(radius, height) {
-            return new pxsim.CylinderGeometry(radius, height);
-        }
-        geometry.cylinderGeometry = cylinderGeometry;
-        function sphereGeometry(radius) {
-            return new pxsim.SphereGeometry(radius);
-        }
-        geometry.sphereGeometry = sphereGeometry;
-        function coneGeometry(radius, height) {
-            return new pxsim.ConeGeometry(radius, height);
-        }
-        geometry.coneGeometry = coneGeometry;
-    })(geometry = pxsim.geometry || (pxsim.geometry = {}));
-})(pxsim || (pxsim = {}));
-var pxsim;
-(function (pxsim) {
     var Light = (function (_super) {
         __extends(Light, _super);
         function Light() {
@@ -404,7 +266,7 @@ var pxsim;
         };
         Light.distFrustum = 100;
         return Light;
-    }(pxsim.Object3D));
+    }(pxsim.Object3d));
     pxsim.Light = Light;
     var AmbientLight = (function (_super) {
         __extends(AmbientLight, _super);
@@ -456,18 +318,18 @@ var pxsim;
 (function (pxsim) {
     var light;
     (function (light) {
-        function ambientLight(color, intensity) {
+        function ambient(color, intensity) {
             return new pxsim.DirectionalLight(color, intensity);
         }
-        light.ambientLight = ambientLight;
-        function directionalLight(color, intensity) {
+        light.ambient = ambient;
+        function directional(color, intensity) {
             return new pxsim.DirectionalLight(color, intensity);
         }
-        light.directionalLight = directionalLight;
-        function hemisphereLight(colorSky, colorGround, intensity) {
+        light.directional = directional;
+        function hemisphere(colorSky, colorGround, intensity) {
             return new pxsim.HemisphereLight(colorSky, colorGround, intensity);
         }
-        light.hemisphereLight = hemisphereLight;
+        light.hemisphere = hemisphere;
     })(light = pxsim.light || (pxsim.light = {}));
 })(pxsim || (pxsim = {}));
 var pxsim;
@@ -509,10 +371,10 @@ var pxsim;
 (function (pxsim) {
     var material;
     (function (material) {
-        function colorMaterial(color) {
+        function ofColor(color) {
             return new pxsim.Material(color);
         }
-        material.colorMaterial = colorMaterial;
+        material.ofColor = ofColor;
     })(material = pxsim.material || (pxsim.material = {}));
 })(pxsim || (pxsim = {}));
 var pxsim;
@@ -586,17 +448,17 @@ var pxsim;
 (function (pxsim) {
     var Mesh = (function (_super) {
         __extends(Mesh, _super);
-        function Mesh(geometry, material, id) {
-            var _this = _super.call(this, new THREE.Mesh(geometry.reference, material.reference), id) || this;
+        function Mesh(shape3d, material, id) {
+            var _this = _super.call(this, new THREE.Mesh(shape3d.reference, material.reference), id) || this;
             _this._rigidbody = null;
-            _this._geometry = geometry;
+            _this._shape3d = shape3d;
             _this._material = material;
-            _this._rigidbody = new pxsim.RigidBody(_this, _this.geometry, _this.geometry.volume * _this.material.density);
+            _this._rigidbody = new pxsim.RigidBody(_this, _this.shape3d, _this.shape3d.volume * _this.material.density);
             return _this;
         }
-        Object.defineProperty(Mesh.prototype, "geometry", {
+        Object.defineProperty(Mesh.prototype, "shape3d", {
             get: function () {
-                return this._geometry;
+                return this._shape3d;
             },
             enumerable: true,
             configurable: true
@@ -608,10 +470,20 @@ var pxsim;
             enumerable: true,
             configurable: true
         });
-        Mesh.prototype.enablePhysics = function (enable) {
-            if (this._rigidbody) {
-                this._rigidbody.setKinematicObject(!enable);
-            }
+        Object.defineProperty(Mesh.prototype, "physicsEnabled", {
+            get: function () {
+                return this._rigidbody ? !this._rigidbody.isKinematic : false;
+            },
+            set: function (enable) {
+                if (this._rigidbody) {
+                    this._rigidbody.isKinematic = !enable;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Mesh.prototype.setPhysicsEnabled = function (enabled) {
+            this.physicsEnabled = enabled;
         };
         Mesh.prototype.animate = function (timeStep) {
             _super.prototype.animate.call(this, timeStep);
@@ -638,27 +510,23 @@ var pxsim;
             _super.prototype._onDispose.call(this);
         };
         return Mesh;
-    }(pxsim.Object3D));
+    }(pxsim.Object3d));
     pxsim.Mesh = Mesh;
-    function isMesh(object) {
-        return undefined !== object.geometry;
-    }
-    pxsim.isMesh = isMesh;
 })(pxsim || (pxsim = {}));
 (function (pxsim) {
     var mesh;
     (function (mesh_1) {
-        function mesh(geometry, material) {
-            return new pxsim.Mesh(geometry, material);
+        function mesh(shape3d, material) {
+            return new pxsim.Mesh(shape3d, material);
         }
         mesh_1.mesh = mesh;
     })(mesh = pxsim.mesh || (pxsim.mesh = {}));
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
-    var Scene = (function (_super) {
-        __extends(Scene, _super);
-        function Scene(id) {
+    var GenericScene = (function (_super) {
+        __extends(GenericScene, _super);
+        function GenericScene(id) {
             var _this = _super.call(this, new THREE.Scene(), id) || this;
             _this._physicsworld = new pxsim.PhysicsWorld();
             _this._ambientlight = new pxsim.AmbientLight();
@@ -666,50 +534,56 @@ var pxsim;
             _this.add(_this._ambientlight);
             return _this;
         }
-        Object.defineProperty(Scene.prototype, "physicsWorld", {
+        Object.defineProperty(GenericScene.prototype, "physicsWorld", {
             get: function () {
                 return this._physicsworld;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Scene.prototype, "ambientLight", {
+        Object.defineProperty(GenericScene.prototype, "ambientLight", {
             get: function () {
                 return this._ambientlight;
             },
             enumerable: true,
             configurable: true
         });
-        Scene.prototype.setBackgroundColor = function (color) {
+        GenericScene.prototype.setBackgroundColor = function (color) {
             this.reference.background = color;
         };
-        Scene.prototype.setAmbientLight = function (color) {
+        GenericScene.prototype.setAmbientLight = function (color) {
             this.ambientLight.reference.color = color;
         };
-        Scene.prototype.addObject = function (object, position) {
-            object.setPosition(position);
-            this.add(object, true);
+        GenericScene.prototype.add = function (object3d, position) {
+            if (position) {
+                object3d.setPosition(position);
+            }
+            this.reference.add(object3d.reference);
+            object3d.onAdded(this);
         };
-        Scene.prototype.animate = function (timeStep) {
+        GenericScene.prototype.remove = function (object3d) {
+            object3d.onRemoved(this);
+            this.reference.remove(object3d.reference);
+        };
+        GenericScene.prototype.animate = function (timeStep) {
             _super.prototype.animate.call(this, timeStep);
             this._physicsworld.animate(timeStep);
             pxsim.WorldBoard.events.queue(1234, 5678, timeStep);
         };
-        Scene.prototype.add = function (object, isRigidBody) {
-            if (isRigidBody === void 0) { isRigidBody = false; }
-            this.reference.add(object.reference);
-            object.onAdded(this);
-        };
-        Scene.prototype.remove = function (object) {
-            object.onRemoved(this);
-            this.reference.remove(object.reference);
-        };
-        Scene.prototype._onDispose = function () {
+        GenericScene.prototype._onDispose = function () {
             this._physicsworld.dispose();
             _super.prototype._onDispose.call(this);
         };
+        return GenericScene;
+    }(pxsim.Object3d));
+    pxsim.GenericScene = GenericScene;
+    var Scene = (function (_super) {
+        __extends(Scene, _super);
+        function Scene() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
         return Scene;
-    }(pxsim.Object3D));
+    }(GenericScene));
     pxsim.Scene = Scene;
 })(pxsim || (pxsim = {}));
 (function (pxsim) {
@@ -723,9 +597,148 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
-    var World3D = (function (_super) {
-        __extends(World3D, _super);
-        function World3D(id) {
+    var Shape3d = (function (_super) {
+        __extends(Shape3d, _super);
+        function Shape3d() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this._volume = 0;
+            _this._ctorCollisionShape = null;
+            return _this;
+        }
+        Object.defineProperty(Shape3d.prototype, "volume", {
+            get: function () {
+                return this._volume;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Shape3d.prototype.createCollisionShape = function () {
+            return this._ctorCollisionShape ? this._ctorCollisionShape() : null;
+        };
+        Shape3d.prototype._onDispose = function () {
+        };
+        Shape3d.prototype._setShapeVolume = function (volume) {
+            this._volume = volume;
+        };
+        Shape3d.prototype._setCtorCollisionShape = function (ctor) {
+            this._ctorCollisionShape = ctor;
+        };
+        Shape3d.prototype._getBounds = function (target) {
+            this.reference.computeBoundingBox();
+            return this.reference.boundingBox.getSize(target);
+        };
+        Shape3d.prototype._createCollisionShapeFromHalfExtents = function (ctor) {
+            var bthalfextents = pxsim.Helper.btVector3FromThree(this._getBounds(new THREE.Vector3()).divideScalar(2));
+            var btshape = ctor(bthalfextents);
+            btshape.setMargin(Shape3d.collisionMargin);
+            pxsim.Helper.safeAmmoObjectDestroy(bthalfextents);
+            return btshape;
+        };
+        Shape3d.radialSegments = 32;
+        Shape3d.collisionMargin = 0.05;
+        return Shape3d;
+    }(rt.WrappedObjectWithId));
+    pxsim.Shape3d = Shape3d;
+    var PlaneShape3d = (function (_super) {
+        __extends(PlaneShape3d, _super);
+        function PlaneShape3d(width, height, id) {
+            var _this = this;
+            var w = width || 100;
+            var h = height || 100;
+            _this = _super.call(this, new THREE.PlaneGeometry(w, h).rotateX(-Math.PI / 2), id) || this;
+            _this._setCtorCollisionShape(function () { return _this._createCollisionShapeFromHalfExtents(function (bthalfextents) { return new Ammo.btBoxShape(bthalfextents); }); });
+            return _this;
+        }
+        return PlaneShape3d;
+    }(Shape3d));
+    pxsim.PlaneShape3d = PlaneShape3d;
+    var BoxShape3d = (function (_super) {
+        __extends(BoxShape3d, _super);
+        function BoxShape3d(width, height, depth, openEnded, id) {
+            var _this = this;
+            width = width || 1;
+            height = height || 1;
+            depth = depth || 1;
+            _this = _super.call(this, new THREE.BoxGeometry(width, height, depth), id) || this;
+            _this._setShapeVolume(width * height * depth);
+            _this._setCtorCollisionShape(function () { return _this._createCollisionShapeFromHalfExtents(function (bthalfextents) { return new Ammo.btBoxShape(bthalfextents); }); });
+            return _this;
+        }
+        return BoxShape3d;
+    }(Shape3d));
+    pxsim.BoxShape3d = BoxShape3d;
+    var CylinderShape3d = (function (_super) {
+        __extends(CylinderShape3d, _super);
+        function CylinderShape3d(radius, height, openEnded, id) {
+            var _this = this;
+            radius = radius || .5;
+            height = height || 1;
+            _this = _super.call(this, new THREE.CylinderGeometry(radius, radius, height, Shape3d.radialSegments, 1, openEnded || false), id) || this;
+            _this._setShapeVolume(Math.PI * Math.pow(radius, 2) * height);
+            _this._setCtorCollisionShape(function () { return _this._createCollisionShapeFromHalfExtents(function (bthalfextents) { return new Ammo.btCylinderShape(bthalfextents); }); });
+            return _this;
+        }
+        return CylinderShape3d;
+    }(Shape3d));
+    pxsim.CylinderShape3d = CylinderShape3d;
+    var SphereShape3d = (function (_super) {
+        __extends(SphereShape3d, _super);
+        function SphereShape3d(radius, id) {
+            var _this = this;
+            radius = radius || .5;
+            _this = _super.call(this, new THREE.SphereGeometry(radius, Shape3d.radialSegments, Shape3d.radialSegments), id) || this;
+            _this._setShapeVolume(4 / 3 * Math.PI * Math.pow(radius, 3));
+            _this._setCtorCollisionShape(function () { return new Ammo.btSphereShape(radius); });
+            return _this;
+        }
+        return SphereShape3d;
+    }(Shape3d));
+    pxsim.SphereShape3d = SphereShape3d;
+    var ConeShape3d = (function (_super) {
+        __extends(ConeShape3d, _super);
+        function ConeShape3d(radius, height, id) {
+            var _this = this;
+            radius = radius || .5;
+            height = height || 1;
+            _this = _super.call(this, new THREE.ConeGeometry(radius, height, Shape3d.radialSegments), id) || this;
+            _this._setShapeVolume(Math.PI * Math.pow(radius, 2) * height / 3);
+            _this._setCtorCollisionShape(function () { return new Ammo.btConeShape(radius, height); });
+            return _this;
+        }
+        return ConeShape3d;
+    }(Shape3d));
+    pxsim.ConeShape3d = ConeShape3d;
+})(pxsim || (pxsim = {}));
+(function (pxsim) {
+    var shape3d;
+    (function (shape3d) {
+        function plane(width, height) {
+            return new pxsim.PlaneShape3d(width, height);
+        }
+        shape3d.plane = plane;
+        function box(width, height, depth) {
+            return new pxsim.BoxShape3d(width, height, depth);
+        }
+        shape3d.box = box;
+        function cylinder(radius, height) {
+            return new pxsim.CylinderShape3d(radius, height);
+        }
+        shape3d.cylinder = cylinder;
+        function sphere(radius) {
+            return new pxsim.SphereShape3d(radius);
+        }
+        shape3d.sphere = sphere;
+        function cone(radius, height) {
+            return new pxsim.ConeShape3d(radius, height);
+        }
+        shape3d.cone = cone;
+    })(shape3d = pxsim.shape3d || (pxsim.shape3d = {}));
+})(pxsim || (pxsim = {}));
+var pxsim;
+(function (pxsim) {
+    var World3d = (function (_super) {
+        __extends(World3d, _super);
+        function World3d(id) {
             if (id === void 0) { id = 'container'; }
             var _this = _super.call(this) || this;
             _this._controls = null;
@@ -739,9 +752,9 @@ var pxsim;
                 pxsim.console.log("(" + x + ", " + y + ")");
             };
             _this._renderer = new pxsim.Renderer(id);
-            _this._renderer.currentScene = new pxsim.Scene('default');
-            _this._renderer.activeCamera = new pxsim.PerspectiveCamera('main');
-            _this._renderer.activeCamera.setPosition(new pxsim.Vector(-40, 20, 15));
+            _this._renderer.scene = new pxsim.Scene();
+            _this._renderer.camera = new pxsim.PerspectiveCamera();
+            _this._renderer.camera.setPosition(new pxsim.Vector(-40, 20, 15));
             var container = document.getElementById(_this._renderer.id);
             if (container) {
                 container.innerHTML = '';
@@ -750,63 +763,63 @@ var pxsim;
             _this._onWindowResize();
             window.addEventListener('resize', _this._onWindowResize, false);
             document.addEventListener('mousemove', _this._onDocumentMouseMove, false);
-            _this._controls = new THREE.OrbitControls(_this._renderer.activeCamera.reference);
+            _this._controls = new THREE.OrbitControls(_this._renderer.camera.reference);
             _this._controls.target.set(0, 2, 0);
             _this._controls.update();
             return _this;
         }
-        Object.defineProperty(World3D.prototype, "renderer", {
+        Object.defineProperty(World3d.prototype, "renderer", {
             get: function () {
                 return this._renderer;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(World3D.prototype, "currentScene", {
+        Object.defineProperty(World3d.prototype, "scene", {
             get: function () {
-                return this._renderer.currentScene;
+                return this._renderer.scene;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(World3D.prototype, "activeCamera", {
+        Object.defineProperty(World3d.prototype, "camera", {
             get: function () {
-                return this._renderer.activeCamera;
+                return this._renderer.camera;
             },
             enumerable: true,
             configurable: true
         });
-        World3D.prototype._onDispose = function () {
+        World3d.prototype._onDispose = function () {
             document.removeEventListener('mousemove', this._onDocumentMouseMove, false);
             window.removeEventListener('resize', this._onWindowResize, false);
             var container = document.getElementById(this._renderer.id);
             if (container) {
                 container.innerHTML = '';
             }
-            this._renderer.currentScene.dispose();
-            this._renderer.activeCamera.dispose();
+            pxsim.Helper.safeObjectDispose(this._renderer.scene);
+            pxsim.Helper.safeObjectDispose(this._renderer.camera);
             this._renderer.dispose();
         };
-        return World3D;
+        return World3d;
     }(rt.ObjectDisposable));
-    pxsim.World3D = World3D;
+    pxsim.World3d = World3d;
 })(pxsim || (pxsim = {}));
 (function (pxsim) {
-    var world;
-    (function (world) {
+    var world3d;
+    (function (world3d) {
         function origin() {
             return pxsim.math3d.vector();
         }
-        world.origin = origin;
-        function currentScene() {
+        world3d.origin = origin;
+        function scene() {
             return pxsim.currentScene();
         }
-        world.currentScene = currentScene;
-        function activeCamera() {
+        world3d.scene = scene;
+        function camera() {
             return pxsim.activeCamera();
         }
-        world.activeCamera = activeCamera;
-    })(world = pxsim.world || (pxsim.world = {}));
+        world3d.camera = camera;
+    })(world3d = pxsim.world3d || (pxsim.world3d = {}));
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
@@ -814,7 +827,7 @@ var pxsim;
         __extends(WorldBoard, _super);
         function WorldBoard() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
-            _this._world = null;
+            _this._world3d = null;
             return _this;
         }
         Object.defineProperty(WorldBoard, "singleton", {
@@ -834,9 +847,9 @@ var pxsim;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(WorldBoard.prototype, "world", {
+        Object.defineProperty(WorldBoard.prototype, "world3d", {
             get: function () {
-                return this._world;
+                return this._world3d;
             },
             enumerable: true,
             configurable: true
@@ -847,17 +860,17 @@ var pxsim;
         };
         WorldBoard.prototype.init = function () {
             this.postkill();
-            this._world = new pxsim.World3D();
+            this._world3d = new pxsim.World3d();
         };
         WorldBoard.prototype.kill = function () {
-            if (this._world) {
-                this._world.renderer.pause = true;
+            if (this._world3d) {
+                this._world3d.renderer.pause = true;
             }
         };
         WorldBoard.prototype.postkill = function () {
-            if (this._world) {
-                this._world.dispose();
-                this._world = null;
+            if (this._world3d) {
+                this._world3d.dispose();
+                this._world3d = null;
             }
         };
         WorldBoard.prototype.receiveMessage = function (msg) {
@@ -875,11 +888,11 @@ var pxsim;
     };
     function singletonWorldBoard() { return WorldBoard.singleton; }
     pxsim.singletonWorldBoard = singletonWorldBoard;
-    function currentWorld() { return singletonWorldBoard().world; }
-    pxsim.currentWorld = currentWorld;
-    function currentScene() { return currentWorld() ? currentWorld().currentScene : null; }
+    function ourWorld3d() { return singletonWorldBoard().world3d; }
+    pxsim.ourWorld3d = ourWorld3d;
+    function currentScene() { return ourWorld3d() ? ourWorld3d().scene : null; }
     pxsim.currentScene = currentScene;
-    function activeCamera() { return currentWorld() ? currentWorld().activeCamera : null; }
+    function activeCamera() { return ourWorld3d() ? ourWorld3d().camera : null; }
     pxsim.activeCamera = activeCamera;
 })(pxsim || (pxsim = {}));
 var pxsim;
@@ -893,9 +906,14 @@ var pxsim;
         Helper.btQuaternionFromThree = function (qtr) {
             return new Ammo.btQuaternion(qtr.x, qtr.y, qtr.z, qtr.w);
         };
-        Helper.safeAmmoDestroy = function (object) {
-            if (object) {
-                Ammo.destroy(object);
+        Helper.safeObjectDispose = function (dispoableobject) {
+            if (dispoableobject) {
+                dispoableobject.dispose();
+            }
+        };
+        Helper.safeAmmoObjectDestroy = function (ammoobject) {
+            if (ammoobject) {
+                Ammo.destroy(ammoobject);
             }
         };
         return Helper;
@@ -928,17 +946,17 @@ var pxsim;
         PhysicsWorld.prototype.setGravity = function (gravity) {
             var btvecGravity = new Ammo.btVector3(0, gravity, 0);
             this._btworld.setGravity(btvecGravity);
-            pxsim.Helper.safeAmmoDestroy(btvecGravity);
+            pxsim.Helper.safeAmmoObjectDestroy(btvecGravity);
         };
         PhysicsWorld.prototype.animate = function (timeStep) {
             this._btworld.stepSimulation(timeStep, 10);
         };
         PhysicsWorld.prototype._onDispose = function () {
-            pxsim.Helper.safeAmmoDestroy(this._btworld);
-            pxsim.Helper.safeAmmoDestroy(this._btconstraintsolver);
-            pxsim.Helper.safeAmmoDestroy(this._btbroadphase);
-            pxsim.Helper.safeAmmoDestroy(this._btdispatcher);
-            pxsim.Helper.safeAmmoDestroy(this._btconfig);
+            pxsim.Helper.safeAmmoObjectDestroy(this._btworld);
+            pxsim.Helper.safeAmmoObjectDestroy(this._btconstraintsolver);
+            pxsim.Helper.safeAmmoObjectDestroy(this._btbroadphase);
+            pxsim.Helper.safeAmmoObjectDestroy(this._btdispatcher);
+            pxsim.Helper.safeAmmoObjectDestroy(this._btconfig);
         };
         return PhysicsWorld;
     }(rt.ObjectDisposable));
@@ -982,7 +1000,7 @@ var pxsim;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Renderer.prototype, "currentScene", {
+        Object.defineProperty(Renderer.prototype, "scene", {
             get: function () {
                 return this._scene;
             },
@@ -992,7 +1010,7 @@ var pxsim;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Renderer.prototype, "activeCamera", {
+        Object.defineProperty(Renderer.prototype, "camera", {
             get: function () {
                 return this._camera;
             },
@@ -1077,9 +1095,9 @@ var pxsim;
         bttransform.setOrigin(btorigin = pxsim.Helper.btVector3FromThree(object3d.reference.position));
         bttransform.setRotation(btquarternion = pxsim.Helper.btQuaternionFromThree(object3d.reference.quaternion));
         btmotionstate.setWorldTransform(bttransform);
-        pxsim.Helper.safeAmmoDestroy(btquarternion);
-        pxsim.Helper.safeAmmoDestroy(btorigin);
-        pxsim.Helper.safeAmmoDestroy(bttransform);
+        pxsim.Helper.safeAmmoObjectDestroy(btquarternion);
+        pxsim.Helper.safeAmmoObjectDestroy(btorigin);
+        pxsim.Helper.safeAmmoObjectDestroy(bttransform);
         return btmotionstate;
     }
     pxsim.btMotionStateFromObject3D = btMotionStateFromObject3D;
@@ -1090,46 +1108,60 @@ var pxsim;
         var btrotation = bttransform.getRotation();
         object3d.reference.position.set(btorigin.x(), btorigin.y(), btorigin.z());
         object3d.reference.quaternion.set(btrotation.x(), btrotation.y(), btrotation.z(), btrotation.w());
-        pxsim.Helper.safeAmmoDestroy(bttransform);
+        pxsim.Helper.safeAmmoObjectDestroy(bttransform);
     }
     pxsim.btMotionStateToObject3D = btMotionStateToObject3D;
     var RigidBody = (function (_super) {
         __extends(RigidBody, _super);
-        function RigidBody(object3d, geometry, mass) {
+        function RigidBody(object3d, shape3d, mass) {
             var _this = _super.call(this) || this;
             _this._world = null;
             mass = Math.max(RigidBody.minMass, Math.min(RigidBody.maxMass, mass));
             var isDynamic = mass !== 0;
             var btmotionstate = new Ammo.btDefaultMotionState();
-            var btshape = geometry.createCollisionShape();
+            var btshape = shape3d.createCollisionShape();
             var btvecLocalInertia = new Ammo.btVector3(0, 0, 0);
             if (isDynamic) {
                 btshape.calculateLocalInertia(mass, btvecLocalInertia);
             }
             var btinfo = new Ammo.btRigidBodyConstructionInfo(mass, btmotionstate, btshape, btvecLocalInertia);
-            pxsim.Helper.safeAmmoDestroy(btvecLocalInertia);
+            pxsim.Helper.safeAmmoObjectDestroy(btvecLocalInertia);
             _this._btbody = new Ammo.btRigidBody(btinfo);
             _this._btshape = btshape;
             _this._btmotionstate = btmotionstate;
             _this._btinfo = btinfo;
-            _this.setStaticObject(!isDynamic);
-            _this.setKinematicObject(isDynamic);
+            _this.isStatic = !isDynamic;
+            _this.isKinematic = isDynamic;
             _this._object3d = object3d;
             return _this;
         }
-        RigidBody.prototype.setStaticObject = function (isStatic) {
-            this._toggleCollisionFlag(1, isStatic);
-        };
-        RigidBody.prototype.setKinematicObject = function (isKinematic) {
-            this._toggleCollisionFlag(2, isKinematic);
-            this._btbody.setActivationState(isKinematic ? 4 : 1);
-            if (!isKinematic) {
-                this._btbody.activate();
-            }
-            if (this._world) {
-                this.addRigidBody(this._world);
-            }
-        };
+        Object.defineProperty(RigidBody.prototype, "isStatic", {
+            get: function () {
+                return this._btbody.isStaticObject();
+            },
+            set: function (isStatic) {
+                this._toggleCollisionFlag(1, isStatic);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(RigidBody.prototype, "isKinematic", {
+            get: function () {
+                return this._btbody.isKinematicObject();
+            },
+            set: function (isKinematic) {
+                this._toggleCollisionFlag(2, isKinematic);
+                this._btbody.setActivationState(isKinematic ? 4 : 1);
+                if (!isKinematic) {
+                    this._btbody.activate();
+                }
+                if (this._world) {
+                    this.addRigidBody(this._world);
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
         RigidBody.prototype.addRigidBody = function (world) {
             this.removeRigidBody(world);
             btMotionStateFromObject3D(this._btmotionstate, this._object3d);
@@ -1160,10 +1192,10 @@ var pxsim;
             this._btbody.setCollisionFlags(flags);
         };
         RigidBody.prototype._onDispose = function () {
-            pxsim.Helper.safeAmmoDestroy(this._btbody);
-            pxsim.Helper.safeAmmoDestroy(this._btinfo);
-            pxsim.Helper.safeAmmoDestroy(this._btmotionstate);
-            pxsim.Helper.safeAmmoDestroy(this._btshape);
+            pxsim.Helper.safeAmmoObjectDestroy(this._btbody);
+            pxsim.Helper.safeAmmoObjectDestroy(this._btinfo);
+            pxsim.Helper.safeAmmoObjectDestroy(this._btmotionstate);
+            pxsim.Helper.safeAmmoObjectDestroy(this._btshape);
         };
         RigidBody.minMass = 0;
         RigidBody.maxMass = 100;

@@ -218,7 +218,7 @@ var ProjectView = /** @class */ (function (_super) {
             compiler.typecheckAsync()
                 .done(function (resp) {
                 var end = Util.now();
-                // if typecheck is slow (>10s) 
+                // if typecheck is slow (>10s)
                 // and it happened more than 2 times,
                 // it's a slow machine, go into light mode
                 if (!pxt.options.light && end - start > 10000 && _this._slowTypeCheck++ > 1) {
@@ -698,8 +698,9 @@ var ProjectView = /** @class */ (function (_super) {
         var sd = this.refs["sidedoc"];
         if (!sd)
             return;
-        if (path)
+        if (path) {
             sd.setPath(path, blocksEditor);
+        }
         else
             sd.collapse();
     };
@@ -1422,6 +1423,12 @@ var ProjectView = /** @class */ (function (_super) {
             if (running)
                 _this.startSimulator();
         });
+    };
+    ProjectView.prototype.printCode = function () {
+        var p = pkg.mainEditorPkg();
+        var files = p.getAllFiles();
+        // render in sidedocs
+        window.open((pxt.webConfig.docsUrl || '/--docs') + "#project:" + encodeURIComponent(JSON.stringify(files)), 'printcode');
     };
     ProjectView.prototype.clearSerial = function () {
         this.serialEditor.clear();
@@ -2278,18 +2285,25 @@ $(function () {
         workspace.setupWorkspace("fs");
     Promise.resolve()
         .then(function () {
-        var mlang = /(live)?lang=([a-z]{2,}(-[A-Z]+)?)/i.exec(window.location.href);
+        var mlang = /(live)?(force)?lang=([a-z]{2,}(-[A-Z]+)?)/i.exec(window.location.href);
         if (mlang && window.location.hash.indexOf(mlang[0]) >= 0) {
-            lang.setCookieLang(mlang[2]);
             pxt.BrowserUtils.changeHash(window.location.hash.replace(mlang[0], ""));
         }
-        var useLang = mlang ? mlang[2] : (lang.getCookieLang() || pxt.appTarget.appTheme.defaultLocale || navigator.userLanguage || navigator.language);
+        var useLang = mlang ? mlang[3] : (lang.getCookieLang() || pxt.appTarget.appTheme.defaultLocale || navigator.userLanguage || navigator.language);
         var live = !pxt.appTarget.appTheme.disableLiveTranslations || (mlang && !!mlang[1]);
-        if (useLang)
-            pxt.tickEvent("locale." + useLang + (live ? ".live" : ""));
-        lang.setInitialLang(useLang);
-        return Util.updateLocalizationAsync(pxt.appTarget.id, false, config.commitCdnUrl, useLang, pxt.appTarget.versions.pxtCrowdinBranch, pxt.appTarget.versions.targetCrowdinBranch, live)
-            .then(function () { return Util.downloadSimulatorLocalizationAsync(pxt.appTarget.id, config.commitCdnUrl, useLang, pxt.appTarget.versions.pxtCrowdinBranch, pxt.appTarget.versions.targetCrowdinBranch, live); }).then(function (simStrings) {
+        var force = !!mlang && !!mlang[2];
+        return Util.updateLocalizationAsync(pxt.appTarget.id, false, config.commitCdnUrl, useLang, pxt.appTarget.versions.pxtCrowdinBranch, pxt.appTarget.versions.targetCrowdinBranch, live, force)
+            .then(function () {
+            if (pxt.Util.isLocaleEnabled(useLang)) {
+                lang.setCookieLang(useLang);
+            }
+            else {
+                pxt.tickEvent("unavailablelocale." + useLang + (force ? ".force" : ""));
+            }
+            pxt.tickEvent("locale." + pxt.Util.userLanguage() + (live ? ".live" : ""));
+            // Download sim translations and save them in the sim
+            return Util.downloadSimulatorLocalizationAsync(pxt.appTarget.id, config.commitCdnUrl, useLang, pxt.appTarget.versions.pxtCrowdinBranch, pxt.appTarget.versions.targetCrowdinBranch, live, force);
+        }).then(function (simStrings) {
             if (simStrings)
                 simulator.setTranslations(simStrings);
         });
@@ -4580,6 +4594,9 @@ var SettingsMenuItem = /** @class */ (function (_super) {
         pxt.tickEvent("menu.about");
         this.props.parent.about();
     };
+    SettingsMenuItem.prototype.print = function () {
+        this.props.parent.printCode();
+    };
     SettingsMenuItem.prototype.componentWillReceiveProps = function (nextProps) {
         var newState = {};
         if (nextProps.highContrast != undefined) {
@@ -4600,6 +4617,7 @@ var SettingsMenuItem = /** @class */ (function (_super) {
         return React.createElement(sui.DropdownMenuItem, { icon: 'setting large', title: lf("More..."), class: "more-dropdown-menuitem" },
             React.createElement(sui.Item, { role: "menuitem", icon: "options", text: lf("Project Settings"), onClick: function () { return _this.openSettings(); }, tabIndex: -1 }),
             packages ? React.createElement(sui.Item, { role: "menuitem", icon: "disk outline", text: lf("Extensions"), onClick: function () { return _this.addPackage(); }, tabIndex: -1 }) : undefined,
+            React.createElement(sui.Item, { role: "menuitem", icon: "print", text: lf("Print..."), onClick: function () { return _this.print(); }, tabIndex: -1 }),
             React.createElement(sui.Item, { role: "menuitem", icon: "trash", text: lf("Delete Project"), onClick: function () { return _this.removeProject(); }, tabIndex: -1 }),
             reportAbuse ? React.createElement(sui.Item, { role: "menuitem", icon: "warning circle", text: lf("Report Abuse..."), onClick: function () { return _this.showReportAbuse(); }, tabIndex: -1 }) : undefined,
             React.createElement("div", { className: "ui divider" }),
@@ -7418,11 +7436,11 @@ var LanguagePicker = /** @class */ (function (_super) {
         };
         return _this;
     }
-    LanguagePicker.prototype.fetchLanguages = function () {
-        if (!pxt.appTarget.appTheme.selectLanguage)
-            return undefined;
-        var targetConfig = this.getData("target-config:");
-        return targetConfig ? targetConfig.languages : undefined;
+    LanguagePicker.prototype.languageList = function () {
+        if (pxt.appTarget.appTheme.selectLanguage && pxt.appTarget.appTheme.availableLocales && pxt.appTarget.appTheme.availableLocales.length) {
+            return pxt.appTarget.appTheme.availableLocales;
+        }
+        return defaultLanguages;
     };
     LanguagePicker.prototype.changeLanguage = function (langId) {
         if (!allLanguages[langId]) {
@@ -7454,16 +7472,13 @@ var LanguagePicker = /** @class */ (function (_super) {
         if (!this.state.visible)
             return React.createElement("div", null);
         var targetTheme = pxt.appTarget.appTheme;
-        var fetchedLangs = this.fetchLanguages();
-        var languagesToShow = fetchedLangs && fetchedLangs.length ? fetchedLangs : defaultLanguages;
-        var modalSize = languagesToShow.length > 4 ? "large" : "small";
+        var languageList = this.languageList();
+        var modalSize = languageList.length > 4 ? "large" : "small";
         return (React.createElement(sui.Modal, { open: this.state.visible, header: lf("Select Language"), size: modalSize, onClose: function () { return _this.hide(); }, dimmer: true, closeIcon: true, allowResetFocus: true, closeOnDimmerClick: true, closeOnDocumentClick: true, closeOnEscape: true },
-            !fetchedLangs ?
-                React.createElement("div", { className: "ui message info" }, lf("loading...")) : undefined,
-            fetchedLangs ? React.createElement("div", { className: "group" },
-                React.createElement("div", { className: "ui cards centered", role: "listbox" }, languagesToShow.map(function (langId) {
+            React.createElement("div", { className: "group" },
+                React.createElement("div", { className: "ui cards centered", role: "listbox" }, languageList.map(function (langId) {
                     return React.createElement(codecard.CodeCardView, { className: "card-selected focused", key: langId, name: allLanguages[langId].localizedName, ariaLabel: allLanguages[langId].englishName, role: "option", description: allLanguages[langId].englishName, onClick: function () { return _this.changeLanguage(langId); } });
-                }))) : undefined,
+                }))),
             React.createElement("p", null,
                 React.createElement("br", null),
                 React.createElement("br", null),

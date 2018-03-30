@@ -80,6 +80,9 @@ var pxt;
         analytics.enableCookies = enableCookies;
     })(analytics = pxt.analytics || (pxt.analytics = {}));
 })(pxt || (pxt = {}));
+var pxt;
+(function (pxt) {
+})(pxt || (pxt = {}));
 // Needs to be in its own file to avoid a circular dependency: util.ts -> main.ts -> util.ts
 var pxt;
 (function (pxt) {
@@ -89,6 +92,7 @@ var pxt;
     pxt.tickEvent = function (id) { };
 })(pxt || (pxt = {}));
 /// <reference path="tickEvent.ts" />
+/// <reference path="apptarget.ts"/>
 var ts;
 (function (ts) {
     var pxtc;
@@ -986,9 +990,14 @@ var pxtc = ts.pxtc;
                     code = code.split("-")[0];
                 return code;
             }
-            function updateLocalizationAsync(targetId, simulator, baseUrl, code, pxtBranch, targetBranch, live) {
+            function isLocaleEnabled(code) {
                 code = normalizeLanguageCode(code);
-                if (code === _localizeLang)
+                return pxt.appTarget.appTheme && pxt.appTarget.appTheme.availableLocales && pxt.appTarget.appTheme.availableLocales.indexOf(code) > -1;
+            }
+            Util.isLocaleEnabled = isLocaleEnabled;
+            function updateLocalizationAsync(targetId, simulator, baseUrl, code, pxtBranch, targetBranch, live, force) {
+                code = normalizeLanguageCode(code);
+                if (code === _localizeLang || (!isLocaleEnabled(code) && !force))
                     return Promise.resolve();
                 return downloadTranslationsAsync(targetId, simulator, baseUrl, code, pxtBranch, targetBranch, live)
                     .then(function (translations) {
@@ -1003,9 +1012,9 @@ var pxtc = ts.pxtc;
                 });
             }
             Util.updateLocalizationAsync = updateLocalizationAsync;
-            function downloadSimulatorLocalizationAsync(targetId, baseUrl, code, pxtBranch, targetBranch, live) {
+            function downloadSimulatorLocalizationAsync(targetId, baseUrl, code, pxtBranch, targetBranch, live, force) {
                 code = normalizeLanguageCode(code);
-                if (code === _localizeLang)
+                if (code === _localizeLang || (!isLocaleEnabled(code) && !force))
                     return Promise.resolve(undefined);
                 return downloadTranslationsAsync(targetId, true, baseUrl, code, pxtBranch, targetBranch, live);
             }
@@ -1448,6 +1457,7 @@ var pxtc = ts.pxtc;
 /// <reference path="../localtypings/pxtparts.d.ts"/>
 /// <reference path="../localtypings/pxtarget.d.ts"/>
 /// <reference path="util.ts"/>
+/// <reference path="apptarget.ts"/>
 /// <reference path="tickEvent.ts"/>
 var pxt;
 (function (pxt) {

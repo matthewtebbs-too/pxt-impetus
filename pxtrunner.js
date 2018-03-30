@@ -180,7 +180,7 @@ var pxt;
             var images = cdn + "images";
             var $h = $('<div class="ui bottom attached tabular icon small compact menu hideprint">'
                 + ' <div class="right icon menu"></div></div>');
-            var $c = $('<div class="ui top attached segment"></div>');
+            var $c = $('<div class="ui top attached segment nobreak"></div>');
             var $menu = $h.find('.right.menu');
             var theme = pxt.appTarget.appTheme || {};
             if (woptions.showEdit && !theme.hideDocsEdit) {
@@ -361,6 +361,37 @@ var pxt;
                 var segment = $('<div class="ui segment"/>').append(s);
                 c.replaceWith(segment);
             }, { package: options.package, snippetMode: true, aspectRatio: options.blocksAspectRatio });
+        }
+        function renderBlocksXmlAsync(opts) {
+            if (!opts.blocksXmlClass)
+                return Promise.resolve();
+            var cls = opts.blocksXmlClass;
+            function renderNextXmlAsync(cls, render, options) {
+                var $el = $("." + cls).first();
+                if (!$el[0])
+                    return Promise.resolve();
+                if (!options.emPixels)
+                    options.emPixels = 14;
+                return pxt.runner.compileBlocksAsync($el.text(), options)
+                    .then(function (r) {
+                    try {
+                        render($el, r);
+                    }
+                    catch (e) {
+                        console.error('error while rendering ' + $el.html());
+                        $el.append($('<div/>').addClass("ui segment warning").text(e.message));
+                    }
+                    $el.removeClass(cls);
+                    return Promise.delay(1, renderNextXmlAsync(cls, render, options));
+                });
+            }
+            return renderNextXmlAsync(cls, function (c, r) {
+                var s = r.blocksSvg;
+                if (opts.snippetReplaceParent)
+                    c = c.parent();
+                var segment = $('<div class="ui segment"/>').append(s);
+                c.replaceWith(segment);
+            }, { package: opts.package, snippetMode: true, aspectRatio: opts.blocksAspectRatio });
         }
         function renderNamespaces(options) {
             if (pxt.appTarget.id == "core")
@@ -741,6 +772,7 @@ var pxt;
                 .then(function () { return renderNextCodeCardAsync(options.codeCardClass, options); })
                 .then(function () { return renderSnippetsAsync(options); })
                 .then(function () { return renderBlocksAsync(options); })
+                .then(function () { return renderBlocksXmlAsync(options); })
                 .then(function () { return renderProjectAsync(options); });
         }
         runner.renderAsync = renderAsync;
@@ -873,13 +905,14 @@ var pxt;
             pxt.setAppTarget(window.pxtTargetBundle);
             pxt.Util.assert(!!pxt.appTarget);
             var cookieValue = /PXT_LANG=(.*?)(?:;|$)/.exec(document.cookie);
-            var mlang = /(live)?lang=([a-z]{2,}(-[A-Z]+)?)/i.exec(window.location.href);
-            var lang = mlang ? mlang[2] : (cookieValue && cookieValue[1] || pxt.appTarget.appTheme.defaultLocale || navigator.userLanguage || navigator.language);
+            var mlang = /(live)?(force)?lang=([a-z]{2,}(-[A-Z]+)?)/i.exec(window.location.href);
+            var lang = mlang ? mlang[3] : (cookieValue && cookieValue[1] || pxt.appTarget.appTheme.defaultLocale || navigator.userLanguage || navigator.language);
             var live = !pxt.appTarget.appTheme.disableLiveTranslations || (mlang && !!mlang[1]);
+            var force = !!mlang && !!mlang[2];
             var versions = pxt.appTarget.versions;
             patchSemantic();
             var cfg = pxt.webConfig;
-            return pxt.Util.updateLocalizationAsync(pxt.appTarget.id, true, cfg.commitCdnUrl, lang, versions ? versions.pxtCrowdinBranch : "", versions ? versions.targetCrowdinBranch : "", live)
+            return pxt.Util.updateLocalizationAsync(pxt.appTarget.id, true, cfg.commitCdnUrl, lang, versions ? versions.pxtCrowdinBranch : "", versions ? versions.targetCrowdinBranch : "", live, force)
                 .then(function () {
                 runner.mainPkg = new pxt.MainPackage(new Host());
             });
@@ -1123,6 +1156,10 @@ var pxt;
                 Promise.delay(100) // allow UI to update
                     .then(function () {
                     switch (doctype) {
+                        case "project":
+                            return renderProjectFilesAsync(content, JSON.parse(src));
+                        case "projectid":
+                            return renderProjectAsync(content, JSON.parse(src));
                         case "doc":
                             return renderDocAsync(content, src);
                         case "tutorial":
@@ -1155,7 +1192,7 @@ var pxt;
                     .done(function () { });
             }
             function renderHash() {
-                var m = /^#(doc|md|tutorial|book):([^&?:]+)(:([^&?:]+):([^&?:]+))?/i.exec(window.location.hash);
+                var m = /^#(doc|md|tutorial|book|project|projectid):([^&?:]+)(:([^&?:]+):([^&?:]+))?/i.exec(window.location.hash);
                 if (m) {
                     // navigation occured
                     var p = m[4] ? setEditorContextAsync(/^blocks$/.test(m[4]) ? LanguageMode.Blocks : LanguageMode.TypeScript, m[5]) : Promise.resolve();
@@ -1178,12 +1215,40 @@ var pxt;
             if (template === void 0) { template = "blocks"; }
             return pxt.Cloud.privateGetTextAsync(projectid + "/text")
                 .then(function (txt) { return JSON.parse(txt); })
-                .then(function (files) {
-                var md = "```" + template + "\n" + files["main.ts"] + "\n```";
-                return renderMarkdownAsync(content, md);
-            });
+                .then(function (files) { return renderProjectFilesAsync(content, files, projectid, template); });
         }
         runner.renderProjectAsync = renderProjectAsync;
+        function renderProjectFilesAsync(content, files, projectid, template) {
+            if (projectid === void 0) { projectid = null; }
+            if (template === void 0) { template = "blocks"; }
+            var cfg = (JSON.parse(files[pxt.CONFIG_NAME]) || {});
+            var md = "# " + cfg.name + " " + (cfg.version ? cfg.version : '') + "\n\n";
+            if (projectid)
+                md += "* " + (pxt.appTarget.appTheme.shareUrl || "https://makecode.com/") + projectid + "\n\n";
+            else
+                md += "* " + pxt.appTarget.appTheme.homeUrl + "\n\n";
+            var readme = "README.md";
+            if (files[readme])
+                md += files[readme].replace(/^#+/, "$0#") + '\n'; // bump all headers down 1
+            cfg.files.filter(function (f) { return f != pxt.CONFIG_NAME && f != readme; })
+                .forEach(function (f) {
+                md += "\n## " + f + "\n";
+                if (/\.ts$/.test(f)) {
+                    md += "```typescript\n" + files[f] + "\n```\n";
+                }
+                else if (/\.blocks?$/.test(f)) {
+                    md += "```blocksxml\n" + files[f] + "\n```\n";
+                }
+                else {
+                    md += "```" + f.substr(f.indexOf('.')) + "\n" + files[f] + "\n```\n";
+                }
+            });
+            if (cfg && cfg.dependencies) {
+                md += "\n## Packages\n\n" + Object.keys(cfg.dependencies).map(function (k) { return "* " + k + ", " + cfg.dependencies[k]; }).join('\n') + "\n\n```package\n" + Object.keys(cfg.dependencies).map(function (k) { return k + "=" + cfg.dependencies[k]; }).join('\n') + "\n```\n";
+            }
+            return renderMarkdownAsync(content, md);
+        }
+        runner.renderProjectFilesAsync = renderProjectFilesAsync;
         function renderDocAsync(content, docid) {
             docid = docid.replace(/^\//, "");
             return pxt.Cloud.downloadMarkdownAsync(docid, runner.editorLocale, pxt.Util.localizeLive)
@@ -1244,6 +1309,7 @@ var pxt;
                 snippetClass: 'lang-blocks',
                 signatureClass: 'lang-sig',
                 blocksClass: 'lang-block',
+                blocksXmlClass: 'lang-blocksxml',
                 simulatorClass: 'lang-sim',
                 linksClass: 'lang-cards',
                 namespacesClass: 'lang-namespaces',
@@ -1409,6 +1475,28 @@ var pxt;
             });
         }
         runner.decompileToBlocksAsync = decompileToBlocksAsync;
+        function compileBlocksAsync(code, options) {
+            var packageid = options && options.packageId ? "pub:" + options.packageId :
+                options && options.package ? "docs:" + options.package
+                    : null;
+            return loadPackageAsync(packageid, "")
+                .then(function () { return getCompileOptionsAsync(pxt.appTarget.compile ? pxt.appTarget.compile.hasHex : false); })
+                .then(function (opts) {
+                opts.ast = true;
+                var resp = pxtc.compile(opts);
+                var apis = pxtc.getApiInfo(opts, resp.ast);
+                return ts.pxtc.localizeApisAsync(apis, runner.mainPkg)
+                    .then(function () {
+                    var blocksInfo = pxtc.getBlocksInfo(apis);
+                    pxt.blocks.initBlocks(blocksInfo);
+                    return {
+                        package: runner.mainPkg,
+                        blocksSvg: pxt.blocks.render(code, options)
+                    };
+                });
+            });
+        }
+        runner.compileBlocksAsync = compileBlocksAsync;
         var pendingLocalToken = [];
         function waitForLocalTokenAsync() {
             if (pxt.Cloud.localToken) {
