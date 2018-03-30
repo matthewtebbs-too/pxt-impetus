@@ -50,6 +50,32 @@ namespace pxsim {
         private _btmotionstate: Ammo.btMotionState;
         private _btinfo: Ammo.btRigidBodyConstructionInfo;
 
+        public get isStatic(): boolean {
+            return this._btbody.isStaticObject();
+        }
+
+        public set isStatic(isStatic: boolean) {
+            this._toggleCollisionFlag(Ammo.CollisionFlags.CF_STATIC_OBJECT, isStatic);
+        }
+
+        public get isKinematic(): boolean {
+            return this._btbody.isKinematicObject();
+        }
+
+        public set isKinematic(isKinematic: boolean) {
+            this._toggleCollisionFlag(Ammo.CollisionFlags.CF_KINEMATIC_OBJECT, isKinematic);
+
+            this._btbody.setActivationState(isKinematic ? Ammo.ActivationState.DISABLE_DEACTIVATION : Ammo.ActivationState.ACTIVE_TAG);
+
+            if (!isKinematic) {
+                this._btbody.activate();
+            }
+
+            if (this._world) {
+                this.addRigidBody(this._world); /* will re-add */
+            }
+        }
+
         constructor(
             object3d: GenericObject3d,
             shape3d: GenericShape3d,
@@ -79,28 +105,10 @@ namespace pxsim {
             this._btmotionstate = btmotionstate;
             this._btinfo = btinfo;
 
-            this.setStaticObject(!isDynamic);
-            this.setKinematicObject(isDynamic);
+            this.isStatic = !isDynamic;
+            this.isKinematic = isDynamic;
 
             this._object3d = object3d;
-        }
-
-        public setStaticObject(isStatic: boolean) {
-            this._toggleCollisionFlag(Ammo.CollisionFlags.CF_STATIC_OBJECT, isStatic);
-        }
-
-        public setKinematicObject(isKinematic: boolean) {
-            this._toggleCollisionFlag(Ammo.CollisionFlags.CF_KINEMATIC_OBJECT, isKinematic);
-
-            this._btbody.setActivationState(isKinematic ? Ammo.ActivationState.DISABLE_DEACTIVATION : Ammo.ActivationState.ACTIVE_TAG);
-
-            if (!isKinematic) {
-                this._btbody.activate();
-            }
-
-            if (this._world) {
-                this.addRigidBody(this._world); /* will re-add */
-            }
         }
 
         public addRigidBody(world: PhysicsWorld) {

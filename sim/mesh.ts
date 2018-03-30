@@ -20,6 +20,16 @@ namespace pxsim {
             return this._material;
         }
 
+        public get physicsEnabled(): boolean {
+            return this._rigidbody ? !this._rigidbody.isKinematic : false;
+        }
+
+        public set physicsEnabled(enable: boolean) {
+            if (this._rigidbody) {
+                this._rigidbody.isKinematic = !enable;
+            }
+        }
+
         constructor(
             shape3d: GenericShape3d,
             material: Material,
@@ -33,10 +43,8 @@ namespace pxsim {
             this._rigidbody = new RigidBody(this, this.shape3d, this.shape3d.volume * this.material.density);
         }
 
-        public enablePhysics(enable: boolean) {
-            if (this._rigidbody) {
-                this._rigidbody.setKinematicObject(!enable);
-            }
+        public setPhysicsEnabled(enabled: boolean) {
+            this.physicsEnabled = enabled;
         }
 
         public animate(timeStep: number) {

@@ -10,13 +10,13 @@ Watch the spheres fall!
         if (count > 0) {
             boxmesh = object3d.mesh(sphereshape, material.ofColor(design.colorRandom()))
             world3d.scene().add(boxmesh, math.vector(0, 40, 0))
-            boxmesh.enablePhysics(true)
+            boxmesh.setPhysicsEnabled(true)
             count += -1
         }
     })
     count = 200
-    world3d.scene().add(light.directional(design.colorPicker(Palette.white), 1), math.vector(0, 10, 0))
-    world3d.scene().add(object3d.mesh(design.plane(100, 100), material.ofColor(design.colorPicker(Palette.white))), world3d.origin())
+    world3d.scene().add(light.directional(design.colorPicker(0xffffff), 1), math.vector(0, 10, 0))
+    world3d.scene().add(object3d.mesh(design.plane(100, 100), material.ofColor(design.colorPicker(0xffffff))), world3d.origin())
     sphereshape = design.sphere(2)
 ```
 

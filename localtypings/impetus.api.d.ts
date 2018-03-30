@@ -248,7 +248,7 @@ declare namespace design { /* paint-brush icon */
 
     /**
      * Pick color from slider.
-     * @param color color, eg: Palette.white
+     * @param color color, eg: 0xffffff
      */
     //% blockId=color_wheel
     //% block="%color"
@@ -384,13 +384,13 @@ declare namespace camera { /* camera icon */
 declare class Mesh extends Object3D {
     /**
      * Enable/disable physics.
-     * @param color Color
+     * @param enabled is physics, e.g. gravity, enabled on this object?
      */
     //% blockId=enable_physics blockNamespace=scene
-    //% block="enable %mesh physics %enable=toggleOnOff"
+    //% block="set %mesh physics %enabled=toggleOnOff"
     //% group="Mesh"
-    //% shim=.enablePhysics
-    public enablePhysics(enable: boolean): void;
+    //% shim=.setPhysicsEnabled
+    public setPhysicsEnabled(enabled: boolean): boolean;
 }
 
 //%
