@@ -1,6 +1,6 @@
-editor/gh-pages
-node_modules
 built
+gh-pages
+node_modules
 projects
 temp
 tmp
