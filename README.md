@@ -6,7 +6,7 @@ The editor is hosted on the GitHub pages [here](http://muddytummy.github.io/pxt-
 
 ## Latest Release Notes
 
-- Enabled physics.
+_No formal releses yet._
 
 ## Open Source Software Usage and Licenses
 
