@@ -38,8 +38,9 @@ namespace pxsim {
     }
 
     export class RigidBody extends rt.ObjectDisposable {
-        public static minMass = 0;
-        public static maxMass = 100;
+        private static _minMass = 0;
+        private static _maxMass = 100;
+        private static _defaultFriction = .75;
 
         private _world: PhysicsWorld | null = null;
 
@@ -83,7 +84,7 @@ namespace pxsim {
         ) {
             super();
 
-            mass = Math.max(RigidBody.minMass, Math.min(RigidBody.maxMass, mass));
+            mass = Math.max(RigidBody._minMass, Math.min(RigidBody._maxMass, mass));
 
             const isDynamic = mass !== 0;
 
@@ -104,6 +105,8 @@ namespace pxsim {
             this._btshape = btshape;
             this._btmotionstate = btmotionstate;
             this._btinfo = btinfo;
+
+            this._btbody.setFriction(RigidBody._defaultFriction);
 
             this.isStatic = !isDynamic;
             this.isKinematic = isDynamic;
