@@ -30,7 +30,6 @@
     "docs/**",
     "sim/public"
   ],
-  "scripts": {},
   "dependencies": {
     "@types/es6-shim": "0.31.36",
     "es6-shim": "0.35.3",
@@ -55,5 +54,9 @@
   "engines": {
     "node": ">=8.0.0",
     "npm": ">=5.0.0"
+  },
+  "scripts": {
+    "start": "pxt serve",
+    "install": "pxt staticpkg --githubpages"
   }
 }
