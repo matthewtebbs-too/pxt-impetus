@@ -318,9 +318,8 @@ export abstract class btActionInterface {
 }
 
 export abstract class btDynamicsWorld extends btCollisionWorld {
-    public getGravity(): btVector3;
-    public setGravity(gravity: btVector3): void;
-
+    public getSolverInfo(): btContactSolverInfo;
+    
     public addAction(action: btActionInterface): void;
     public removeAction(action: btActionInterface): void;
 }
@@ -332,6 +331,9 @@ export class btDiscreteDynamicsWorld extends btDynamicsWorld {
         constraintsolver: btConstraintSolver,
         collisionconfig: btCollisionConfiguration
     );
+
+    public getGravity(): btVector3;
+    public setGravity(gravity: btVector3): void;
 
     public addRigidBody(body: btRigidBody): void;
     public addRigidBody(body: btRigidBody, group: number, mask: number): void;

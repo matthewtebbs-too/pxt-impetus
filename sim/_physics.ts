@@ -8,6 +8,10 @@
 
 namespace pxsim {
     export class PhysicsWorld /* rigid body physics */ extends rt.ObjectDisposable {
+        private static _numIterationsSolver = 4;
+        private static _maxStepSimulation = 3;      /* min 20 fps */
+        private static _fixedTimeStep = 1 / 60;     /* normal 60 fps */
+
         private _btconfig: Ammo.btDefaultCollisionConfiguration;
         private _btdispatcher: Ammo.btCollisionDispatcher;
         private _btbroadphase: Ammo.btDbvtBroadphase;
@@ -28,6 +32,8 @@ namespace pxsim {
             this._btconstraintsolver = new Ammo.btSequentialImpulseConstraintSolver();
 
             this._btworld = new Ammo.btDiscreteDynamicsWorld(this._btdispatcher, this._btbroadphase, this._btconstraintsolver, this._btconfig);
+
+            this._btworld.getSolverInfo().m_numIterations = PhysicsWorld._numIterationsSolver;
         }
 
         public getGravity(): number {
@@ -43,7 +49,7 @@ namespace pxsim {
         }
 
         public animate(timeStep: number) {
-            this._btworld.stepSimulation(timeStep, 10);
+            this._btworld.stepSimulation(timeStep, PhysicsWorld._maxStepSimulation, PhysicsWorld._fixedTimeStep);
         }
 
         protected _onDispose() {
