@@ -2223,7 +2223,7 @@ var pxt;
             return b ? b.fn : undefined;
         }
         blocks_6.blockSymbol = blockSymbol;
-        function createShadowValue(p, shadowId, defaultV) {
+        function createShadowValue(info, p, shadowId, defaultV) {
             defaultV = defaultV || p.defaultValue;
             shadowId = shadowId || p.shadowBlockId;
             var defaultValue;
@@ -2246,7 +2246,7 @@ var pxt;
             var typeInfo = typeDefaults[p.type];
             shadow.setAttribute("type", shadowId || typeInfo && typeInfo.block || p.type);
             shadow.setAttribute("colour", Blockly.Colours.textField);
-            if (typeInfo) {
+            if (typeInfo && (!shadowId || typeInfo.block === shadowId)) {
                 var field = document.createElement("field");
                 shadow.appendChild(field);
                 var fieldName = void 0;
@@ -2271,11 +2271,25 @@ var pxt;
                 }
                 field.appendChild(value_1);
             }
-            else if (isVariable && defaultValue) {
+            else if (defaultValue) {
                 var field = document.createElement("field");
-                shadow.appendChild(field);
-                field.setAttribute("name", "VAR");
                 field.textContent = defaultValue;
+                if (isVariable) {
+                    field.setAttribute("name", "VAR");
+                    shadow.appendChild(field);
+                }
+                else if (shadowId) {
+                    var shadowInfo = info.blocksById[shadowId];
+                    if (shadowInfo && shadowInfo.attributes._def && shadowInfo.attributes._def.parameters.length) {
+                        var shadowParam = shadowInfo.attributes._def.parameters[0];
+                        field.setAttribute("name", shadowParam.name);
+                        shadow.appendChild(field);
+                    }
+                }
+                else {
+                    field.setAttribute("name", p.definitionName);
+                    shadow.appendChild(field);
+                }
             }
             return value;
         }
@@ -2291,7 +2305,7 @@ var pxt;
                 block.setAttribute("gap", pxt.appTarget.appTheme.defaultBlockGap.toString());
             if (comp.thisParameter) {
                 var t = comp.thisParameter;
-                block.appendChild(createShadowValue(t, t.shadowBlockId || "variables_get", t.defaultValue || t.definitionName));
+                block.appendChild(createShadowValue(info, t, t.shadowBlockId || "variables_get", t.defaultValue || t.definitionName));
             }
             if (fn.parameters) {
                 comp.parameters.filter(function (pr) { return !pr.isOptional &&
@@ -2300,7 +2314,7 @@ var pxt;
                     var shadowValue;
                     var container;
                     if (pr.range) {
-                        shadowValue = createShadowValue(pr, "math_number_minmax");
+                        shadowValue = createShadowValue(info, pr, "math_number_minmax");
                         container = document.createElement('mutation');
                         container.setAttribute('min', pr.range.min.toString());
                         container.setAttribute('max', pr.range.max.toString());
@@ -2313,7 +2327,7 @@ var pxt;
                         }
                     }
                     else {
-                        shadowValue = createShadowValue(pr);
+                        shadowValue = createShadowValue(info, pr);
                     }
                     if (pr.fieldOptions) {
                         if (!container)

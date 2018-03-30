@@ -7,7 +7,7 @@
     "workerjs": "/pxt-Impetus/worker.js",
     "tdworkerjs": "/pxt-Impetus/tdworker.js",
     "monacoworkerjs": "/pxt-Impetus/monacoworker.js",
-    "pxtVersion": "3.6.3",
+    "pxtVersion": "3.8.1",
     "pxtRelId": "",
     "pxtCdnUrl": "/pxt-Impetus/",
     "commitCdnUrl": "/pxt-Impetus/",

@@ -2066,7 +2066,10 @@ var pxsim;
         }
     }
     function reload() {
-        pxsim.Runtime.postMessage({ type: "simulator", command: "reload" });
+        // Continuously send message just in case the editor isn't ready to handle it yet
+        setInterval(function () {
+            pxsim.Runtime.postMessage({ type: "simulator", command: "reload" });
+        }, 500);
     }
     pxsim.reload = reload;
 })(pxsim || (pxsim = {}));

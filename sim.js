@@ -85,6 +85,7 @@ var pxsim;
         __extends(Object3d, _super);
         function Object3d(reference, id) {
             var _this = _super.call(this, reference, id) || this;
+            _this._rigidbody = null;
             _this.reference.name = _this.id;
             _this.reference.userData = __assign({}, _this.reference.userData, { outer: _this });
             if (undefined !== _this.reference.castShadow) {
@@ -98,8 +99,6 @@ var pxsim;
         Object3d.prototype.lookAt = function (position) {
             this.reference.lookAt(position);
         };
-        Object3d.prototype.resize = function (width, height) {
-        };
         Object3d.prototype.setPosition = function (position) {
             this.reference.position.set(position.x, position.y, position.z);
         };
@@ -112,6 +111,11 @@ var pxsim;
         Object3d.prototype.setRotationFromAxisAngle = function (axis, angle) {
             this.reference.setRotationFromAxisAngle(axis, THREE.Math.degToRad(angle));
         };
+        Object3d.prototype.setPhysicsEnabled = function (enable) {
+            if (this._rigidbody) {
+                this._rigidbody.isKinematic = !enable;
+            }
+        };
         Object3d.prototype.animate = function (timeStep) {
             this.reference.children.forEach(function (reference) {
                 var outer = outerObject(reference);
@@ -119,10 +123,22 @@ var pxsim;
                     outer.animate(timeStep);
                 }
             });
+            if (this._rigidbody) {
+                this._rigidbody.syncMotionStateToObject3D();
+            }
         };
         Object3d.prototype.onAdded = function (scene) {
+            if (this._rigidbody) {
+                this._rigidbody.addRigidBody(scene.physicsWorld);
+            }
         };
         Object3d.prototype.onRemoved = function (scene) {
+            if (this._rigidbody) {
+                this._rigidbody.removeRigidBody(scene.physicsWorld);
+            }
+        };
+        Object3d.prototype._constructRigidBody = function () {
+            return null;
         };
         Object3d.prototype._onDispose = function () {
             this.reference.children.forEach(function (reference) {
@@ -131,6 +147,9 @@ var pxsim;
                     outer.dispose();
                 }
             });
+            if (this._rigidbody) {
+                this._rigidbody.dispose();
+            }
             this.reference.userData = __assign({}, this.reference.userData, { outer: null });
         };
         return Object3d;
@@ -148,6 +167,8 @@ var pxsim;
         function Camera() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
+        Camera.prototype.setSize = function (width, height) {
+        };
         return Camera;
     }(pxsim.Object3d));
     pxsim.Camera = Camera;
@@ -161,8 +182,8 @@ var pxsim;
             _this = _super.call(this, new THREE.PerspectiveCamera(fov, 1, near, far), id) || this;
             return _this;
         }
-        PerspectiveCamera.prototype.resize = function (width, height) {
-            _super.prototype.resize.call(this, width, height);
+        PerspectiveCamera.prototype.setSize = function (width, height) {
+            _super.prototype.setSize.call(this, width, height);
             this.reference.aspect = width / height;
             this.reference.updateProjectionMatrix();
         };
@@ -450,7 +471,6 @@ var pxsim;
         __extends(Mesh, _super);
         function Mesh(shape3d, material, id) {
             var _this = _super.call(this, new THREE.Mesh(shape3d.reference, material.reference), id) || this;
-            _this._rigidbody = null;
             _this._shape3d = shape3d;
             _this._material = material;
             _this._rigidbody = new pxsim.RigidBody(_this, _this.shape3d, _this.shape3d.volume * _this.material.density);
@@ -470,56 +490,17 @@ var pxsim;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Mesh.prototype, "physicsEnabled", {
-            get: function () {
-                return this._rigidbody ? !this._rigidbody.isKinematic : false;
-            },
-            set: function (enable) {
-                if (this._rigidbody) {
-                    this._rigidbody.isKinematic = !enable;
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Mesh.prototype.setPhysicsEnabled = function (enabled) {
-            this.physicsEnabled = enabled;
-        };
-        Mesh.prototype.animate = function (timeStep) {
-            _super.prototype.animate.call(this, timeStep);
-            if (this._rigidbody) {
-                this._rigidbody.syncMotionStateToObject3D();
-            }
-        };
-        Mesh.prototype.onAdded = function (scene) {
-            _super.prototype.onAdded.call(this, scene);
-            if (this._rigidbody) {
-                this._rigidbody.addRigidBody(scene.physicsWorld);
-            }
-        };
-        Mesh.prototype.onRemoved = function (scene) {
-            if (this._rigidbody) {
-                this._rigidbody.removeRigidBody(scene.physicsWorld);
-            }
-            _super.prototype.onRemoved.call(this, scene);
-        };
-        Mesh.prototype._onDispose = function () {
-            if (this._rigidbody) {
-                this._rigidbody.dispose();
-            }
-            _super.prototype._onDispose.call(this);
-        };
         return Mesh;
     }(pxsim.Object3d));
     pxsim.Mesh = Mesh;
 })(pxsim || (pxsim = {}));
 (function (pxsim) {
     var mesh;
-    (function (mesh_1) {
-        function mesh(shape3d, material) {
+    (function (mesh) {
+        function from3dShape(shape3d, material) {
             return new pxsim.Mesh(shape3d, material);
         }
-        mesh_1.mesh = mesh;
+        mesh.from3dShape = from3dShape;
     })(mesh = pxsim.mesh || (pxsim.mesh = {}));
 })(pxsim || (pxsim = {}));
 var pxsim;
@@ -931,6 +912,7 @@ var pxsim;
             _this._btbroadphase = new Ammo.btDbvtBroadphase();
             _this._btconstraintsolver = new Ammo.btSequentialImpulseConstraintSolver();
             _this._btworld = new Ammo.btDiscreteDynamicsWorld(_this._btdispatcher, _this._btbroadphase, _this._btconstraintsolver, _this._btconfig);
+            _this._btworld.getSolverInfo().m_numIterations = PhysicsWorld._numIterationsSolver;
             return _this;
         }
         Object.defineProperty(PhysicsWorld.prototype, "btWorld", {
@@ -949,7 +931,7 @@ var pxsim;
             pxsim.Helper.safeAmmoObjectDestroy(btvecGravity);
         };
         PhysicsWorld.prototype.animate = function (timeStep) {
-            this._btworld.stepSimulation(timeStep, 10);
+            this._btworld.stepSimulation(timeStep, PhysicsWorld._maxStepSimulation, PhysicsWorld._fixedTimeStep);
         };
         PhysicsWorld.prototype._onDispose = function () {
             pxsim.Helper.safeAmmoObjectDestroy(this._btworld);
@@ -958,6 +940,9 @@ var pxsim;
             pxsim.Helper.safeAmmoObjectDestroy(this._btdispatcher);
             pxsim.Helper.safeAmmoObjectDestroy(this._btconfig);
         };
+        PhysicsWorld._numIterationsSolver = 4;
+        PhysicsWorld._maxStepSimulation = 3;
+        PhysicsWorld._fixedTimeStep = 1 / 60;
         return PhysicsWorld;
     }(rt.ObjectDisposable));
     pxsim.PhysicsWorld = PhysicsWorld;
@@ -1057,7 +1042,7 @@ var pxsim;
         Renderer.prototype._resizeCamera = function () {
             if (this._camera) {
                 var size = this.reference.getSize();
-                this._camera.resize(size.width, size.height);
+                this._camera.setSize(size.width, size.height);
             }
         };
         Renderer.prototype._runRenderLoop = function () {
@@ -1116,7 +1101,7 @@ var pxsim;
         function RigidBody(object3d, shape3d, mass) {
             var _this = _super.call(this) || this;
             _this._world = null;
-            mass = Math.max(RigidBody.minMass, Math.min(RigidBody.maxMass, mass));
+            mass = Math.max(RigidBody._minMass, Math.min(RigidBody._maxMass, mass));
             var isDynamic = mass !== 0;
             var btmotionstate = new Ammo.btDefaultMotionState();
             var btshape = shape3d.createCollisionShape();
@@ -1130,6 +1115,7 @@ var pxsim;
             _this._btshape = btshape;
             _this._btmotionstate = btmotionstate;
             _this._btinfo = btinfo;
+            _this._btbody.setFriction(RigidBody._defaultFriction);
             _this.isStatic = !isDynamic;
             _this.isKinematic = isDynamic;
             _this._object3d = object3d;
@@ -1197,8 +1183,9 @@ var pxsim;
             pxsim.Helper.safeAmmoObjectDestroy(this._btmotionstate);
             pxsim.Helper.safeAmmoObjectDestroy(this._btshape);
         };
-        RigidBody.minMass = 0;
-        RigidBody.maxMass = 100;
+        RigidBody._minMass = 0;
+        RigidBody._maxMass = 100;
+        RigidBody._defaultFriction = .75;
         return RigidBody;
     }(rt.ObjectDisposable));
     pxsim.RigidBody = RigidBody;
