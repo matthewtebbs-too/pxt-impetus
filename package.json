@@ -35,7 +35,7 @@
     "@types/es6-shim": "0.31.36",
     "es6-shim": "0.35.3",
     "object-hash": "1.3.0",
-    "pxt-core": "3.5.13",
+    "pxt-core": "3.6.1",
     "three": "0.91.0"
   },
   "main": "built/pxtrequire.js",
