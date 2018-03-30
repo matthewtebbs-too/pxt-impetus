@@ -8,6 +8,8 @@
 
 namespace pxsim {
     export abstract class Object3d<T extends THREE.Object3D> extends rt.WrappedObjectWithId<T> {
+        protected _rigidbody: RigidBody | null = null;
+
         constructor(reference: T, id?: rt.ObjId) {
             super(reference, id);
 
@@ -27,10 +29,6 @@ namespace pxsim {
             this.reference.lookAt(position);
         }
 
-        public resize(width: number, height: number) {
-            /* do nothing */
-        }
-
         public setPosition(position: Vector) {
             this.reference.position.set(position.x, position.y, position.z);
         }
@@ -47,6 +45,12 @@ namespace pxsim {
             this.reference.setRotationFromAxisAngle(axis, THREE.Math.degToRad(angle));
         }
 
+        public setPhysicsEnabled(enable: boolean) {
+            if (this._rigidbody) {
+                this._rigidbody.isKinematic = !enable;
+            }
+        }
+
         public animate(timeStep: number) {
             this.reference.children.forEach(reference => {
                 const outer = outerObject(reference);
@@ -54,14 +58,26 @@ namespace pxsim {
                     outer.animate(timeStep);
                 }
             });
+
+            if (this._rigidbody) {
+                this._rigidbody!.syncMotionStateToObject3D();
+            }
         }
 
         public onAdded(scene: GenericScene) {
-            /* do nothing */
+            if (this._rigidbody) {
+                this._rigidbody.addRigidBody(scene.physicsWorld);
+            }
         }
 
         public onRemoved(scene: GenericScene) {
-            /* do nothing */
+            if (this._rigidbody) {
+                this._rigidbody.removeRigidBody(scene.physicsWorld);
+            }
+        }
+
+        protected _constructRigidBody(): RigidBody | null {
+            return null;
         }
 
         protected _onDispose() {
@@ -71,6 +87,10 @@ namespace pxsim {
                     outer.dispose();
                 }
             });
+
+            if (this._rigidbody) {
+                this._rigidbody.dispose();
+            }
 
             this.reference.userData = {...this.reference.userData, outer: null};
         }

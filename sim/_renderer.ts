@@ -104,7 +104,7 @@ namespace pxsim {
         private _resizeCamera() {
             if (this._camera) {
                 const size = this.reference.getSize();
-                this._camera.resize(size.width, size.height);
+                this._camera.setSize(size.width, size.height);
             }
         }
 

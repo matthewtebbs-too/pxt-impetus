@@ -190,6 +190,15 @@ declare class Object3D {
     //% block="set %object3d rotation|around %axis=math_vector|by %angle"
     //% shim=.setRotationFromAxisAngle
     public setRotationFromAxisAngle(axis: Vector, angle: number): void;
+
+    /**
+     * Enable/disable physics.
+     * @param enabled is physics, e.g. gravity, enabled on this object?
+     */
+    //% blockId=enable_physics blockNamespace=scene
+    //% block="set %object physics %enabled=toggleOnOff"
+    //% shim=.setPhysicsEnabled
+    public setPhysicsEnabled(enabled: boolean): void;
 }
 
 //%
@@ -328,15 +337,19 @@ declare namespace design { /* paint-brush icon */
     function cone(radius?: number, height?: number): Shape3d;
 }
 
+//%
+declare class Mesh extends Object3D {
+}
+
 //% color="#2626d9" icon="\uf1b2" block="3D Object" weight=99
 declare namespace object3d { /* cube icon */
     /**
      * Create object with shape.
      */
-    //% blockId=mesh
+    //% blockId=object3d_from_shape3d
     //% block="object with shape %shape=shape3d_box|and material %material=material_with_color"
-    //% shim=mesh::mesh
-    function mesh(shape3d: Shape3d, material: Material): Mesh;
+    //% shim=mesh::from3dShape
+    function from3dShape(shape3d: Shape3d, material: Material): Mesh;
 }
 
 //%
@@ -381,26 +394,13 @@ declare namespace camera { /* camera icon */
 }
 
 //%
-declare class Mesh extends Object3D {
-    /**
-     * Enable/disable physics.
-     * @param enabled is physics, e.g. gravity, enabled on this object?
-     */
-    //% blockId=enable_physics blockNamespace=scene
-    //% block="set %mesh physics %enabled=toggleOnOff"
-    //% group="Mesh"
-    //% shim=.setPhysicsEnabled
-    public setPhysicsEnabled(enabled: boolean): void;
-}
-
-//%
 declare class Scene extends Object3D {
     /**
      * Set background color.
      * @param color Color
      */
     //% blockId=set_background_color blockNamespace=scene
-    //% block="set %current=world_current_scene|background %color=color_picker"
+    //% block="set %current=world_scene|background %color=color_picker"
     //% shim=.setBackgroundColor
     public setBackgroundColor(color: Color): void;
 
@@ -409,7 +409,7 @@ declare class Scene extends Object3D {
      * @param color Color
      */
     //% blockId=set_ambientlight_color blockNamespace=scene
-    //% block="set %current=world_current_scene|ambient light %color=color_picker"
+    //% block="set %current=world_scene|ambient light %color=color_picker"
     //% shim=.setAmbientLight
     public setAmbientLight(color: Color): void;
 
@@ -417,7 +417,7 @@ declare class Scene extends Object3D {
      * Add object to scene.
      */
     //% blockId=add_object blockNamespace=scene
-    //% block="add to %scene=world_current_scene %object3d|at %position=world_origin"
+    //% block="add to %scene=world_scene %object3d|at %position=world_origin"
     //% shim=.add
     public add(object3d: Object3D, position: Vector): void;
 
@@ -425,7 +425,7 @@ declare class Scene extends Object3D {
      * Remove object from scene.
      */
     //% blockId=remove_object blockNamespace=scene
-    //% block="remove from %scene=world_current_scene %object3d"
+    //% block="remove from %scene=world_scene %object3d"
     //% shim=.remove
     public remove(object3d: Object3D): void;
 }

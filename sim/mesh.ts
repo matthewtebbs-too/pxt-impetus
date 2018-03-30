@@ -10,7 +10,6 @@ namespace pxsim {
     export class Mesh extends Object3d<THREE.Mesh> {
         private _shape3d: GenericShape3d;
         private _material: Material;
-        private _rigidbody: RigidBody | null = null;
 
         public get shape3d() {
             return this._shape3d;
@@ -18,16 +17,6 @@ namespace pxsim {
 
         public get material() {
             return this._material;
-        }
-
-        public get physicsEnabled(): boolean {
-            return this._rigidbody ? !this._rigidbody.isKinematic : false;
-        }
-
-        public set physicsEnabled(enable: boolean) {
-            if (this._rigidbody) {
-                this._rigidbody.isKinematic = !enable;
-            }
         }
 
         constructor(
@@ -42,47 +31,11 @@ namespace pxsim {
 
             this._rigidbody = new RigidBody(this, this.shape3d, this.shape3d.volume * this.material.density);
         }
-
-        public setPhysicsEnabled(enabled: boolean) {
-            this.physicsEnabled = enabled;
-        }
-
-        public animate(timeStep: number) {
-            super.animate(timeStep);
-
-            if (this._rigidbody) {
-                this._rigidbody!.syncMotionStateToObject3D();
-            }
-        }
-
-        public onAdded(scene: GenericScene) {
-            super.onAdded(scene);
-
-            if (this._rigidbody) {
-                this._rigidbody.addRigidBody(scene.physicsWorld);
-            }
-        }
-
-        public onRemoved(scene: GenericScene) {
-            if (this._rigidbody) {
-                this._rigidbody.removeRigidBody(scene.physicsWorld);
-            }
-
-            super.onRemoved(scene);
-        }
-
-        protected _onDispose() {
-            if (this._rigidbody) {
-                this._rigidbody.dispose();
-            }
-
-            super._onDispose();
-        }
     }
 }
 
 namespace pxsim.mesh {
-    export function mesh(shape3d: GenericShape3d, material: Material): Mesh {
+    export function from3dShape(shape3d: GenericShape3d, material: Material): Mesh {
         return new Mesh(shape3d, material);
     }
 }

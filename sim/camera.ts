@@ -8,6 +8,9 @@
 
 namespace pxsim {
     export abstract class Camera<T extends THREE.Camera> extends Object3d<T> {
+        public setSize(width: number, height: number) {
+            /* do nothing */
+        }
     }
 
     export type GenericCamera = Camera<THREE.Camera>;
@@ -26,8 +29,8 @@ namespace pxsim {
             super(new THREE.PerspectiveCamera(fov, 1, near, far), id);
         }
 
-        public resize(width: number, height: number) {
-            super.resize(width, height);
+        public setSize(width: number, height: number) {
+            super.setSize(width, height);
 
             this.reference.aspect = width / height;
             this.reference.updateProjectionMatrix();
