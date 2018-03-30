@@ -7,13 +7,13 @@
 /// <reference path="object3d.ts"/>
 
 namespace pxsim {
-    export class Mesh extends Object3D<THREE.Mesh> {
-        private _geometry: GenericGeometry;
+    export class Mesh extends Object3d<THREE.Mesh> {
+        private _shape3d: GenericShape3d;
         private _material: Material;
         private _rigidbody: RigidBody | null = null;
 
-        public get geometry() {
-            return this._geometry;
+        public get shape3d() {
+            return this._shape3d;
         }
 
         public get material() {
@@ -21,16 +21,16 @@ namespace pxsim {
         }
 
         constructor(
-            geometry: GenericGeometry,
+            shape3d: GenericShape3d,
             material: Material,
             id?: rt.ObjId,
         ) {
-            super(new THREE.Mesh(geometry.reference, material.reference), id);
+            super(new THREE.Mesh(shape3d.reference, material.reference), id);
 
-            this._geometry = geometry;
+            this._shape3d = shape3d;
             this._material = material;
 
-            this._rigidbody = new RigidBody(this, this.geometry, this.geometry.volume * this.material.density);
+            this._rigidbody = new RigidBody(this, this.shape3d, this.shape3d.volume * this.material.density);
         }
 
         public enablePhysics(enable: boolean) {
@@ -47,7 +47,7 @@ namespace pxsim {
             }
         }
 
-        public onAdded(scene: Scene) {
+        public onAdded(scene: GenericScene) {
             super.onAdded(scene);
 
             if (this._rigidbody) {
@@ -55,7 +55,7 @@ namespace pxsim {
             }
         }
 
-        public onRemoved(scene: Scene) {
+        public onRemoved(scene: GenericScene) {
             if (this._rigidbody) {
                 this._rigidbody.removeRigidBody(scene.physicsWorld);
             }
@@ -71,14 +71,10 @@ namespace pxsim {
             super._onDispose();
         }
     }
-
-    export function isMesh(object: Mesh | any): object is Mesh {
-        return undefined !== (object as Mesh).geometry;
-    }
 }
 
 namespace pxsim.mesh {
-    export function mesh(geometry: GenericGeometry, material: Material): Mesh {
-        return new Mesh(geometry, material);
+    export function mesh(shape3d: GenericShape3d, material: Material): Mesh {
+        return new Mesh(shape3d, material);
     }
 }

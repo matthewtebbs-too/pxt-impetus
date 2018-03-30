@@ -23,10 +23,10 @@ namespace pxsim {
         private static _board: WorldBoard = new WorldBoard();
         private static _events: EventBus;
 
-        private _world: World3D | null = null;
+        private _world3d: World3d | null = null;
 
-        public get world(): World3D | null {
-            return this._world;
+        public get world3d(): World3d | null {
+            return this._world3d;
         }
 
         public initAsync(msg: SimulatorRunMessage): Promise<void> {
@@ -36,20 +36,20 @@ namespace pxsim {
 
         public init() {
             this.postkill();
-            this._world = new World3D();
+            this._world3d = new World3d();
         }
 
         public kill() {
-            if (this._world) {
-                this._world.renderer.pause = true;
+            if (this._world3d) {
+                this._world3d.renderer.pause = true;
             }
         }
 
         public postkill() {
-            if (this._world) {
-                this._world.dispose();
+            if (this._world3d) {
+                this._world3d.dispose();
 
-                this._world = null;
+                this._world3d = null;
             }
         }
 
@@ -69,7 +69,8 @@ namespace pxsim {
     };
 
     export function singletonWorldBoard(): WorldBoard       { return WorldBoard.singleton; }
-    export function currentWorld(): World3D | null          { return singletonWorldBoard().world; }
-    export function currentScene(): Scene | null            { return currentWorld() ? currentWorld()!.currentScene : null; }
-    export function activeCamera(): GenericCamera | null    { return currentWorld() ? currentWorld()!.activeCamera : null; }
+
+    export function ourWorld3d(): World3d | null            { return singletonWorldBoard().world3d; }
+    export function currentScene(): GenericScene | null     { return ourWorld3d() ? ourWorld3d()!.scene : null; }
+    export function activeCamera(): GenericCamera | null    { return ourWorld3d() ? ourWorld3d()!.camera : null; }
 }

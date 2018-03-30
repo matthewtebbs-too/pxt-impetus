@@ -27,7 +27,7 @@ namespace pxsim {
 }
 
 namespace pxsim.material {
-    export function colorMaterial(color?: Color): Material {
+    export function ofColor(color?: Color): Material {
         return new Material(color);
     }
 }

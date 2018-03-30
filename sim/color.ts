@@ -28,11 +28,11 @@ namespace pxsim.color {
         return new Color().setHSL(hue / 255, sat / 255, val / 255);
     }
 
-    export function colorWheelPicker(color: number): Color {
+    export function colorWheel(color: number): Color {
         return new Color(color);
     }
 
-    export function colorNumberPicker(color: number): Color {
+    export function colorPicker(color: number): Color {
         return new Color(color);
     }
 }

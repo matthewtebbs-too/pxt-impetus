@@ -7,7 +7,7 @@
 /// <reference path="_physics.ts"/>
 
 namespace pxsim {
-    export function btMotionStateFromObject3D(btmotionstate: Ammo.btMotionState, object3d: GenericObject3D) {
+    export function btMotionStateFromObject3D(btmotionstate: Ammo.btMotionState, object3d: GenericObject3d) {
         const bttransform = new Ammo.btTransform();
         let btorigin, btquarternion;
 
@@ -16,14 +16,14 @@ namespace pxsim {
 
         btmotionstate.setWorldTransform(bttransform);
 
-        Helper.safeAmmoDestroy(btquarternion);
-        Helper.safeAmmoDestroy(btorigin);
-        Helper.safeAmmoDestroy(bttransform);
+        Helper.safeAmmoObjectDestroy(btquarternion);
+        Helper.safeAmmoObjectDestroy(btorigin);
+        Helper.safeAmmoObjectDestroy(bttransform);
 
         return btmotionstate;
     }
 
-    export function btMotionStateToObject3D(btmotionstate: Ammo.btMotionState, object3d: GenericObject3D): void {
+    export function btMotionStateToObject3D(btmotionstate: Ammo.btMotionState, object3d: GenericObject3d): void {
         const bttransform = new Ammo.btTransform();
 
         btmotionstate.getWorldTransform(bttransform);
@@ -34,7 +34,7 @@ namespace pxsim {
         object3d.reference.position.set(btorigin.x(), btorigin.y(), btorigin.z());
         object3d.reference.quaternion.set(btrotation.x(), btrotation.y(), btrotation.z(), btrotation.w());
 
-        Helper.safeAmmoDestroy(bttransform);
+        Helper.safeAmmoObjectDestroy(bttransform);
     }
 
     export class RigidBody extends rt.ObjectDisposable {
@@ -43,7 +43,7 @@ namespace pxsim {
 
         private _world: PhysicsWorld | null = null;
 
-        private _object3d: GenericObject3D;
+        private _object3d: GenericObject3d;
 
         private _btbody: Ammo.btRigidBody;
         private _btshape: Ammo.btCollisionShape;
@@ -51,8 +51,8 @@ namespace pxsim {
         private _btinfo: Ammo.btRigidBodyConstructionInfo;
 
         constructor(
-            object3d: GenericObject3D,
-            geometry: GenericGeometry,
+            object3d: GenericObject3d,
+            shape3d: GenericShape3d,
             mass: number,
         ) {
             super();
@@ -62,7 +62,7 @@ namespace pxsim {
             const isDynamic = mass !== 0;
 
             const btmotionstate = new Ammo.btDefaultMotionState();
-            const btshape = geometry.createCollisionShape()!;
+            const btshape = shape3d.createCollisionShape()!;
 
             const btvecLocalInertia = new Ammo.btVector3(0, 0, 0);
 
@@ -72,7 +72,7 @@ namespace pxsim {
 
             const btinfo = new Ammo.btRigidBodyConstructionInfo(mass, btmotionstate, btshape, btvecLocalInertia);
 
-            Helper.safeAmmoDestroy(btvecLocalInertia);
+            Helper.safeAmmoObjectDestroy(btvecLocalInertia);
 
             this._btbody = new Ammo.btRigidBody(btinfo);
             this._btshape = btshape;
@@ -141,11 +141,11 @@ namespace pxsim {
         }
 
         protected _onDispose() {
-            Helper.safeAmmoDestroy(this._btbody);
+            Helper.safeAmmoObjectDestroy(this._btbody);
 
-            Helper.safeAmmoDestroy(this._btinfo);
-            Helper.safeAmmoDestroy(this._btmotionstate);
-            Helper.safeAmmoDestroy(this._btshape);
+            Helper.safeAmmoObjectDestroy(this._btinfo);
+            Helper.safeAmmoObjectDestroy(this._btmotionstate);
+            Helper.safeAmmoObjectDestroy(this._btshape);
         }
     }
 }

@@ -4,6 +4,8 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
+/// <reference path="_runtime.ts"/>
+
 namespace pxsim {
     export class Helper {
         public static btVector3FromThree(vec: THREE.Vector3): Ammo.btVector3 {
@@ -14,9 +16,15 @@ namespace pxsim {
             return new Ammo.btQuaternion(qtr.x, qtr.y, qtr.z, qtr.w);
         }
 
-        public static safeAmmoDestroy(object: any) {
-            if (object) {
-                Ammo.destroy(object);
+        public static safeObjectDispose(dispoableobject: rt.IObjectDisposable | null) {
+            if (dispoableobject) {
+                dispoableobject.dispose();
+            }
+        }
+
+        public static safeAmmoObjectDestroy(ammoobject: any | null) {
+            if (ammoobject) {
+                Ammo.destroy(ammoobject);
             }
         }
     }

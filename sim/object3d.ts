@@ -7,7 +7,7 @@
 /// <reference path="_runtime.ts"/>
 
 namespace pxsim {
-    export abstract class Object3D<T extends THREE.Object3D> extends rt.WrappedObjectWithId<T> {
+    export abstract class Object3d<T extends THREE.Object3D> extends rt.WrappedObjectWithId<T> {
         constructor(reference: T, id?: rt.ObjId) {
             super(reference, id);
 
@@ -56,11 +56,11 @@ namespace pxsim {
             });
         }
 
-        public onAdded(scene: Scene) {
+        public onAdded(scene: GenericScene) {
             /* do nothing */
         }
 
-        public onRemoved(scene: Scene) {
+        public onRemoved(scene: GenericScene) {
             /* do nothing */
         }
 
@@ -76,10 +76,10 @@ namespace pxsim {
         }
     }
 
-    export type GenericObject3D = Object3D<THREE.Object3D>;
+    export type GenericObject3d = Object3d<THREE.Object3D>;
 
-    export function outerObject(reference: THREE.Object3D): GenericObject3D | null {
-        return reference.userData.outer as GenericObject3D || null;
+    export function outerObject(reference: THREE.Object3D): GenericObject3d | null {
+        return reference.userData.outer as GenericObject3d || null;
     }
 }
 

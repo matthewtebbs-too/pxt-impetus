@@ -7,7 +7,7 @@
 /// <reference path='object3d.ts'/>
 
 namespace pxsim {
-    export class Scene extends Object3D<THREE.Scene> {
+    export abstract class GenericScene extends Object3d<THREE.Scene> {
         private _physicsworld: PhysicsWorld = new PhysicsWorld();
 
         private _ambientlight: AmbientLight = new AmbientLight();
@@ -35,10 +35,18 @@ namespace pxsim {
             this.ambientLight.reference.color = color;
         }
 
-        public addObject(object: GenericObject3D, position: Vector) {
-            object.setPosition(position);
+        public add(object3d: GenericObject3d, position?: Vector) {
+            if (position) {
+                object3d.setPosition(position);
+            }
 
-            this.add(object, true /* has rigid body */);
+            this.reference.add(object3d.reference);
+            object3d.onAdded(this);
+        }
+
+        public remove(object3d: GenericObject3d) {
+            object3d.onRemoved(this);
+            this.reference.remove(object3d.reference);
         }
 
         public animate(timeStep: number) {
@@ -49,21 +57,14 @@ namespace pxsim {
             WorldBoard.events.queue(1234, 5678, timeStep);
         }
 
-        public add(object: GenericObject3D, isRigidBody: boolean = false) {
-            this.reference.add(object.reference);
-            object.onAdded(this);
-        }
-
-        public remove(object: GenericObject3D) {
-            object.onRemoved(this);
-            this.reference.remove(object.reference);
-        }
-
         protected _onDispose() {
             this._physicsworld.dispose();
 
             super._onDispose();
         }
+    }
+
+    export class Scene extends GenericScene {
     }
 }
 

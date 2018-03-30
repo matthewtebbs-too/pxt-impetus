@@ -7,7 +7,7 @@
 /// <reference path="object3d.ts"/>
 
 namespace pxsim {
-    export abstract class Light<T extends THREE.Light> extends Object3D<T> {
+    export abstract class Light<T extends THREE.Light> extends Object3d<T> {
         public static distFrustum = 100;
 
         protected _configureShadow() {
@@ -80,15 +80,15 @@ namespace pxsim {
 }
 
 namespace pxsim.light {
-    export function ambientLight(color?: Color, intensity?: number): DirectionalLight  {
+    export function ambient(color?: Color, intensity?: number): DirectionalLight  {
         return new DirectionalLight(color, intensity);
     }
 
-    export function directionalLight(color?: Color, intensity?: number): DirectionalLight  {
+    export function directional(color?: Color, intensity?: number): DirectionalLight  {
         return new DirectionalLight(color, intensity);
     }
 
-    export function hemisphereLight(colorSky?: Color, colorGround?: Color, intensity?: number): HemisphereLight  {
+    export function hemisphere(colorSky?: Color, colorGround?: Color, intensity?: number): HemisphereLight  {
         return new HemisphereLight(colorSky, colorGround, intensity);
     }
 }

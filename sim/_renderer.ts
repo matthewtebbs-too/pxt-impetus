@@ -24,7 +24,7 @@ namespace pxsim {
 
         private _domElement: HTMLElement = document.createElement('div');
 
-        private _scene: Scene | null = null;
+        private _scene: GenericScene | null = null;
         private _camera: GenericCamera | null = null;
         private _stats: Stats = new Stats();
 
@@ -38,19 +38,19 @@ namespace pxsim {
             return this._domElement;
         }
 
-        public get currentScene(): Scene | null {
+        public get scene(): GenericScene | null {
             return this._scene;
         }
 
-        public set currentScene(scene: Scene | null) {
+        public set scene(scene: GenericScene | null) {
             this._scene = scene;
         }
 
-        public get activeCamera(): GenericCamera | null {
+        public get camera(): GenericCamera | null {
             return this._camera;
         }
 
-        public set activeCamera(camera: GenericCamera | null) {
+        public set camera(camera: GenericCamera | null) {
             this._camera = camera;
             this._resizeCamera();
         }

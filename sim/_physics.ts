@@ -39,7 +39,7 @@ namespace pxsim {
 
             this._btworld.setGravity(btvecGravity);
 
-            Helper.safeAmmoDestroy(btvecGravity);
+            Helper.safeAmmoObjectDestroy(btvecGravity);
         }
 
         public animate(timeStep: number) {
@@ -47,12 +47,12 @@ namespace pxsim {
         }
 
         protected _onDispose() {
-            Helper.safeAmmoDestroy(this._btworld);
+            Helper.safeAmmoObjectDestroy(this._btworld);
 
-            Helper.safeAmmoDestroy(this._btconstraintsolver);
-            Helper.safeAmmoDestroy(this._btbroadphase);
-            Helper.safeAmmoDestroy(this._btdispatcher);
-            Helper.safeAmmoDestroy(this._btconfig);
+            Helper.safeAmmoObjectDestroy(this._btconstraintsolver);
+            Helper.safeAmmoObjectDestroy(this._btbroadphase);
+            Helper.safeAmmoObjectDestroy(this._btdispatcher);
+            Helper.safeAmmoObjectDestroy(this._btconfig);
         }
     }
 }

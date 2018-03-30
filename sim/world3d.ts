@@ -7,7 +7,7 @@
 /// <reference path="_runtime.ts"/>
 
 namespace pxsim {
-    export class World3D extends rt.ObjectDisposable {
+    export class World3d extends rt.ObjectDisposable {
         private _renderer: Renderer;
         private _controls: THREE.OrbitControls | null = null;
 
@@ -15,12 +15,12 @@ namespace pxsim {
             return this._renderer;
         }
 
-        public get currentScene(): Scene | null {
-            return this._renderer.currentScene;
+        public get scene(): GenericScene | null {
+            return this._renderer.scene;
         }
 
-        public get activeCamera(): GenericCamera | null {
-            return this._renderer.activeCamera;
+        public get camera(): GenericCamera | null {
+            return this._renderer.camera;
         }
 
         constructor(id: rt.ObjId = 'container') {
@@ -28,10 +28,10 @@ namespace pxsim {
 
             this._renderer = new Renderer(id);
 
-            this._renderer.currentScene = new Scene('default');
-            this._renderer.activeCamera = new PerspectiveCamera('main');
+            this._renderer.scene = new Scene();
+            this._renderer.camera = new PerspectiveCamera();
 
-            this._renderer.activeCamera.setPosition(new Vector(-40, 20, 15));
+            this._renderer.camera.setPosition(new Vector(-40, 20, 15));
 
             const container = document.getElementById(this._renderer.id as string);
             if (container) {
@@ -44,7 +44,7 @@ namespace pxsim {
             window.addEventListener('resize', this._onWindowResize, false);
             document.addEventListener('mousemove', this._onDocumentMouseMove, false);
 
-            this._controls = new THREE.OrbitControls(this._renderer.activeCamera.reference);
+            this._controls = new THREE.OrbitControls(this._renderer.camera.reference);
             this._controls.target.set(0, 2, 0);
             this._controls.update();
         }
@@ -58,8 +58,9 @@ namespace pxsim {
                 container.innerHTML = '';
             }
 
-            this._renderer.currentScene!.dispose();
-            this._renderer.activeCamera!.dispose();
+            Helper.safeObjectDispose(this._renderer.scene);
+            Helper.safeObjectDispose(this._renderer.camera);
+
             this._renderer.dispose();
         }
 
@@ -78,16 +79,16 @@ namespace pxsim {
     }
 }
 
-namespace pxsim.world {
+namespace pxsim.world3d {
     export function origin(): Vector  {
         return pxsim.math3d.vector();
     }
 
-    export function currentScene(): Scene {
+    export function scene(): GenericScene {
         return pxsim.currentScene()!;
     }
 
-    export function activeCamera(): GenericCamera {
+    export function camera(): GenericCamera {
         return pxsim.activeCamera()!;
     }
 }

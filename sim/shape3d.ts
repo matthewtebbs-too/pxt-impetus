@@ -7,7 +7,7 @@
 /// <reference path="_runtime.ts"/>
 
 namespace pxsim {
-    export abstract class Geometry<T extends THREE.Geometry> extends rt.WrappedObjectWithId<T> {
+    export abstract class Shape3d<T extends THREE.Geometry> extends rt.WrappedObjectWithId<T> {
         public static radialSegments = 32;
         public static collisionMargin = 0.05;
 
@@ -44,17 +44,17 @@ namespace pxsim {
             const bthalfextents = Helper.btVector3FromThree(this._getBounds(new THREE.Vector3()).divideScalar(2));
 
             const btshape = ctor(bthalfextents);
-            btshape.setMargin(Geometry.collisionMargin);
+            btshape.setMargin(Shape3d.collisionMargin);
 
-            Helper.safeAmmoDestroy(bthalfextents);
+            Helper.safeAmmoObjectDestroy(bthalfextents);
 
             return btshape;
         }
     }
 
-    export type GenericGeometry = Geometry<THREE.Geometry>;
+    export type GenericShape3d = Shape3d<THREE.Geometry>;
 
-    export class PlaneGeometry extends Geometry<THREE.PlaneGeometry> {
+    export class PlaneShape3d extends Shape3d<THREE.PlaneGeometry> {
         constructor(width?: number, height?: number, id?: rt.ObjId) {
             const w = width || 100;
             const h = height || 100;
@@ -65,7 +65,7 @@ namespace pxsim {
         }
     }
 
-    export class BoxGeometry extends Geometry<THREE.BoxGeometry> {
+    export class BoxShape3d extends Shape3d<THREE.BoxGeometry> {
         constructor(
             width?: number,
             height?: number,
@@ -84,7 +84,7 @@ namespace pxsim {
         }
     }
 
-    export class CylinderGeometry extends Geometry<THREE.CylinderGeometry> {
+    export class CylinderShape3d extends Shape3d<THREE.CylinderGeometry> {
         constructor(
             radius?: number,
             height?: number,
@@ -94,30 +94,30 @@ namespace pxsim {
             radius = radius || .5;
             height = height || 1;
 
-            super(new THREE.CylinderGeometry(radius, radius, height, Geometry.radialSegments, 1, openEnded || false), id);
+            super(new THREE.CylinderGeometry(radius, radius, height, Shape3d.radialSegments, 1, openEnded || false), id);
 
             this._setShapeVolume(Math.PI * Math.pow(radius, 2) * height);
             this._setCtorCollisionShape(() => this._createCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btCylinderShape(bthalfextents)));
         }
     }
 
-    export class SphereGeometry extends Geometry<THREE.SphereGeometry> {
+    export class SphereShape3d extends Shape3d<THREE.SphereGeometry> {
         constructor(radius?: number, id?: rt.ObjId) {
             radius = radius || .5;
 
-            super(new THREE.SphereGeometry(radius, Geometry.radialSegments, Geometry.radialSegments), id);
+            super(new THREE.SphereGeometry(radius, Shape3d.radialSegments, Shape3d.radialSegments), id);
 
             this._setShapeVolume(4 / 3 * Math.PI * Math.pow(radius, 3));
             this._setCtorCollisionShape(() => new Ammo.btSphereShape(radius!));
         }
     }
 
-    export class ConeGeometry extends Geometry<THREE.ConeGeometry> {
+    export class ConeShape3d extends Shape3d<THREE.ConeGeometry> {
         constructor(radius?: number, height?: number, id?: rt.ObjId) {
             radius = radius || .5;
             height = height || 1;
 
-            super(new THREE.ConeGeometry(radius, height, Geometry.radialSegments), id);
+            super(new THREE.ConeGeometry(radius, height, Shape3d.radialSegments), id);
 
             this._setShapeVolume(Math.PI * Math.pow(radius, 2) * height / 3);
             this._setCtorCollisionShape(() => new Ammo.btConeShape(radius!, height!));
@@ -126,24 +126,24 @@ namespace pxsim {
     }
 }
 
-namespace pxsim.geometry {
-    export function planeGeometry(width?: number, height?: number): PlaneGeometry  {
-        return new PlaneGeometry(width, height);
+namespace pxsim.shape3d {
+    export function plane(width?: number, height?: number): PlaneShape3d {
+        return new PlaneShape3d(width, height);
     }
 
-    export function boxGeometry(width?: number, height?: number, depth?: number): BoxGeometry  {
-        return new BoxGeometry(width, height, depth);
+    export function box(width?: number, height?: number, depth?: number): BoxShape3d {
+        return new BoxShape3d(width, height, depth);
     }
 
-    export function cylinderGeometry(radius?: number, height?: number): CylinderGeometry  {
-        return new CylinderGeometry(radius, height);
+    export function cylinder(radius?: number, height?: number): CylinderShape3d  {
+        return new CylinderShape3d(radius, height);
     }
 
-    export function sphereGeometry(radius?: number): SphereGeometry  {
-        return new SphereGeometry(radius);
+    export function sphere(radius?: number): SphereShape3d  {
+        return new SphereShape3d(radius);
     }
 
-    export function coneGeometry(radius?: number, height?: number): ConeGeometry  {
-        return new ConeGeometry(radius, height);
+    export function cone(radius?: number, height?: number): ConeShape3d  {
+        return new ConeShape3d(radius, height);
     }
 }
