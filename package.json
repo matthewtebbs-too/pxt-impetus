@@ -45,7 +45,7 @@
     "@types/node": "9.6.1",
     "@types/object-hash": "1.2.0",
     "@types/stats": "0.16.30",
-    "@types/three": "0.91.2",
+    "@types/three": "0.91.3",
     "less": "2.7.3",
     "semantic-ui-less": "2.2.14",
     "tslint": "5.9.1",
@@ -57,6 +57,6 @@
   },
   "scripts": {
     "start": "pxt serve",
-    "install": "pxt staticpkg --githubpages"
+    "package": "pxt staticpkg --githubpages"
   }
 }
