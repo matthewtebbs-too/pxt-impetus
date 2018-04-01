@@ -47,6 +47,22 @@ var rt;
         return ObjectWithId;
     }(ObjectDisposable));
     rt.ObjectWithId = ObjectWithId;
+    var ObjectWithIdDictionary = (function () {
+        function ObjectWithIdDictionary() {
+            this._objs = new Map();
+        }
+        ObjectWithIdDictionary.prototype.set = function (obj) {
+            return this._objs.set(obj.id, obj);
+        };
+        ObjectWithIdDictionary.prototype.retrieve = function (id) {
+            return this._objs.get(id) || null;
+        };
+        ObjectWithIdDictionary.prototype.delete = function (obj) {
+            return this._objs.delete(obj.id);
+        };
+        return ObjectWithIdDictionary;
+    }());
+    rt.ObjectWithIdDictionary = ObjectWithIdDictionary;
     var WrappedObjectWithId = (function (_super) {
         __extends(WrappedObjectWithId, _super);
         function WrappedObjectWithId(reference, id) {
@@ -62,22 +78,30 @@ var rt;
         return WrappedObjectWithId;
     }(ObjectWithId));
     rt.WrappedObjectWithId = WrappedObjectWithId;
-    var ObjectWithIdCache = (function () {
-        function ObjectWithIdCache() {
-            this._objs = new Map();
+    var ObjectWithIdFactory = (function () {
+        function ObjectWithIdFactory(ctor) {
+            this._objectcache = new Map();
+            this._ctor = ctor;
+            ObjectWithIdFactory._factories.push(this);
         }
-        ObjectWithIdCache.prototype.set = function (obj) {
-            return this._objs.set(obj.id, obj);
+        ObjectWithIdFactory.forgetAllInstances = function () {
+            ObjectWithIdFactory._factories.forEach(function (factory) { return factory.forgetAllInstances(); });
         };
-        ObjectWithIdCache.prototype.retrieve = function (id) {
-            return this._objs.get(id) || null;
+        ObjectWithIdFactory.prototype.getInstance = function (parameters, id) {
+            var hash = objectHash([parameters, id], { algorithm: 'md5', encoding: 'hex', respectType: false });
+            var instance = this._objectcache.get(hash);
+            if (!instance) {
+                this._objectcache.set(hash, instance = new (this._ctor)(parameters, id));
+            }
+            return instance;
         };
-        ObjectWithIdCache.prototype.delete = function (obj) {
-            return this._objs.delete(obj.id);
+        ObjectWithIdFactory.prototype.forgetAllInstances = function () {
+            this._objectcache.clear();
         };
-        return ObjectWithIdCache;
+        ObjectWithIdFactory._factories = new Array();
+        return ObjectWithIdFactory;
     }());
-    rt.ObjectWithIdCache = ObjectWithIdCache;
+    rt.ObjectWithIdFactory = ObjectWithIdFactory;
 })(rt || (rt = {}));
 var pxsim;
 (function (pxsim) {
@@ -371,8 +395,8 @@ var pxsim;
 (function (pxsim) {
     var Material = (function (_super) {
         __extends(Material, _super);
-        function Material(solidColor, id) {
-            var _this = _super.call(this, new THREE.MeshPhongMaterial({ color: solidColor || 16777215 }), id) || this;
+        function Material() {
+            var _this = _super !== null && _super.apply(this, arguments) || this;
             _this._density = 1;
             return _this;
         }
@@ -388,12 +412,24 @@ var pxsim;
         return Material;
     }(rt.WrappedObjectWithId));
     pxsim.Material = Material;
+    var SolidMaterial = (function (_super) {
+        __extends(SolidMaterial, _super);
+        function SolidMaterial(params, id) {
+            return _super.call(this, new THREE.MeshPhongMaterial(params), id) || this;
+        }
+        SolidMaterial.getInstance = function (solidColor, id) {
+            return this._factory.getInstance({ color: (solidColor ? solidColor.getHex() : undefined) || 16777215 }, id);
+        };
+        SolidMaterial._factory = new rt.ObjectWithIdFactory(SolidMaterial);
+        return SolidMaterial;
+    }(Material));
+    pxsim.SolidMaterial = SolidMaterial;
 })(pxsim || (pxsim = {}));
 (function (pxsim) {
     var material;
     (function (material) {
         function ofColor(color) {
-            return new pxsim.Material(color);
+            return pxsim.SolidMaterial.getInstance(color);
         }
         material.ofColor = ofColor;
     })(material = pxsim.material || (pxsim.material = {}));
@@ -841,6 +877,7 @@ var pxsim;
         };
         WorldBoard.prototype.init = function () {
             this.postkill();
+            rt.ObjectWithIdFactory.forgetAllInstances();
             this._world3d = new pxsim.World3d();
         };
         WorldBoard.prototype.kill = function () {
