@@ -9,7 +9,7 @@
 namespace pxsim {
     export class Mesh extends Object3d<THREE.Mesh> {
         private _shape3d: GenericShape3d;
-        private _material: Material;
+        private _material: GenericMaterial;
 
         public get shape3d() {
             return this._shape3d;
@@ -21,7 +21,7 @@ namespace pxsim {
 
         constructor(
             shape3d: GenericShape3d,
-            material: Material,
+            material: GenericMaterial,
             id?: rt.ObjId,
         ) {
             super(new THREE.Mesh(shape3d.reference, material.reference), id);
@@ -35,7 +35,7 @@ namespace pxsim {
 }
 
 namespace pxsim.mesh {
-    export function from3dShape(shape3d: GenericShape3d, material: Material): Mesh {
+    export function from3dShape(shape3d: GenericShape3d, material: GenericMaterial): Mesh {
         return new Mesh(shape3d, material);
     }
 }

@@ -6,6 +6,8 @@
 
 /// <reference path="../node_modules/pxt-core/built/pxtsim.d.ts"/>
 
+/// <reference path="_runtime.ts" />
+
 namespace pxsim {
     export class WorldBoard extends BaseBoard {
         public static get singleton(): WorldBoard {
@@ -31,11 +33,15 @@ namespace pxsim {
 
         public initAsync(msg: SimulatorRunMessage): Promise<void> {
             this.init();
+
             return Promise.resolve();
         }
 
         public init() {
             this.postkill();
+
+            rt.ObjectWithIdFactory.forgetAllInstances();
+
             this._world3d = new World3d();
         }
 

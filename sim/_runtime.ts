@@ -9,12 +9,12 @@ type _Map<K, V> = Map<K, V>;
 namespace rt {
     export type ObjId = number | string | null;
 
-    export interface IObjectWithId {
-        id: ObjId;
-    }
-
     export interface IObjectDisposable {
         dispose(): void;
+    }
+
+    export interface IObjectWithId {
+        id: ObjId;
     }
 
     export abstract class ObjectDisposable implements IObjectDisposable {
@@ -42,19 +42,7 @@ namespace rt {
         }
     }
 
-    export abstract class WrappedObjectWithId<T> extends ObjectWithId {
-        private _reference: T;
-
-        public get reference(): T { return this._reference; }
-
-        constructor(reference: T, id?: ObjId) {
-            super(id);
-
-            this._reference = reference;
-        }
-    }
-
-    export class ObjectWithIdCache<T extends IObjectWithId> {
+    export class ObjectWithIdDictionary<T extends ObjectWithId> {
         private _objs: Map<ObjId, T> = new Map<ObjId, T>();
 
         public set(obj: T): Map<ObjId, T> {
@@ -67,6 +55,56 @@ namespace rt {
 
         public delete(obj: T): boolean {
             return this._objs.delete(obj.id);
+        }
+    }
+
+    export abstract class WrappedObjectWithId<T> extends ObjectWithId {
+        private _reference: T;
+
+        public get reference(): T { return this._reference; }
+
+        constructor(reference: T, id?: ObjId) {
+            super(id);
+
+            this._reference = reference;
+        }
+    }
+
+    export interface IObjectWithIdConstructor<T> {
+        new (parameters?: any, id?: ObjId): T;
+    }
+
+    export class ObjectWithIdFactory<T extends ObjectWithId> {
+        public static forgetAllInstances() {
+            ObjectWithIdFactory._factories.forEach(factory => factory.forgetAllInstances());
+        }
+
+        private static _factories = new Array<ObjectWithIdFactory<ObjectWithId>>();
+
+        private _ctor: IObjectWithIdConstructor<T>;
+        private _objectcache = new Map<string, T>();
+
+        constructor(ctor: IObjectWithIdConstructor<T>) {
+            this._ctor = ctor;
+            ObjectWithIdFactory._factories.push(this);
+        }
+
+        public getInstance(
+            parameters?: any,
+            id?: ObjId,
+        ) {
+            const hash = objectHash([ parameters, id ], { algorithm: 'md5', encoding: 'hex', respectType: false } as any);
+
+            let instance = this._objectcache.get(hash);
+            if (!instance) {
+                this._objectcache.set(hash, instance = new (this._ctor)(parameters, id));
+            }
+
+            return instance;
+        }
+
+        public forgetAllInstances() {
+            this._objectcache.clear();
         }
     }
 }

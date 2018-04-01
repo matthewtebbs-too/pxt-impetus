@@ -7,27 +7,43 @@
 /// <reference path="_runtime.ts"/>
 
 namespace pxsim {
-    export class Material extends rt.WrappedObjectWithId<THREE.Material>  {
+    export abstract class Material<T extends THREE.Material> extends rt.WrappedObjectWithId<T>  {
         private _density = 1;
 
         public get density(): number {
             return this._density;
         }
 
-        constructor(
-            solidColor?: Color,
-            id?: rt.ObjId) {
-            super(new THREE.MeshPhongMaterial({ color: solidColor || Palette.white }), id);
-        }
-
         protected _onDispose() {
             /* do nothing */
+        }
+    }
+
+    export type GenericMaterial = Material<THREE.Material>;
+
+    export class SolidMaterial extends Material<THREE.MeshPhongMaterial> {
+        public static getInstance(
+            solidColor?: Color,
+            id?: rt.ObjId,
+        ) {
+            return this._factory.getInstance(
+                { color: (solidColor ? solidColor.getHex() : undefined) || Palette.white },
+                id);
+        }
+
+        private static _factory = new rt.ObjectWithIdFactory<SolidMaterial>(SolidMaterial);
+
+        constructor(
+            params?: any,
+            id?: rt.ObjId,
+        ) {
+            super(new THREE.MeshPhongMaterial(params), id);
         }
     }
 }
 
 namespace pxsim.material {
-    export function ofColor(color?: Color): Material {
-        return new Material(color);
+    export function ofColor(color?: Color): SolidMaterial {
+        return SolidMaterial.getInstance(color);
     }
 }
