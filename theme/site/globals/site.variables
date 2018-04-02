@@ -32,6 +32,3 @@
 /*-------------------
    Icons
 --------------------*/
-
-@poweredBySmallUrl: '../docs/static/icons/1x1-transparent.png';
-@poweredByLargeUrl: @poweredBySmallUrl;
