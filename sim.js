@@ -775,7 +775,12 @@ var pxsim;
             var container = document.getElementById(_this._renderer.id);
             if (container) {
                 container.innerHTML = '';
-                container.appendChild(_this._renderer.domElement);
+                if (Detector.webgl) {
+                    container.appendChild(_this._renderer.domElement);
+                }
+                else {
+                    Detector.addGetWebGLMessage({ parent: container });
+                }
             }
             _this._onWindowResize();
             window.addEventListener('resize', _this._onWindowResize, false);
