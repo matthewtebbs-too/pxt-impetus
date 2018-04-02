@@ -36,7 +36,12 @@ namespace pxsim {
             const container = document.getElementById(this._renderer.id as string);
             if (container) {
                 container.innerHTML = '';
-                container.appendChild(this._renderer.domElement);
+
+                if (Detector.webgl) {
+                    container.appendChild(this._renderer.domElement);
+                } else {
+                    Detector.addGetWebGLMessage({ parent: container });
+                }
             }
 
             this._onWindowResize();

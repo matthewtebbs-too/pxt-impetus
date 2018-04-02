@@ -7,6 +7,7 @@
 
   "include": [
     "../localtypings/ammo.d.ts",
+    "../localtypings/detector.d.ts",
     "../localtypings/impetus.enums.d.ts",
 
     "./**/*"
