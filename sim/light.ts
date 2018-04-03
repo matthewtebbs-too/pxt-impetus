@@ -4,7 +4,7 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path="object3d.ts"/>
+/// <reference path="object.ts"/>
 
 namespace pxsim {
     export abstract class Light<T extends THREE.Light> extends Object3d<T> {

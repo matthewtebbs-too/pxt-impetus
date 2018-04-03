@@ -4,27 +4,46 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path='object3d.ts'/>
+/// <reference path='object.ts'/>
 
 namespace pxsim {
-    export abstract class GenericScene extends Object3d<THREE.Scene> {
+    export abstract class GenericScene3d extends Object3d<THREE.Scene> {
+        private _ambientlight: AmbientLight;
+        private _camera: GenericCamera | null;
+
         private _physicsworld: PhysicsWorld = new PhysicsWorld();
 
-        private _ambientlight: AmbientLight = new AmbientLight();
-
-        public get physicsWorld(): PhysicsWorld {
-            return this._physicsworld;
-        }
+        private _raycaster: THREE.Raycaster;
+        private _controls: THREE.OrbitControls | null = null;
 
         public get ambientLight(): AmbientLight {
             return this._ambientlight;
+        }
+
+        public get camera(): GenericCamera | null {
+            return this._camera;
+        }
+
+        public get physicsWorld(): PhysicsWorld {
+            return this._physicsworld;
         }
 
         constructor(id?: rt.ObjId) {
             super(new THREE.Scene(), id);
 
             this.reference.background = new THREE.Color(Palette.lightgray);
+
+            this._ambientlight = new AmbientLight();
             this.add(this._ambientlight);
+
+            this._camera = new PerspectiveCamera();
+            this.add(this._camera, new Vector(-40, 20, 15));
+
+            this._raycaster = new THREE.Raycaster();
+
+            this._controls = new THREE.OrbitControls(this._camera.reference);
+            this._controls.target.set(0, 2, 0);
+            this._controls.update();
         }
 
         public setBackgroundColor(color: Color)  {
@@ -70,7 +89,22 @@ namespace pxsim {
 
             this._physicsworld.animate(timeStep);
 
-            WorldBoard.events.queue(ScopeId.Scene, EventId.Animate, timeStep);
+            singletonWorldBoard().events!.queue(ScopeId.Scene, EventId.Animate, timeStep);
+        }
+
+        public intersectedObjects(x: number, y: number): GenericObject3d[] | null {
+            if (!this._camera) {
+                return null;
+            }
+
+            this._raycaster.setFromCamera(new THREE.Vector2(x, y), this._camera.reference);
+            const intersections = this._raycaster.intersectObjects(this.reference.children);
+
+            return intersections.length > 0 ? intersections.map(intersection => new GenericObject3d(intersection.object)) : null;
+        }
+
+        public setPhysicsEnabled(enable: boolean) {
+            /* TODO$: */
         }
 
         protected _onDispose() {
@@ -80,12 +114,11 @@ namespace pxsim {
         }
     }
 
-    export class Scene extends GenericScene {
-    }
+    export class Scene3d extends GenericScene3d { }
 }
 
 namespace pxsim.scene {
     export function onAnimate(handler: RefAction) {
-        WorldBoard.events.listen(ScopeId.Scene, EventId.Animate, handler);
+        singletonWorldBoard().events!.listen(ScopeId.Scene, EventId.Animate, handler);
     }
 }

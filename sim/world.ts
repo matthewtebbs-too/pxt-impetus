@@ -9,20 +9,15 @@
 namespace pxsim {
     export class World3d extends rt.ObjectDisposable {
         private _renderer: Renderer;
-        private _raycaster: THREE.Raycaster;
 
-        private _controls: THREE.OrbitControls | null = null;
+        private _scene: Scene3d | null = null;
 
         public get renderer(): Renderer {
             return this._renderer;
         }
 
-        public get scene(): GenericScene | null {
-            return this._renderer.scene;
-        }
-
-        public get camera(): GenericCamera | null {
-            return this._renderer.camera;
+        public get scene(): GenericScene3d | null {
+            return this._scene;
         }
 
         constructor(id: rt.ObjId = 'container') {
@@ -30,10 +25,8 @@ namespace pxsim {
 
             this._renderer = new Renderer(id);
 
-            this._renderer.scene = new Scene();
-            this._renderer.camera = new PerspectiveCamera();
-
-            this._renderer.camera.setPosition(new Vector(-40, 20, 15));
+            this._scene = new Scene3d();
+            this._updateRendererScene();
 
             const container = document.getElementById(this._renderer.id as string);
             if (container) {
@@ -50,19 +43,6 @@ namespace pxsim {
 
             window.addEventListener('resize', this._onWindowResize, false);
             document.addEventListener('mousemove', this._onDocumentMouseMove, false);
-
-            this._raycaster = new THREE.Raycaster();
-
-            this._controls = new THREE.OrbitControls(this._renderer.camera.reference);
-            this._controls.target.set(0, 2, 0);
-            this._controls.update();
-        }
-
-        public intersectedObjects(x: number, y: number): GenericObject3d[] | null {
-            this._raycaster.setFromCamera(new THREE.Vector2(x, y), this.renderer.camera!.reference);
-            const intersections = this._raycaster.intersectObjects(this._renderer.scene!.reference.children);
-
-            return intersections.length > 0 ? intersections.map(intersection => new GenericObject3d(intersection.object)) : null;
         }
 
         protected _onDispose() {
@@ -74,10 +54,13 @@ namespace pxsim {
                 container.innerHTML = '';
             }
 
-            Helper.safeObjectDispose(this._renderer.scene);
-            Helper.safeObjectDispose(this._renderer.camera);
+            Helper.safeObjectDispose(this._renderer.scene); /* TODO$: put someplace else */
 
             this._renderer.dispose();
+        }
+
+        protected _updateRendererScene() {
+            this._renderer.scene = this._scene;
         }
 
         protected _onWindowResize = () => {
@@ -90,31 +73,38 @@ namespace pxsim {
             const x = (event.clientX / window.innerWidth) * 2 - 1;
             const y = - (event.clientY / window.innerHeight) * 2 + 1;
 
-            WorldBoard.events.queue(ScopeId.World, EventId.MouseMove, new MouseEventValue(x, y));
+            singletonWorldBoard().events!.queue(ScopeId.World, EventId.MouseMove, new MouseEventValue(x, y));
         }
     }
 }
 
-namespace pxsim.world3d {
+namespace pxsim.world {
+    export function world(): World3d | null {
+        return singletonWorldBoard().world;
+    }
+
     export function origin(): Vector  {
         return pxsim.math3d.vector();
     }
 
-    export function scene(): GenericScene {
-        return pxsim.currentScene()!;
+    export function scene(): GenericScene3d | null {
+        const world3d = pxsim.world.world();
+        return world3d ? world3d.scene : null;
     }
 
-    export function camera(): GenericCamera {
-        return pxsim.activeCamera()!;
+    export function camera(): GenericCamera | null {
+        const scene3d = pxsim.world.scene();
+        return scene3d ? scene3d.camera : null;
     }
 
     export function intersectedObjectAt(x: number, y: number): GenericObject3d | null {
-        const objects = ourWorld3d()!.intersectedObjects(x, y);
+        const scene3d = pxsim.world.scene();
+        const objects = scene3d ? scene3d.intersectedObjects(x, y) : null;
 
         return objects && objects.length > 0 ? objects[0] : null;
     }
 
     export function onMouseMove(handler: RefAction) {
-        WorldBoard.events.listen(ScopeId.World, EventId.MouseMove, handler);
+        singletonWorldBoard().events!.listen(ScopeId.World, EventId.MouseMove, handler);
     }
 }

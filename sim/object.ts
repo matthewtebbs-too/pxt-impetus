@@ -26,14 +26,26 @@ namespace pxsim {
         }
 
         public lookAt(position: Vector)  {
+            if (!position) {
+                return;
+            }
+
             this.reference.lookAt(position);
         }
 
         public setPosition(position: Vector) {
+            if (!position) {
+                return;
+            }
+
             this.reference.position.set(position.x, position.y, position.z);
         }
 
         public setRotation(rotation: Vector) {
+            if (!rotation) {
+                return;
+            }
+
             this.reference.rotation.set(THREE.Math.degToRad(rotation.x), THREE.Math.degToRad(rotation.y), THREE.Math.degToRad(rotation.z));
         }
 
@@ -42,6 +54,10 @@ namespace pxsim {
         }
 
         public setRotationFromAxisAngle(axis: Vector, angle: number) {
+            if (!axis) {
+                return;
+            }
+
             this.reference.setRotationFromAxisAngle(axis, THREE.Math.degToRad(angle));
         }
 
@@ -64,15 +80,15 @@ namespace pxsim {
             }
         }
 
-        public onAdded(scene: GenericScene) {
+        public onAdded(scene3d: GenericScene3d) {
             if (this._rigidbody) {
-                this._rigidbody.addRigidBody(scene.physicsWorld);
+                this._rigidbody.addRigidBody(scene3d.physicsWorld);
             }
         }
 
-        public onRemoved(scene: GenericScene) {
+        public onRemoved(scene3d: GenericScene3d) {
             if (this._rigidbody) {
-                this._rigidbody.removeRigidBody(scene.physicsWorld);
+                this._rigidbody.removeRigidBody(scene3d.physicsWorld);
             }
         }
 
@@ -103,5 +119,5 @@ namespace pxsim {
     }
 }
 
-namespace pxsim.object3d {
+namespace pxsim.object {
 }

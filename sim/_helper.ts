@@ -16,6 +16,10 @@ namespace pxsim {
             return new Ammo.btQuaternion(qtr.x, qtr.y, qtr.z, qtr.w);
         }
 
+        public static applyFn<T, R>(input: T | T[], fn: (t: T) => R): R | R[] {
+            return Array.isArray(input) ? input.map(fn) : fn(input);
+        }
+
         public static safeObjectDispose(dispoableobject: rt.IObjectDisposable | null) {
             if (dispoableobject) {
                 dispoableobject.dispose();
