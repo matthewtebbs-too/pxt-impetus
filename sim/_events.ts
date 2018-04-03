@@ -11,8 +11,12 @@ namespace pxsim {
     }
 
     export const enum EventId {
+        /* World */
         Animate = 1,
+
+        /* Scene */
         MouseMove,
+        MouseClick,
     }
 
     export abstract class EventValue {

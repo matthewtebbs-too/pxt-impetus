@@ -43,9 +43,11 @@ namespace pxsim {
 
             window.addEventListener('resize', this._onWindowResize, false);
             document.addEventListener('mousemove', this._onDocumentMouseMove, false);
+            document.addEventListener('click', this._onDocumentMouseClick, false);
         }
 
         protected _onDispose() {
+            document.removeEventListener('click', this._onDocumentMouseClick, false);
             document.removeEventListener('mousemove', this._onDocumentMouseMove, false);
             window.removeEventListener('resize', this._onWindowResize, false);
 
@@ -67,13 +69,16 @@ namespace pxsim {
             this._renderer.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio);
         }
 
-        protected _onDocumentMouseMove = (event: MouseEvent) => {
+        protected _onDocumentMouseMove = (event: MouseEvent) => this._onDocumentMouseEvent(EventId.MouseMove, event);
+        protected _onDocumentMouseClick = (event: MouseEvent) => this._onDocumentMouseEvent(EventId.MouseClick, event);
+
+        protected _onDocumentMouseEvent = (eventid: EventId, event: MouseEvent) => {
             event.preventDefault();
 
             const x = (event.clientX / window.innerWidth) * 2 - 1;
             const y = - (event.clientY / window.innerHeight) * 2 + 1;
 
-            singletonWorldBoard().events!.queue(ScopeId.World, EventId.MouseMove, new MouseEventValue(x, y));
+            singletonWorldBoard().events!.queue(ScopeId.World, eventid, new MouseEventValue(x, y));
         }
     }
 }
