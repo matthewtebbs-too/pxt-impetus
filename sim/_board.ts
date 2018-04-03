@@ -14,16 +14,16 @@ namespace pxsim {
             return this._board;
         }
 
-        public static get events(): EventBus {
+        public static get events(): WorldEventBus {
             return this._events;
         }
 
-        public static set events(bus: EventBus) {
+        public static set events(bus: WorldEventBus) {
             this._events = bus;
         }
 
         private static _board: WorldBoard = new WorldBoard();
-        private static _events: EventBus;
+        private static _events: WorldEventBus;
 
         private _world3d: World3d | null = null;
 
@@ -40,8 +40,6 @@ namespace pxsim {
         public init() {
             this.postkill();
 
-            rt.ObjectWithIdFactory.forgetAllInstances();
-
             this._world3d = new World3d();
         }
 
@@ -52,6 +50,8 @@ namespace pxsim {
         }
 
         public postkill() {
+            rt.ObjectWithIdFactory.forgetAllInstances();
+
             if (this._world3d) {
                 this._world3d.dispose();
 
@@ -70,7 +70,7 @@ namespace pxsim {
 
     initCurrentRuntime = (msg: SimulatorMessage) => {
         singletonWorldBoard().postkill();               /* post-kill now */
-        WorldBoard.events = new EventBus(runtime);
+        WorldBoard.events = new WorldEventBus(runtime);
         return runtime.board = singletonWorldBoard();   /* will be initialized by runtime */
     };
 

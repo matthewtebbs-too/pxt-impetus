@@ -54,7 +54,7 @@ namespace pxsim {
 
             this._physicsworld.animate(timeStep);
 
-            WorldBoard.events.queue(1234, 5678, timeStep);
+            WorldBoard.events.queue(WorldId.Scene, EventId.Animate, timeStep);
         }
 
         protected _onDispose() {
@@ -70,6 +70,10 @@ namespace pxsim {
 
 namespace pxsim.scene {
     export function onAnimate(handler: RefAction) {
-        WorldBoard.events.listen(1234, 5678, handler);
+        WorldBoard.events.listen(WorldId.Scene, EventId.Animate, handler);
+    }
+
+    export function onMouseMove(handler: RefAction) {
+        WorldBoard.events.listen(WorldId.Scene, EventId.MouseMove, handler);
     }
 }

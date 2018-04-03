@@ -79,7 +79,7 @@ namespace pxsim {
             const x = (event.clientX / window.innerWidth) * 2 - 1;
             const y = - (event.clientY / window.innerHeight) * 2 + 1;
 
-            pxsim.console.log(`(${x}, ${y})`);
+            WorldBoard.events.queue(WorldId.Scene, EventId.MouseMove, new MouseEventValue(x, y));
         }
     }
 }
