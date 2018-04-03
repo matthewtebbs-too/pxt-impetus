@@ -28,16 +28,23 @@ namespace pxsim {
         }
 
         public setBackgroundColor(color: Color)  {
+            if (!color) {
+                return;
+            }
+
             this.reference.background = color;
         }
 
         public setAmbientLight(color: Color)  {
+            if (!color) {
+                return;
+            }
+
             this.ambientLight.reference.color = color;
         }
 
         public add(object3d: GenericObject3d, position?: Vector) {
             if (!object3d) {
-                /* TODO$: invalid arg */
                 return;
             }
 
@@ -50,6 +57,10 @@ namespace pxsim {
         }
 
         public remove(object3d: GenericObject3d) {
+            if (!object3d) {
+                return;
+            }
+
             object3d.onRemoved(this);
             this.reference.remove(object3d.reference);
         }
