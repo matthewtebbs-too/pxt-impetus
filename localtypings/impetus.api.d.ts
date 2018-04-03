@@ -439,6 +439,14 @@ declare namespace scene { /* image icon */
     //% block="on animate"
     //% shim=scene::onAnimate
     function onAnimate(cb: (msec: number) => void): void;
+
+    /**
+     * Code to run when the mouse is moved over the render window.
+     */
+    //% blockId=scene_on_mousemove
+    //% block="on mouse move"
+    //% shim=scene::onMouseMove
+    function onMouseMove(cb: (x: number, y: number) => void): void;
 }
 
 //% color="#d92626" icon="\uf0ac" block="World" weight=94
