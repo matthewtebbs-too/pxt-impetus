@@ -79,7 +79,7 @@ namespace pxsim {
             const x = (event.clientX / window.innerWidth) * 2 - 1;
             const y = - (event.clientY / window.innerHeight) * 2 + 1;
 
-            WorldBoard.events.queue(WorldId.Scene, EventId.MouseMove, new MouseEventValue(x, y));
+            WorldBoard.events.queue(ScopeId.World, EventId.MouseMove, new MouseEventValue(x, y));
         }
     }
 }
@@ -95,5 +95,9 @@ namespace pxsim.world3d {
 
     export function camera(): GenericCamera {
         return pxsim.activeCamera()!;
+    }
+
+    export function onMouseMove(handler: RefAction) {
+        WorldBoard.events.listen(ScopeId.World, EventId.MouseMove, handler);
     }
 }

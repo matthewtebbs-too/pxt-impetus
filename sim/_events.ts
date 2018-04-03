@@ -5,8 +5,9 @@
 */
 
 namespace pxsim {
-    export const enum WorldId {
-        Scene = 1,
+    export const enum ScopeId {
+        World = 1,
+        Scene,
     }
 
     export const enum EventId {

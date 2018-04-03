@@ -36,6 +36,11 @@ namespace pxsim {
         }
 
         public add(object3d: GenericObject3d, position?: Vector) {
+            if (!object3d) {
+                /* TODO$: invalid arg */
+                return;
+            }
+
             if (position) {
                 object3d.setPosition(position);
             }
@@ -54,7 +59,7 @@ namespace pxsim {
 
             this._physicsworld.animate(timeStep);
 
-            WorldBoard.events.queue(WorldId.Scene, EventId.Animate, timeStep);
+            WorldBoard.events.queue(ScopeId.Scene, EventId.Animate, timeStep);
         }
 
         protected _onDispose() {
@@ -70,10 +75,6 @@ namespace pxsim {
 
 namespace pxsim.scene {
     export function onAnimate(handler: RefAction) {
-        WorldBoard.events.listen(WorldId.Scene, EventId.Animate, handler);
-    }
-
-    export function onMouseMove(handler: RefAction) {
-        WorldBoard.events.listen(WorldId.Scene, EventId.MouseMove, handler);
+        WorldBoard.events.listen(ScopeId.Scene, EventId.Animate, handler);
     }
 }
