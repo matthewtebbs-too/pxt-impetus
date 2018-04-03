@@ -31,7 +31,7 @@ namespace pxsim {
 }
 
 namespace pxsim.mesh {
-    export function from3dShape(shape3d: GenericShape3d, material: GenericMaterial): Mesh {
+    export function fromShapeAndMaterial(shape3d: GenericShape3d, material: GenericMaterial): Mesh {
         return new Mesh(shape3d, material);
     }
 }

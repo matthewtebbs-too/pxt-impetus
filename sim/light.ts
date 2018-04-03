@@ -80,15 +80,15 @@ namespace pxsim {
 }
 
 namespace pxsim.light {
-    export function ambient(color?: Color, intensity?: number): DirectionalLight  {
+    export function ambientLight(color?: Color, intensity?: number): DirectionalLight  {
         return new DirectionalLight(color, intensity);
     }
 
-    export function directional(color?: Color, intensity?: number): DirectionalLight  {
+    export function directionalLight(color?: Color, intensity?: number): DirectionalLight  {
         return new DirectionalLight(color, intensity);
     }
 
-    export function hemisphere(colorSky?: Color, colorGround?: Color, intensity?: number): HemisphereLight  {
+    export function hemisphereLight(colorSky?: Color, colorGround?: Color, intensity?: number): HemisphereLight  {
         return new HemisphereLight(colorSky, colorGround, intensity);
     }
 }

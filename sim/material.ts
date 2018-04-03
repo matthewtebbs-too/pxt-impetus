@@ -43,7 +43,7 @@ namespace pxsim {
 }
 
 namespace pxsim.material {
-    export function ofColor(color?: Color): SolidMaterial {
+    export function materialOfColor(color?: Color): SolidMaterial {
         return SolidMaterial.getInstance(color);
     }
 }

@@ -10,7 +10,7 @@ declare namespace fieldeditors {
     /**
      * Render a boolean as a on/off toggle.
      */
-    //% blockId=toggleOnOff
+    //% blockId=fieldeditors_toggleOnOff
     //% block="%on"
     //% on.fieldEditor=toggleonoff
     //% on.fieldOptions.decompileLiterals=true
@@ -75,8 +75,9 @@ declare class Vector {
     public toString(): string;
 }
 
-//% color="#9966ff" icon="\uf1ec" block="Math"
-declare namespace math {
+//@ts-ignore
+//% color="#9966ff" icon="\uf1ec" block="3D Math"
+declare namespace math3d {
     /**
      * Create vector.
      * @param x value, eg: 0
@@ -149,7 +150,7 @@ declare class Object3d {
      * Look at.
      * @param position Vector
      */
-    //% blockId=object3d_look_at blockNamespace=object3d
+    //% blockId=object3d_look_at
     //% block="%object3d=world_active_camera|look at %position=math_vector"
     //% shim=.lookAt
     public lookAt(position: Vector): void;
@@ -158,7 +159,7 @@ declare class Object3d {
      * Set object position.
      * @param position Vector
      */
-    //% blockId=object3d_set_position blockNamespace=object3d
+    //% blockId=object3d_set_position
     //% block="set %object3d position|at %position=math_vector"
     //% shim=.setPosition
     public setPosition(position: Vector): void;
@@ -167,7 +168,7 @@ declare class Object3d {
      * Set object rotation.
      * @param rotation Vector
      */
-    //% blockId=object3d_set_rotation blockNamespace=object3d
+    //% blockId=object3d_set_rotation
     //% block="set %object3d rotation|to %rotation=math_unit_vector"
     //% shim=.setRotation
     public setRotation(rotation: Vector): void;
@@ -176,7 +177,7 @@ declare class Object3d {
      * Set object scale.
      * @param scale Vector
      */
-    //% blockId=object3d_set_scale blockNamespace=object3d
+    //% blockId=object3d_set_scale
     //% block="set %object3d scale|to %scale=math_unit_vector"
     //% shim=.setScale
     public setScale(scale: Vector): void;
@@ -186,7 +187,7 @@ declare class Object3d {
      * @param axis Vector
      * @param angle number, eg: 0
      */
-    //% blockId=object3d_set_rotation_from_axis_angle blockNamespace=object3d
+    //% blockId=object3d_set_rotation_from_axis_angle
     //% block="set %object3d rotation|around %axis=math_vector|by %angle"
     //% shim=.setRotationFromAxisAngle
     public setRotationFromAxisAngle(axis: Vector, angle: number): void;
@@ -195,8 +196,8 @@ declare class Object3d {
      * Enable/disable physics.
      * @param enabled is physics, e.g. gravity, enabled on this object?
      */
-    //% blockId=enable_physics blockNamespace=scene
-    //% block="set %object physics %enabled=toggleOnOff"
+    //% blockId=object3d_set_physics_enabled
+    //% block="set %object physics %enabled=fieldeditors_toggleOnOff"
     //% shim=.setPhysicsEnabled
     public setPhysicsEnabled(enabled: boolean): void;
 }
@@ -211,14 +212,17 @@ declare class Shape3d {
 
 //% color="#2680d9" icon="\uf1fc" block="Design" weight=100
 declare namespace design { /* paint-brush icon */
+}
+
+declare namespace design {
     /**
      * Standard color.
      */
     //% blockId=color_standard
     //% block="%color"
     //% group="Color"
-    //% shim=color::colorStandard
-    function colorStandard(rgb: Palette): Color;
+    //% shim=color::standardColor
+    function standardColor(rgb: Palette): Color;
 
     /**
      * Random color.
@@ -226,8 +230,8 @@ declare namespace design { /* paint-brush icon */
     //% blockId=color_random
     //% block="random color"
     //% group="Color"
-    //% shim=color::colorRandom
-    function colorRandom(): Color;
+    //% shim=color::randomColor
+    function randomColor(): Color;
 
     /**
      * Converts red, green, blue channels into a RGB color
@@ -279,8 +283,10 @@ declare namespace design { /* paint-brush icon */
     //% color.fieldOptions.decompileLiterals=true
     //% blockHidden=true
     //% shim=color::colorPicker
-    function colorPicker(color: number): Color;
+    function colorPicker(color: number): Color;    
+}
 
+declare namespace design {
     /**
      * Plane shape.
      * @param width number, eg: 100
@@ -288,9 +294,9 @@ declare namespace design { /* paint-brush icon */
      */
     //% blockId=shape3d_plane
     //% block="plane of width %radius|height %height"
-    //% group="3D Shape"
-    //% shim=shape3d::plane
-    function plane(width?: number, height?: number): Shape3d;
+    //% group="Shape"
+    //% shim=shape3d::planeShape
+    function planeShape(width?: number, height?: number): Shape3d;
 
     /**
      * Box shape.
@@ -300,64 +306,48 @@ declare namespace design { /* paint-brush icon */
      */
     //% blockId=shape3d_box
     //% block="box of width %width|height %height|depth %depth"
-    //% group="3D Shape"
-    //% shim=shape3d::box
-    function box(width?: number, height?: number, depth?: number): Shape3d;
+    //% group="Shape"
+    //% shim=shape3d::boxShape
+    function boxShape(width?: number, height?: number, depth?: number): Shape3d;
 
     /**
      * Cylinder shape.
      * @param radius number, eg: 0.5
      * @param height number, eg: 1
      */
-    //% blockId=shape3d_cylinder
+    //% blockId=shape3d_cylinder 
     //% block="cylinder of radius %radius|height %height"
-    //% group="3D Shape"
-    //% shim=shape3d::cylinder
-    function cylinder(radius?: number, height?: number): Shape3d;
+    //% group="Shape"
+    //% shim=shape3d::cylinderShape
+    function cylinderShape(radius?: number, height?: number): Shape3d;
 
     /**
      * Sphere shape.
      * @param radius number, eg: 0.5
      */
-    //% blockId=shape3d_sphere
+    //% blockId=shape3d_sphere 
     //% block="sphere of radius %radius"
-    //% group="3D Shape"
-    //% shim=shape3d::sphere
-    function sphere(radius?: number): Shape3d;
+    //% group="Shape"
+    //% shim=shape3d::sphereShape
+    function sphereShape(radius?: number): Shape3d;
 
     /**
      * Cone shape.
      * @param radius number, eg: 0.5
      * @param height number, eg: 1
      */
-    //% blockId=shape3d_cone
+    //% blockId=shape3d_cone 
     //% block="cone of radius %radius|height %height"
-    //% group="3D Shape"
-    //% shim=shape3d::cone
-    function cone(radius?: number, height?: number): Shape3d;
-}
-
-//%
-declare class Mesh extends Object3d {
-}
-
-//% color="#2626d9" icon="\uf1b2" block="3D Object" weight=99
-declare namespace object3d { /* cube icon */
-    /**
-     * Create object with shape.
-     */
-    //% blockId=object3d_from_shape3d
-    //% block="object with shape %shape=shape3d_box|and material %material=material_with_color"
-    //% shim=mesh::from3dShape
-    function from3dShape(shape3d: Shape3d, material: Material): Mesh;
+    //% group="Shape"
+    //% shim=shape3d::coneShape
+    function coneShape(radius?: number, height?: number): Shape3d;
 }
 
 //%
 declare class Light extends Object3d {
 }
 
-//% color="#7f26d9" icon="\uf0eb" block="Light" weight=98
-declare namespace light { /* lightbulb icon */
+declare namespace design {
     /**
      * Directional light.
      * @param color Color
@@ -365,24 +355,25 @@ declare namespace light { /* lightbulb icon */
      */
     //% blockId=light_directional
     //% block="%color=color_picker directional light|with intensity %intensity"
-    //% shim=light::directional
-    function directional(color?: Color, intensity?: number): Light;
+    //% group="Light"
+    //% shim=light::directionalLight
+    function directionalLight(color?: Color, intensity?: number): Light;
 }
 
 //%
 declare class Material {
 }
 
-//% color="#d926d9" icon="\uf042" block="Material" weight=97
-declare namespace material { /* adjust icon */
+declare namespace design {
     /**
      * Solid color material.
      * @param color Color
      */
     //% blockId=material_of_color
     //% block="%color=color_picker material"
-    //% shim=material::ofColor
-    function ofColor(color?: Color): Material;
+    //% group="Material"
+    //% shim=material::materialOfColor
+    function materialOfColor(color?: Color): Material;
 }
 
 //%
@@ -394,12 +385,27 @@ declare namespace camera { /* camera icon */
 }
 
 //%
+declare class Mesh extends Object3d {
+}
+
+//% color="#7f26d9" icon="\uf1b2" block="Object" weight=99
+declare namespace object3d { /* cube icon */
+    /**
+     * Create object with shape.
+     */
+    //% blockId=object3d_from_shape3d_and_material
+    //% block="object with shape %shape=shape3d_box|and material %material=material_with_color"
+    //% shim=mesh::fromShapeAndMaterial
+    function fromShapeAndMaterial(shape3d: Shape3d, material: Material): Mesh;
+}
+
+//%
 declare class Scene extends Object3d {
     /**
      * Set background color.
      * @param color Color
      */
-    //% blockId=set_background_color blockNamespace=scene
+    //% blockId=set_background_color
     //% block="set %current=world_scene|background %color=color_picker"
     //% shim=.setBackgroundColor
     public setBackgroundColor(color: Color): void;
@@ -408,7 +414,7 @@ declare class Scene extends Object3d {
      * Set ambient light color.
      * @param color Color
      */
-    //% blockId=set_ambientlight_color blockNamespace=scene
+    //% blockId=set_ambientlight_color
     //% block="set %current=world_scene|ambient light %color=color_picker"
     //% shim=.setAmbientLight
     public setAmbientLight(color: Color): void;
@@ -416,7 +422,7 @@ declare class Scene extends Object3d {
     /**
      * Add object to scene.
      */
-    //% blockId=add_object blockNamespace=scene
+    //% blockId=add_object
     //% block="add to %scene=world_scene %object3d|at %position=world_origin"
     //% shim=.add
     public add(object3d: Object3d, position: Vector): void;
@@ -424,7 +430,7 @@ declare class Scene extends Object3d {
     /**
      * Remove object from scene.
      */
-    //% blockId=remove_object blockNamespace=scene
+    //% blockId=remove_object
     //% block="remove from %scene=world_scene %object3d"
     //% shim=.remove
     public remove(object3d: Object3d): void;

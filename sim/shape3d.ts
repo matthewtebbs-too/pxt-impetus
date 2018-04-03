@@ -127,23 +127,23 @@ namespace pxsim {
 }
 
 namespace pxsim.shape3d {
-    export function plane(width?: number, height?: number): PlaneShape3d {
+    export function planeShape(width?: number, height?: number): PlaneShape3d {
         return new PlaneShape3d(width, height);
     }
 
-    export function box(width?: number, height?: number, depth?: number): BoxShape3d {
+    export function boxShape(width?: number, height?: number, depth?: number): BoxShape3d {
         return new BoxShape3d(width, height, depth);
     }
 
-    export function cylinder(radius?: number, height?: number): CylinderShape3d  {
+    export function cylinderShape(radius?: number, height?: number): CylinderShape3d  {
         return new CylinderShape3d(radius, height);
     }
 
-    export function sphere(radius?: number): SphereShape3d  {
+    export function sphereShape(radius?: number): SphereShape3d  {
         return new SphereShape3d(radius);
     }
 
-    export function cone(radius?: number, height?: number): ConeShape3d  {
+    export function coneShape(radius?: number, height?: number): ConeShape3d  {
         return new ConeShape3d(radius, height);
     }
 }

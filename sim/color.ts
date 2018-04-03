@@ -12,11 +12,11 @@ namespace pxsim {
 }
 
 namespace pxsim.color {
-    export function colorStandard(rgb: number): Color {
+    export function standardColor(rgb: number): Color {
         return new Color(rgb);
     }
 
-    export function colorRandom(): Color {
+    export function randomColor(): Color {
         return new Color(Math.random() * (1 << 24));
     }
 
