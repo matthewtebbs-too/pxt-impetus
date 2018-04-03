@@ -3,8 +3,8 @@
 Click a floating cube! (NYI)
 
 ```blocks
+    let boxobject: Mesh3d = null
     let boxshape: Shape3d = null
-    let boxmesh: Mesh3d = null
     let theta = 0
     scene.onAnimate(function (msec) {
         theta += 0.1 * msec / (1 / 60)
@@ -16,8 +16,8 @@ Click a floating cube! (NYI)
     world.scene().add(design.directionalLight(design.colorPicker(0xffffff), 1), Math.vector(5, 20, 0))
     boxshape = design.boxShape(20, 20, 20)
     for (let i = 0; i < 2000; i++) {
-        boxmesh = object.fromShapeAndMaterial(boxshape, design.materialOfColor(design.randomColor()))
-        world.scene().add(boxmesh, Math.vector(Math.randomRange(-400, 400), Math.randomRange(-400, 400), Math.randomRange(-400, 400)))
+        boxobject = object.fromShapeAndMaterial(boxshape, design.materialOfColor(design.randomColor()))
+        world.scene().add(boxobject, Math.vector(Math.randomRange(-400, 400), Math.randomRange(-400, 400), Math.randomRange(-400, 400)))
     }
 ```
 

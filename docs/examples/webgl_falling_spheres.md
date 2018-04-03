@@ -4,13 +4,13 @@ Watch the spheres fall!
 
 ```blocks
     let sphereshape: Shape3d = null
-    let spheremesh: Mesh3d = null
+    let sphereobject: Mesh3d = null
     let count = 0
     loops.forever(function () {
         if (count > 0) {
-            spheremesh = object.fromShapeAndMaterial(sphereshape, design.materialOfColor(design.randomColor()))
-            world.scene().add(spheremesh, Math.vector(0, 40, 0))
-            spheremesh.setPhysicsEnabled(true)
+            sphereobject = object.fromShapeAndMaterial(sphereshape, design.materialOfColor(design.randomColor()))
+            world.scene().add(sphereobject, Math.vector(0, 40, 0))
+            sphereobject.setPhysicsEnabled(true)
             count += -1
         }
     })

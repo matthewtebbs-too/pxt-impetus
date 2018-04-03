@@ -159,7 +159,7 @@ declare class Object3d {
      * @param position Vector
      */
     //% blockId=object3d_set_position blockNamespace=object
-    //% block="set %object position|at %position=math_vector"
+    //% block="set %object3d position|at %position=math_vector"
     //% shim=.setPosition
     public setPosition(position: Vector): void;
 
@@ -168,7 +168,7 @@ declare class Object3d {
      * @param rotation Vector
      */
     //% blockId=object3d_set_rotation blockNamespace=object
-    //% block="set %object rotation|to %rotation=math_unit_vector"
+    //% block="set %object3d rotation|to %rotation=math_unit_vector"
     //% shim=.setRotation
     public setRotation(rotation: Vector): void;
 
@@ -177,7 +177,7 @@ declare class Object3d {
      * @param scale Vector
      */
     //% blockId=object3d_set_scale blockNamespace=object
-    //% block="set %object scale|to %scale=math_unit_vector"
+    //% block="set %object3d scale|to %scale=math_unit_vector"
     //% shim=.setScale
     public setScale(scale: Vector): void;
 
@@ -187,7 +187,7 @@ declare class Object3d {
      * @param angle number, eg: 0
      */
     //% blockId=object3d_set_rotation_from_axis_angle blockNamespace=object
-    //% block="set %object rotation|around %axis=math_vector|by %angle"
+    //% block="set %object3d rotation|around %axis=math_vector|by %angle"
     //% shim=.setRotationFromAxisAngle
     public setRotationFromAxisAngle(axis: Vector, angle: number): void;
 
@@ -196,7 +196,7 @@ declare class Object3d {
      * @param enabled is physics, e.g. gravity, enabled on this object?
      */
     //% blockId=object3d_set_physics_enabled blockNamespace=object
-    //% block="set %object physics %enabled=fieldeditors_toggleOnOff"
+    //% block="set %object3d physics %enabled=fieldeditors_toggleOnOff"
     //% shim=.setPhysicsEnabled
     public setPhysicsEnabled(enabled: boolean): void;
 }
@@ -422,7 +422,7 @@ declare class Scene3d extends Object3d {
      * Add object to scene.
      */
     //% blockId=add_object blockNamespace=scene
-    //% block="add to %scene=world_scene %object|at %position=world_origin"
+    //% block="add to %scene=world_scene %object3d|at %position=world_origin"
     //% shim=.add
     public add(object3d: Object3d, position: Vector): void;
 
@@ -430,7 +430,7 @@ declare class Scene3d extends Object3d {
      * Remove object from scene.
      */
     //% blockId=remove_object blockNamespace=scene
-    //% block="remove from %scene=world_scene %object"
+    //% block="remove from %scene=world_scene %object3d"
     //% shim=.remove
     public remove(object3d: Object3d): void;
 }
