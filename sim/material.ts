@@ -19,7 +19,7 @@ namespace pxsim {
         }
     }
 
-    export type GenericMaterial = Material<THREE.Material>;
+    export class GenericMaterial extends Material<THREE.Material> { }
 
     export class SolidMaterial extends Material<THREE.MeshPhongMaterial> {
         public static getInstance(

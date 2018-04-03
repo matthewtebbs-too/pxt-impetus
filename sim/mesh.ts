@@ -8,15 +8,14 @@
 
 namespace pxsim {
     export class Mesh extends Object3d<THREE.Mesh> {
-        private _shape3d: GenericShape3d;
-        private _material: GenericMaterial;
-
-        public get shape3d() {
-            return this._shape3d;
+        public get shape3d(): GenericShape3d {
+            return new GenericShape3d(this.reference.geometry);
         }
 
-        public get material() {
-            return this._material;
+        public get material(): GenericMaterial[] | GenericMaterial {
+            return Array.isArray(this.reference.material) ?
+                this.reference.material.map(ref => new GenericMaterial(ref)) :
+                new GenericMaterial(this.reference.material);
         }
 
         constructor(
@@ -26,10 +25,7 @@ namespace pxsim {
         ) {
             super(new THREE.Mesh(shape3d.reference, material.reference), id);
 
-            this._shape3d = shape3d;
-            this._material = material;
-
-            this._rigidbody = new RigidBody(this, this.shape3d, this.shape3d.volume * this.material.density);
+            this._rigidbody = new RigidBody(this, shape3d, shape3d.volume * material.density);
         }
     }
 }

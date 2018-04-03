@@ -60,7 +60,7 @@ namespace pxsim {
             });
 
             if (this._rigidbody) {
-                this._rigidbody!.syncMotionStateToObject3D();
+                this._rigidbody!.syncMotionStateToObject3d();
             }
         }
 
@@ -96,7 +96,7 @@ namespace pxsim {
         }
     }
 
-    export type GenericObject3d = Object3d<THREE.Object3D>;
+    export class GenericObject3d extends Object3d<THREE.Object3D> { }
 
     export function outerObject(reference: THREE.Object3D): GenericObject3d | null {
         return reference.userData.outer as GenericObject3d || null;

@@ -9,6 +9,8 @@
 namespace pxsim {
     export class World3d extends rt.ObjectDisposable {
         private _renderer: Renderer;
+        private _raycaster: THREE.Raycaster;
+
         private _controls: THREE.OrbitControls | null = null;
 
         public get renderer(): Renderer {
@@ -49,9 +51,18 @@ namespace pxsim {
             window.addEventListener('resize', this._onWindowResize, false);
             document.addEventListener('mousemove', this._onDocumentMouseMove, false);
 
+            this._raycaster = new THREE.Raycaster();
+
             this._controls = new THREE.OrbitControls(this._renderer.camera.reference);
             this._controls.target.set(0, 2, 0);
             this._controls.update();
+        }
+
+        public intersectedObjects(x: number, y: number): GenericObject3d[] | null {
+            this._raycaster.setFromCamera(new THREE.Vector2(x, y), this.renderer.camera!.reference);
+            const intersections = this._raycaster.intersectObjects(this._renderer.scene!.reference.children);
+
+            return intersections.length > 0 ? intersections.map(intersection => new GenericObject3d(intersection.object)) : null;
         }
 
         protected _onDispose() {
@@ -95,6 +106,12 @@ namespace pxsim.world3d {
 
     export function camera(): GenericCamera {
         return pxsim.activeCamera()!;
+    }
+
+    export function intersectedObjectAt(x: number, y: number): GenericObject3d | null {
+        const objects = ourWorld3d()!.intersectedObjects(x, y);
+
+        return objects && objects.length > 0 ? objects[0] : null;
     }
 
     export function onMouseMove(handler: RefAction) {

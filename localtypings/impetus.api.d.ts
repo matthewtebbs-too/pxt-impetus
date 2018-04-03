@@ -144,7 +144,7 @@ declare namespace math {
 }
 
 //%
-declare class Object3D {
+declare class Object3d {
     /**
      * Look at.
      * @param position Vector
@@ -338,7 +338,7 @@ declare namespace design { /* paint-brush icon */
 }
 
 //%
-declare class Mesh extends Object3D {
+declare class Mesh extends Object3d {
 }
 
 //% color="#2626d9" icon="\uf1b2" block="3D Object" weight=99
@@ -353,7 +353,7 @@ declare namespace object3d { /* cube icon */
 }
 
 //%
-declare class Light extends Object3D {
+declare class Light extends Object3d {
 }
 
 //% color="#7f26d9" icon="\uf0eb" block="Light" weight=98
@@ -386,7 +386,7 @@ declare namespace material { /* adjust icon */
 }
 
 //%
-declare class Camera extends Object3D {
+declare class Camera extends Object3d {
 }
 
 //% color="#ffffff" icon="\uf030" block="Camera" weight=96
@@ -394,7 +394,7 @@ declare namespace camera { /* camera icon */
 }
 
 //%
-declare class Scene extends Object3D {
+declare class Scene extends Object3d {
     /**
      * Set background color.
      * @param color Color
@@ -419,7 +419,7 @@ declare class Scene extends Object3D {
     //% blockId=add_object blockNamespace=scene
     //% block="add to %scene=world_scene %object3d|at %position=world_origin"
     //% shim=.add
-    public add(object3d: Object3D, position: Vector): void;
+    public add(object3d: Object3d, position: Vector): void;
 
     /**
      * Remove object from scene.
@@ -427,7 +427,7 @@ declare class Scene extends Object3D {
     //% blockId=remove_object blockNamespace=scene
     //% block="remove from %scene=world_scene %object3d"
     //% shim=.remove
-    public remove(object3d: Object3D): void;
+    public remove(object3d: Object3d): void;
 }
 
 //% color="#d92680" icon="\uf03e" block="Scene" weight=95
@@ -466,6 +466,15 @@ declare namespace world3d { /* globe icon */
     //% block="camera"
     //% shim=world3d::camera
     function camera(): Camera;
+
+    /**
+     * Intersect the view of the current scene with the active camera.
+     */
+    //% blockId=world_intersect_objectat
+    //% block="intersected object at %x|%y"
+    //% shim=world3d::intersectedObjectAt
+    function intersectedObjectAt(x: number, y: number): Object3d | null;
+
 
     /**
      * Code to run when the mouse is moved over the world's render window.

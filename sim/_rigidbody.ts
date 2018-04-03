@@ -7,7 +7,7 @@
 /// <reference path="_physics.ts"/>
 
 namespace pxsim {
-    export function btMotionStateFromObject3D(btmotionstate: Ammo.btMotionState, object3d: GenericObject3d) {
+    export function btMotionStateFromObject3d(btmotionstate: Ammo.btMotionState, object3d: GenericObject3d) {
         const bttransform = new Ammo.btTransform();
         let btorigin, btquarternion;
 
@@ -23,7 +23,7 @@ namespace pxsim {
         return btmotionstate;
     }
 
-    export function btMotionStateToObject3D(btmotionstate: Ammo.btMotionState, object3d: GenericObject3d): void {
+    export function btMotionStateToObject3d(btmotionstate: Ammo.btMotionState, object3d: GenericObject3d): void {
         const bttransform = new Ammo.btTransform();
 
         btmotionstate.getWorldTransform(bttransform);
@@ -117,7 +117,7 @@ namespace pxsim {
         public addRigidBody(world: PhysicsWorld) {
             this.removeRigidBody(world);
 
-            btMotionStateFromObject3D(this._btmotionstate, this._object3d);
+            btMotionStateFromObject3d(this._btmotionstate, this._object3d);
             this._btbody.setMotionState(this._btmotionstate);
 
             this._world = world;
@@ -133,9 +133,9 @@ namespace pxsim {
             this._world = null;
         }
 
-        public syncMotionStateToObject3D() {
+        public syncMotionStateToObject3d() {
             if (!this._btbody.isStaticOrKinematicObject() /* is dynamic? */) {
-                btMotionStateToObject3D(this._btbody.getMotionState(), this._object3d);
+                btMotionStateToObject3d(this._btbody.getMotionState(), this._object3d);
             }
         }
 
