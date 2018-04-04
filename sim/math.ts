@@ -33,37 +33,37 @@ namespace pxsim.math3d {
         return vector(1, 1, 1);
     }
 
-    export function vectorOp(a: Vector, op: Op, b: Vector): Vector {
+    export function vectorOp(a: Vector, op: MathOp, b: Vector): Vector {
         const result: Vector = vector();
 
         switch (op) {
-            case Op.Add:
+            case MathOp.Add:
                 return result.addVectors(a, b);
 
-            case Op.Subtract:
+            case MathOp.Subtract:
                 return result.subVectors(a, b);
 
-            case Op.Multiply:
+            case MathOp.Multiply:
                 return result.multiplyVectors(a, b);
         }
 
         throw new Error();
     }
 
-    export function vectorScalarOp(a: Vector, op: Op, s: number): Vector {
+    export function vectorScalarOp(a: Vector, op: MathOp, s: number): Vector {
         const result: Vector = a;
 
         switch (op) {
-            case Op.Add:
+            case MathOp.Add:
                 return result.addScalar(s);
 
-            case Op.Subtract:
+            case MathOp.Subtract:
                 return result.subScalar(s);
 
-            case Op.Multiply:
+            case MathOp.Multiply:
                 return result.multiplyScalar(s);
 
-            case Op.Divide:
+            case MathOp.Divide:
                 return result.divideScalar(s);
         }
     }

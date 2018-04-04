@@ -31,7 +31,7 @@ namespace pxsim {
         constructor(id?: rt.ObjId) {
             super(new THREE.Scene(), id);
 
-            this.reference.background = new THREE.Color(Palette.lightgray);
+            this.reference.background = new THREE.Color(Palette.LightGray);
 
             this._ambientlight = new AmbientLight();
             this.add(this._ambientlight);

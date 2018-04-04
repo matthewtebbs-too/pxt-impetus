@@ -63,7 +63,7 @@ namespace pxsim {
 
             this.reference.shadowMap.enabled = true;
             this.reference.shadowMap.type = THREE.PCFSoftShadowMap;
-            this.reference.setClearColor(Palette.lightcyan);
+            this.reference.setClearColor(Palette.LightCyan);
 
             this._runRenderLoop();
         }

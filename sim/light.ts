@@ -26,13 +26,13 @@ namespace pxsim {
 
     export class AmbientLight extends Light<THREE.AmbientLight> {
         constructor(color?: Color, intensity?: number, id?: rt.ObjId) {
-            super(new THREE.AmbientLight(color || Palette.softwhite, intensity || 1), id);
+            super(new THREE.AmbientLight(color || Palette.SoftWhite, intensity || 1), id);
         }
     }
 
     export class DirectionalLight extends Light<THREE.DirectionalLight> {
         constructor(color?: Color, intensity?: number, id?: rt.ObjId) {
-            super(new THREE.DirectionalLight(color || Palette.white, intensity || 1), id);
+            super(new THREE.DirectionalLight(color || Palette.White, intensity || 1), id);
 
             this._configureShadow();
         }
@@ -40,7 +40,7 @@ namespace pxsim {
 
     export class HemisphereLight extends Light<THREE.HemisphereLight> {
         constructor(colorSky?: Color, colorGround?: Color, intensity?: number, id?: rt.ObjId) {
-            super(new THREE.HemisphereLight(colorSky || NaturePalette.sky, NaturePalette.ground, intensity || 0.6), id);
+            super(new THREE.HemisphereLight(colorSky || NaturePalette.Sky, NaturePalette.Ground, intensity || 0.6), id);
         }
     }
 
@@ -51,7 +51,7 @@ namespace pxsim {
             decay?: number,
             id?: rt.ObjId,
         ) {
-            super(new THREE.PointLight(color || Palette.white, intensity || 1, distance || 0, decay || 2), id);
+            super(new THREE.PointLight(color || Palette.White, intensity || 1, distance || 0, decay || 2), id);
 
             this._configureShadow();
         }
@@ -67,7 +67,7 @@ namespace pxsim {
             super(
                 new THREE.SpotLight
                 (
-                    color || Palette.white, intensity || 1,
+                    color || Palette.White, intensity || 1,
                     distance || 0, angle || Math.PI / 3,
                     penumbra || 0, decay || 2,
                 ),

@@ -6,24 +6,30 @@
 
 namespace pxsim {
     export const enum ScopeId {
-        World = 1,
+        World,
+
         Scene,
+
+        MouseDevice,
+        MouseLeftButton,
+        MouseMiddleButton,
+        MouseRightButton,
     }
 
     export const enum EventId {
-        /* World */
-        Animate = 1,
+        Animate,
 
-        /* Scene */
-        MouseMove,
-        MouseClick,
+        Move,
+
+        Click,
+        DoubleClick,
     }
 
     export abstract class EventValue {
         public abstract toActionArgs(): any[];
     }
 
-    export class MouseEventValue extends EventValue {
+    export class EventCoordValue extends EventValue {
         constructor(public x: number, public y: number) {
             super();
         }

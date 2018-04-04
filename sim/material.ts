@@ -27,7 +27,7 @@ namespace pxsim {
             id?: rt.ObjId,
         ) {
             return this._factory.getInstance(
-                { color: (solidColor ? solidColor.getHex() : undefined) || Palette.white },
+                { color: (solidColor ? solidColor.getHex() : undefined) || Palette.White },
                 id);
         }
 

@@ -108,7 +108,7 @@ declare namespace Math {
     //% block="%a=math_unit_vector|%op|%b=math_unit_vector"
     //% group="Vector"
     //% shim=math3d::vectorOp
-    function vectorOp(a: Vector, op: Op, b: Vector): Vector;
+    function vectorOp(a: Vector, op: MathOp, b: Vector): Vector;
 
     /**
      * Vector scalar operations.
@@ -120,7 +120,7 @@ declare namespace Math {
     //% block="%a=math_unit_vector|%op|scalar %s"
     //% group="Vector"
     //% shim=math3d::vectorScalarOp
-    function vectorScalarOp(a: Vector, op: Op, s: number): Vector;
+    function vectorScalarOp(a: Vector, op: MathOp, s: number): Vector;
 
     /**
      * Convert degress to radians.
@@ -480,12 +480,19 @@ declare namespace world { /* globe icon */
     //% shim=world::intersectedObjectAt
     function intersectedObjectAt(x: number, y: number): Object3d | null;
 
-
     /**
-     * Code to run when the mouse is moved over the world's render window.
+     * Code to run when a mouse event occurs.
      */
     //% blockId=world_on_mousemove
     //% block="on mouse move"
     //% shim=world::onMouseMove
     function onMouseMove(cb: (x: number, y: number) => void): void;
+
+    /**
+     * Code to run when a mouse event occurs.
+     */
+    //% blockId=world_on_mouseclick
+    //% block="on mouse %button click"
+    //% shim=world::onMouseClick
+    function onMouseClick(button: MouseButton, cb: (x: number, y: number) => void): void;
 }

@@ -8,6 +8,20 @@
 
 namespace pxsim {
     export class World3d extends rt.ObjectDisposable {
+        protected static _sidFromMouseButtonEvent(event: MouseEvent): ScopeId | undefined {
+            let sid;
+
+            if (0 === event.button) {
+                sid = ScopeId.MouseLeftButton;
+            } else if (1 === event.button) {
+                sid = ScopeId.MouseMiddleButton;
+            } else if (2 === event.button) {
+                sid = ScopeId.MouseRightButton;
+            }
+
+            return sid;
+        }
+
         private _renderer: Renderer;
 
         private _scene: Scene3d | null = null;
@@ -69,16 +83,20 @@ namespace pxsim {
             this._renderer.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio);
         }
 
-        protected _onDocumentMouseMove = (event: MouseEvent) => this._onDocumentMouseEvent(EventId.MouseMove, event);
-        protected _onDocumentMouseClick = (event: MouseEvent) => this._onDocumentMouseEvent(EventId.MouseClick, event);
+        protected _onDocumentMouseMove = (event: MouseEvent) => this._onDocumentMouseEvent(ScopeId.MouseDevice, EventId.Move, event);
+        protected _onDocumentMouseClick = (event: MouseEvent) => this._onDocumentMouseEvent(World3d._sidFromMouseButtonEvent(event), EventId.Click, event);
 
-        protected _onDocumentMouseEvent = (eventid: EventId, event: MouseEvent) => {
+        protected _onDocumentMouseEvent = (sid: ScopeId | undefined, evid: EventId, event: MouseEvent) => {
             event.preventDefault();
+
+            if (!sid) {
+                return;
+            }
 
             const x = (event.clientX / window.innerWidth) * 2 - 1;
             const y = - (event.clientY / window.innerHeight) * 2 + 1;
 
-            singletonWorldBoard().events!.queue(ScopeId.World, eventid, new MouseEventValue(x, y));
+            singletonWorldBoard().events!.queue(sid, evid, new EventCoordValue(x, y));
         }
     }
 }
@@ -110,6 +128,30 @@ namespace pxsim.world {
     }
 
     export function onMouseMove(handler: RefAction) {
-        singletonWorldBoard().events!.listen(ScopeId.World, EventId.MouseMove, handler);
+        singletonWorldBoard().events!.listen(ScopeId.MouseDevice, EventId.Move, handler);
     }
+
+    export function onMouseClick(button: MouseButton, handler: RefAction) {
+        let sid;
+
+        switch (button) {
+            case MouseButton.Left:
+                sid = ScopeId.MouseLeftButton;
+                break;
+
+            case MouseButton.Middle:
+                sid = ScopeId.MouseMiddleButton;
+                break;
+
+            case MouseButton.Right:
+                sid = ScopeId.MouseRightButton;
+                break;
+
+            default:
+                return;
+        }
+
+        singletonWorldBoard().events!.listen(sid, EventId.Click, handler);
+    }
+
 }

@@ -12,7 +12,7 @@ Click a floating cube! (NYI)
         world.camera().lookAt(world.origin())
     })
     theta = 0
-    world.scene().setBackgroundColor(design.standardColor(Palette.lightcyan))
+    world.scene().setBackgroundColor(design.standardColor(Palette.LightCyan))
     world.scene().add(design.directionalLight(design.colorPicker(0xffffff), 1), Math.vector(5, 20, 0))
     boxshape = design.boxShape(20, 20, 20)
     for (let i = 0; i < 2000; i++) {
