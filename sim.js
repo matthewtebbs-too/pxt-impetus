@@ -121,18 +121,30 @@ var pxsim;
             return _this;
         }
         Object3d.prototype.lookAt = function (position) {
+            if (!position) {
+                return;
+            }
             this.reference.lookAt(position);
         };
         Object3d.prototype.setPosition = function (position) {
+            if (!position) {
+                return;
+            }
             this.reference.position.set(position.x, position.y, position.z);
         };
         Object3d.prototype.setRotation = function (rotation) {
+            if (!rotation) {
+                return;
+            }
             this.reference.rotation.set(THREE.Math.degToRad(rotation.x), THREE.Math.degToRad(rotation.y), THREE.Math.degToRad(rotation.z));
         };
         Object3d.prototype.setScale = function (scale) {
             this.reference.scale.set(scale.x, scale.y, scale.z);
         };
         Object3d.prototype.setRotationFromAxisAngle = function (axis, angle) {
+            if (!axis) {
+                return;
+            }
             this.reference.setRotationFromAxisAngle(axis, THREE.Math.degToRad(angle));
         };
         Object3d.prototype.setPhysicsEnabled = function (enable) {
@@ -148,17 +160,17 @@ var pxsim;
                 }
             });
             if (this._rigidbody) {
-                this._rigidbody.syncMotionStateToObject3D();
+                this._rigidbody.syncMotionStateToObject3d();
             }
         };
-        Object3d.prototype.onAdded = function (scene) {
+        Object3d.prototype.onAdded = function (scene3d) {
             if (this._rigidbody) {
-                this._rigidbody.addRigidBody(scene.physicsWorld);
+                this._rigidbody.addRigidBody(scene3d.physicsWorld);
             }
         };
-        Object3d.prototype.onRemoved = function (scene) {
+        Object3d.prototype.onRemoved = function (scene3d) {
             if (this._rigidbody) {
-                this._rigidbody.removeRigidBody(scene.physicsWorld);
+                this._rigidbody.removeRigidBody(scene3d.physicsWorld);
             }
         };
         Object3d.prototype._constructRigidBody = function () {
@@ -179,6 +191,14 @@ var pxsim;
         return Object3d;
     }(rt.WrappedObjectWithId));
     pxsim.Object3d = Object3d;
+    var GenericObject3d = (function (_super) {
+        __extends(GenericObject3d, _super);
+        function GenericObject3d() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return GenericObject3d;
+    }(Object3d));
+    pxsim.GenericObject3d = GenericObject3d;
     function outerObject(reference) {
         return reference.userData.outer || null;
     }
@@ -238,14 +258,14 @@ var pxsim;
 (function (pxsim) {
     var color;
     (function (color_1) {
-        function colorStandard(rgb) {
+        function standardColor(rgb) {
             return new pxsim.Color(rgb);
         }
-        color_1.colorStandard = colorStandard;
-        function colorRandom() {
+        color_1.standardColor = standardColor;
+        function randomColor() {
             return new pxsim.Color(Math.random() * (1 << 24));
         }
-        color_1.colorRandom = colorRandom;
+        color_1.randomColor = randomColor;
         function colorFromRgb(red, green, blue) {
             return new pxsim.Color(red / 255, green / 255, blue / 255);
         }
@@ -292,6 +312,34 @@ var pxsim;
         }
         console.logValue = logValue;
     })(console = pxsim.console || (pxsim.console = {}));
+})(pxsim || (pxsim = {}));
+var pxsim;
+(function (pxsim) {
+    var input;
+    (function (input) {
+        function onMouseMove(handler) {
+            pxsim.singletonWorldBoard().events.listen(2, 1, handler);
+        }
+        input.onMouseMove = onMouseMove;
+        function onMouseClick(button, handler) {
+            var sid;
+            switch (button) {
+                case 1:
+                    sid = 3;
+                    break;
+                case 2:
+                    sid = 4;
+                    break;
+                case 3:
+                    sid = 5;
+                    break;
+                default:
+                    return;
+            }
+            pxsim.singletonWorldBoard().events.listen(sid, 2, handler);
+        }
+        input.onMouseClick = onMouseClick;
+    })(input = pxsim.input || (pxsim.input = {}));
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
@@ -363,18 +411,18 @@ var pxsim;
 (function (pxsim) {
     var light;
     (function (light) {
-        function ambient(color, intensity) {
+        function ambientLight(color, intensity) {
             return new pxsim.DirectionalLight(color, intensity);
         }
-        light.ambient = ambient;
-        function directional(color, intensity) {
+        light.ambientLight = ambientLight;
+        function directionalLight(color, intensity) {
             return new pxsim.DirectionalLight(color, intensity);
         }
-        light.directional = directional;
-        function hemisphere(colorSky, colorGround, intensity) {
+        light.directionalLight = directionalLight;
+        function hemisphereLight(colorSky, colorGround, intensity) {
             return new pxsim.HemisphereLight(colorSky, colorGround, intensity);
         }
-        light.hemisphere = hemisphere;
+        light.hemisphereLight = hemisphereLight;
     })(light = pxsim.light || (pxsim.light = {}));
 })(pxsim || (pxsim = {}));
 var pxsim;
@@ -412,6 +460,14 @@ var pxsim;
         return Material;
     }(rt.WrappedObjectWithId));
     pxsim.Material = Material;
+    var GenericMaterial = (function (_super) {
+        __extends(GenericMaterial, _super);
+        function GenericMaterial() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return GenericMaterial;
+    }(Material));
+    pxsim.GenericMaterial = GenericMaterial;
     var SolidMaterial = (function (_super) {
         __extends(SolidMaterial, _super);
         function SolidMaterial(params, id) {
@@ -428,10 +484,10 @@ var pxsim;
 (function (pxsim) {
     var material;
     (function (material) {
-        function ofColor(color) {
+        function materialOfColor(color) {
             return pxsim.SolidMaterial.getInstance(color);
         }
-        material.ofColor = ofColor;
+        material.materialOfColor = materialOfColor;
     })(material = pxsim.material || (pxsim.material = {}));
 })(pxsim || (pxsim = {}));
 var pxsim;
@@ -468,6 +524,10 @@ var pxsim;
             return new pxsim.Vector(x || 0, y || 0, z || 0);
         }
         math3d.vector = vector;
+        function zeroVector() {
+            return vector();
+        }
+        math3d.zeroVector = zeroVector;
         function unitVector() {
             return vector(1, 1, 1);
         }
@@ -503,111 +563,148 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
-    var Mesh = (function (_super) {
-        __extends(Mesh, _super);
-        function Mesh(shape3d, material, id) {
+    var Mesh3d = (function (_super) {
+        __extends(Mesh3d, _super);
+        function Mesh3d(shape3d, material, id) {
             var _this = _super.call(this, new THREE.Mesh(shape3d.reference, material.reference), id) || this;
-            _this._shape3d = shape3d;
-            _this._material = material;
-            _this._rigidbody = new pxsim.RigidBody(_this, _this.shape3d, _this.shape3d.volume * _this.material.density);
+            _this._rigidbody = new pxsim.RigidBody(_this, shape3d, shape3d.volume * material.density);
             return _this;
         }
-        Object.defineProperty(Mesh.prototype, "shape3d", {
+        Object.defineProperty(Mesh3d.prototype, "shape3d", {
             get: function () {
-                return this._shape3d;
+                return new pxsim.GenericShape3d(this.reference.geometry);
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Mesh.prototype, "material", {
+        Object.defineProperty(Mesh3d.prototype, "material", {
             get: function () {
-                return this._material;
+                return pxsim.Helper.applyFn(this.reference.material, function (ref) { return new pxsim.GenericMaterial(ref); });
             },
             enumerable: true,
             configurable: true
         });
-        return Mesh;
+        return Mesh3d;
     }(pxsim.Object3d));
-    pxsim.Mesh = Mesh;
+    pxsim.Mesh3d = Mesh3d;
 })(pxsim || (pxsim = {}));
 (function (pxsim) {
     var mesh;
     (function (mesh) {
-        function from3dShape(shape3d, material) {
-            return new pxsim.Mesh(shape3d, material);
+        function fromShapeAndMaterial(shape3d, material) {
+            if (!shape3d || !material) {
+                return null;
+            }
+            return new pxsim.Mesh3d(shape3d, material);
         }
-        mesh.from3dShape = from3dShape;
+        mesh.fromShapeAndMaterial = fromShapeAndMaterial;
     })(mesh = pxsim.mesh || (pxsim.mesh = {}));
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
-    var GenericScene = (function (_super) {
-        __extends(GenericScene, _super);
-        function GenericScene(id) {
+    var GenericScene3d = (function (_super) {
+        __extends(GenericScene3d, _super);
+        function GenericScene3d(id) {
             var _this = _super.call(this, new THREE.Scene(), id) || this;
             _this._physicsworld = new pxsim.PhysicsWorld();
-            _this._ambientlight = new pxsim.AmbientLight();
+            _this._controls = null;
             _this.reference.background = new THREE.Color(13882323);
+            _this._ambientlight = new pxsim.AmbientLight();
             _this.add(_this._ambientlight);
+            _this._camera = new pxsim.PerspectiveCamera();
+            _this.add(_this._camera, new pxsim.Vector(-40, 20, 15));
+            _this._raycaster = new THREE.Raycaster();
+            _this._controls = new THREE.OrbitControls(_this._camera.reference);
+            _this._controls.target.set(0, 2, 0);
+            _this._controls.update();
             return _this;
         }
-        Object.defineProperty(GenericScene.prototype, "physicsWorld", {
-            get: function () {
-                return this._physicsworld;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(GenericScene.prototype, "ambientLight", {
+        Object.defineProperty(GenericScene3d.prototype, "ambientLight", {
             get: function () {
                 return this._ambientlight;
             },
             enumerable: true,
             configurable: true
         });
-        GenericScene.prototype.setBackgroundColor = function (color) {
+        Object.defineProperty(GenericScene3d.prototype, "physicsWorld", {
+            get: function () {
+                return this._physicsworld;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        GenericScene3d.prototype.camera = function () {
+            return this._camera;
+        };
+        GenericScene3d.prototype.setBackgroundColor = function (color) {
+            if (!color) {
+                return;
+            }
             this.reference.background = color;
         };
-        GenericScene.prototype.setAmbientLight = function (color) {
+        GenericScene3d.prototype.setAmbientLight = function (color) {
+            if (!color) {
+                return;
+            }
             this.ambientLight.reference.color = color;
         };
-        GenericScene.prototype.add = function (object3d, position) {
+        GenericScene3d.prototype.add = function (object3d, position) {
+            if (!object3d) {
+                return;
+            }
             if (position) {
                 object3d.setPosition(position);
             }
             this.reference.add(object3d.reference);
             object3d.onAdded(this);
         };
-        GenericScene.prototype.remove = function (object3d) {
+        GenericScene3d.prototype.remove = function (object3d) {
+            if (!object3d) {
+                return;
+            }
             object3d.onRemoved(this);
             this.reference.remove(object3d.reference);
         };
-        GenericScene.prototype.animate = function (timeStep) {
+        GenericScene3d.prototype.animate = function (timeStep) {
             _super.prototype.animate.call(this, timeStep);
             this._physicsworld.animate(timeStep);
-            pxsim.WorldBoard.events.queue(1234, 5678, timeStep);
+            pxsim.singletonWorldBoard().events.queue(1, 0, timeStep);
         };
-        GenericScene.prototype._onDispose = function () {
+        GenericScene3d.prototype.intersectedObjects = function (x, y) {
+            if (!this._camera) {
+                return null;
+            }
+            this._raycaster.setFromCamera(new THREE.Vector2(x, y), this._camera.reference);
+            var intersections = this._raycaster.intersectObjects(this.reference.children);
+            return intersections.length > 0 ? intersections.map(function (intersection) { return new pxsim.GenericObject3d(intersection.object); }) : null;
+        };
+        GenericScene3d.prototype.setPhysicsEnabled = function (enable) {
+        };
+        GenericScene3d.prototype._onDispose = function () {
             this._physicsworld.dispose();
             _super.prototype._onDispose.call(this);
         };
-        return GenericScene;
+        return GenericScene3d;
     }(pxsim.Object3d));
-    pxsim.GenericScene = GenericScene;
-    var Scene = (function (_super) {
-        __extends(Scene, _super);
-        function Scene() {
+    pxsim.GenericScene3d = GenericScene3d;
+    var Scene3d = (function (_super) {
+        __extends(Scene3d, _super);
+        function Scene3d() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        return Scene;
-    }(GenericScene));
-    pxsim.Scene = Scene;
+        return Scene3d;
+    }(GenericScene3d));
+    pxsim.Scene3d = Scene3d;
 })(pxsim || (pxsim = {}));
 (function (pxsim) {
     var scene;
     (function (scene) {
+        function origin() {
+            return pxsim.math3d.zeroVector();
+        }
+        scene.origin = origin;
         function onAnimate(handler) {
-            pxsim.WorldBoard.events.listen(1234, 5678, handler);
+            pxsim.singletonWorldBoard().events.listen(1, 0, handler);
         }
         scene.onAnimate = onAnimate;
     })(scene = pxsim.scene || (pxsim.scene = {}));
@@ -656,13 +753,21 @@ var pxsim;
         return Shape3d;
     }(rt.WrappedObjectWithId));
     pxsim.Shape3d = Shape3d;
+    var GenericShape3d = (function (_super) {
+        __extends(GenericShape3d, _super);
+        function GenericShape3d() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        return GenericShape3d;
+    }(Shape3d));
+    pxsim.GenericShape3d = GenericShape3d;
     var PlaneShape3d = (function (_super) {
         __extends(PlaneShape3d, _super);
         function PlaneShape3d(width, height, id) {
             var _this = this;
             var w = width || 100;
             var h = height || 100;
-            _this = _super.call(this, new THREE.PlaneGeometry(w, h).rotateX(-Math.PI / 2), id) || this;
+            _this = _super.call(this, new THREE.PlaneBufferGeometry(w, h).rotateX(-Math.PI / 2), id) || this;
             _this._setCtorCollisionShape(function () { return _this._createCollisionShapeFromHalfExtents(function (bthalfextents) { return new Ammo.btBoxShape(bthalfextents); }); });
             return _this;
         }
@@ -676,7 +781,7 @@ var pxsim;
             width = width || 1;
             height = height || 1;
             depth = depth || 1;
-            _this = _super.call(this, new THREE.BoxGeometry(width, height, depth), id) || this;
+            _this = _super.call(this, new THREE.BoxBufferGeometry(width, height, depth), id) || this;
             _this._setShapeVolume(width * height * depth);
             _this._setCtorCollisionShape(function () { return _this._createCollisionShapeFromHalfExtents(function (bthalfextents) { return new Ammo.btBoxShape(bthalfextents); }); });
             return _this;
@@ -690,7 +795,7 @@ var pxsim;
             var _this = this;
             radius = radius || .5;
             height = height || 1;
-            _this = _super.call(this, new THREE.CylinderGeometry(radius, radius, height, Shape3d.radialSegments, 1, openEnded || false), id) || this;
+            _this = _super.call(this, new THREE.CylinderBufferGeometry(radius, radius, height, Shape3d.radialSegments, 1, openEnded || false), id) || this;
             _this._setShapeVolume(Math.PI * Math.pow(radius, 2) * height);
             _this._setCtorCollisionShape(function () { return _this._createCollisionShapeFromHalfExtents(function (bthalfextents) { return new Ammo.btCylinderShape(bthalfextents); }); });
             return _this;
@@ -703,7 +808,7 @@ var pxsim;
         function SphereShape3d(radius, id) {
             var _this = this;
             radius = radius || .5;
-            _this = _super.call(this, new THREE.SphereGeometry(radius, Shape3d.radialSegments, Shape3d.radialSegments), id) || this;
+            _this = _super.call(this, new THREE.SphereBufferGeometry(radius, Shape3d.radialSegments, Shape3d.radialSegments), id) || this;
             _this._setShapeVolume(4 / 3 * Math.PI * Math.pow(radius, 3));
             _this._setCtorCollisionShape(function () { return new Ammo.btSphereShape(radius); });
             return _this;
@@ -717,7 +822,7 @@ var pxsim;
             var _this = this;
             radius = radius || .5;
             height = height || 1;
-            _this = _super.call(this, new THREE.ConeGeometry(radius, height, Shape3d.radialSegments), id) || this;
+            _this = _super.call(this, new THREE.ConeBufferGeometry(radius, height, Shape3d.radialSegments), id) || this;
             _this._setShapeVolume(Math.PI * Math.pow(radius, 2) * height / 3);
             _this._setCtorCollisionShape(function () { return new Ammo.btConeShape(radius, height); });
             return _this;
@@ -729,26 +834,26 @@ var pxsim;
 (function (pxsim) {
     var shape3d;
     (function (shape3d) {
-        function plane(width, height) {
+        function planeShape(width, height) {
             return new pxsim.PlaneShape3d(width, height);
         }
-        shape3d.plane = plane;
-        function box(width, height, depth) {
+        shape3d.planeShape = planeShape;
+        function boxShape(width, height, depth) {
             return new pxsim.BoxShape3d(width, height, depth);
         }
-        shape3d.box = box;
-        function cylinder(radius, height) {
+        shape3d.boxShape = boxShape;
+        function cylinderShape(radius, height) {
             return new pxsim.CylinderShape3d(radius, height);
         }
-        shape3d.cylinder = cylinder;
-        function sphere(radius) {
+        shape3d.cylinderShape = cylinderShape;
+        function sphereShape(radius) {
             return new pxsim.SphereShape3d(radius);
         }
-        shape3d.sphere = sphere;
-        function cone(radius, height) {
+        shape3d.sphereShape = sphereShape;
+        function coneShape(radius, height) {
             return new pxsim.ConeShape3d(radius, height);
         }
-        shape3d.cone = cone;
+        shape3d.coneShape = coneShape;
     })(shape3d = pxsim.shape3d || (pxsim.shape3d = {}));
 })(pxsim || (pxsim = {}));
 var pxsim;
@@ -758,20 +863,24 @@ var pxsim;
         function World3d(id) {
             if (id === void 0) { id = 'container'; }
             var _this = _super.call(this) || this;
-            _this._controls = null;
+            _this._scene = null;
             _this._onWindowResize = function () {
                 _this._renderer.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio);
             };
-            _this._onDocumentMouseMove = function (event) {
+            _this._onDocumentMouseMove = function (event) { return _this._onDocumentMouseEvent(2, 1, event); };
+            _this._onDocumentMouseClick = function (event) { return _this._onDocumentMouseEvent(World3d._sidFromMouseButtonEvent(event), 2, event); };
+            _this._onDocumentMouseEvent = function (sid, evid, event) {
                 event.preventDefault();
+                if (!sid) {
+                    return;
+                }
                 var x = (event.clientX / window.innerWidth) * 2 - 1;
                 var y = -(event.clientY / window.innerHeight) * 2 + 1;
-                pxsim.console.log("(" + x + ", " + y + ")");
+                pxsim.singletonWorldBoard().events.queue(sid, evid, new pxsim.EventCoordValue(x, y));
             };
             _this._renderer = new pxsim.Renderer(id);
-            _this._renderer.scene = new pxsim.Scene();
-            _this._renderer.camera = new pxsim.PerspectiveCamera();
-            _this._renderer.camera.setPosition(new pxsim.Vector(-40, 20, 15));
+            _this._scene = new pxsim.Scene3d();
+            _this._updateRendererScene();
             var container = document.getElementById(_this._renderer.id);
             if (container) {
                 container.innerHTML = '';
@@ -785,11 +894,22 @@ var pxsim;
             _this._onWindowResize();
             window.addEventListener('resize', _this._onWindowResize, false);
             document.addEventListener('mousemove', _this._onDocumentMouseMove, false);
-            _this._controls = new THREE.OrbitControls(_this._renderer.camera.reference);
-            _this._controls.target.set(0, 2, 0);
-            _this._controls.update();
+            document.addEventListener('click', _this._onDocumentMouseClick, false);
             return _this;
         }
+        World3d._sidFromMouseButtonEvent = function (event) {
+            var sid;
+            if (0 === event.button) {
+                sid = 3;
+            }
+            else if (1 === event.button) {
+                sid = 4;
+            }
+            else if (2 === event.button) {
+                sid = 5;
+            }
+            return sid;
+        };
         Object.defineProperty(World3d.prototype, "renderer", {
             get: function () {
                 return this._renderer;
@@ -799,19 +919,13 @@ var pxsim;
         });
         Object.defineProperty(World3d.prototype, "scene", {
             get: function () {
-                return this._renderer.scene;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(World3d.prototype, "camera", {
-            get: function () {
-                return this._renderer.camera;
+                return this._scene;
             },
             enumerable: true,
             configurable: true
         });
         World3d.prototype._onDispose = function () {
+            document.removeEventListener('click', this._onDocumentMouseClick, false);
             document.removeEventListener('mousemove', this._onDocumentMouseMove, false);
             window.removeEventListener('resize', this._onWindowResize, false);
             var container = document.getElementById(this._renderer.id);
@@ -819,29 +933,34 @@ var pxsim;
                 container.innerHTML = '';
             }
             pxsim.Helper.safeObjectDispose(this._renderer.scene);
-            pxsim.Helper.safeObjectDispose(this._renderer.camera);
             this._renderer.dispose();
+        };
+        World3d.prototype._updateRendererScene = function () {
+            this._renderer.scene = this._scene;
         };
         return World3d;
     }(rt.ObjectDisposable));
     pxsim.World3d = World3d;
 })(pxsim || (pxsim = {}));
 (function (pxsim) {
-    var world3d;
-    (function (world3d) {
-        function origin() {
-            return pxsim.math3d.vector();
+    var world;
+    (function (world_1) {
+        function world() {
+            return pxsim.singletonWorldBoard().world;
         }
-        world3d.origin = origin;
+        world_1.world = world;
         function scene() {
-            return pxsim.currentScene();
+            var world3d = pxsim.world.world();
+            return world3d ? world3d.scene : null;
         }
-        world3d.scene = scene;
-        function camera() {
-            return pxsim.activeCamera();
+        world_1.scene = scene;
+        function intersectedObjectAt(x, y) {
+            var scene3d = pxsim.world.scene();
+            var objects = scene3d ? scene3d.intersectedObjects(x, y) : null;
+            return objects && objects.length > 0 ? objects[0] : null;
         }
-        world3d.camera = camera;
-    })(world3d = pxsim.world3d || (pxsim.world3d = {}));
+        world_1.intersectedObjectAt = intersectedObjectAt;
+    })(world = pxsim.world || (pxsim.world = {}));
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
@@ -850,6 +969,7 @@ var pxsim;
         function WorldBoard() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this._world3d = null;
+            _this._events = null;
             return _this;
         }
         Object.defineProperty(WorldBoard, "singleton", {
@@ -859,19 +979,16 @@ var pxsim;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(WorldBoard, "events", {
+        Object.defineProperty(WorldBoard.prototype, "world", {
             get: function () {
-                return this._events;
-            },
-            set: function (bus) {
-                this._events = bus;
+                return this._world3d;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(WorldBoard.prototype, "world3d", {
+        Object.defineProperty(WorldBoard.prototype, "events", {
             get: function () {
-                return this._world3d;
+                return this._events;
             },
             enumerable: true,
             configurable: true
@@ -882,8 +999,8 @@ var pxsim;
         };
         WorldBoard.prototype.init = function () {
             this.postkill();
-            rt.ObjectWithIdFactory.forgetAllInstances();
             this._world3d = new pxsim.World3d();
+            this._events = new pxsim.WorldEventBus(pxsim.runtime);
         };
         WorldBoard.prototype.kill = function () {
             if (this._world3d) {
@@ -891,10 +1008,9 @@ var pxsim;
             }
         };
         WorldBoard.prototype.postkill = function () {
-            if (this._world3d) {
-                this._world3d.dispose();
-                this._world3d = null;
-            }
+            rt.ObjectWithIdFactory.forgetAllInstances();
+            pxsim.Helper.safeObjectDispose(this._world3d);
+            this._world3d = null;
         };
         WorldBoard.prototype.receiveMessage = function (msg) {
         };
@@ -906,17 +1022,41 @@ var pxsim;
     pxsim.WorldBoard = WorldBoard;
     pxsim.initCurrentRuntime = function (msg) {
         singletonWorldBoard().postkill();
-        WorldBoard.events = new pxsim.EventBus(pxsim.runtime);
         return pxsim.runtime.board = singletonWorldBoard();
     };
     function singletonWorldBoard() { return WorldBoard.singleton; }
     pxsim.singletonWorldBoard = singletonWorldBoard;
-    function ourWorld3d() { return singletonWorldBoard().world3d; }
-    pxsim.ourWorld3d = ourWorld3d;
-    function currentScene() { return ourWorld3d() ? ourWorld3d().scene : null; }
-    pxsim.currentScene = currentScene;
-    function activeCamera() { return ourWorld3d() ? ourWorld3d().camera : null; }
-    pxsim.activeCamera = activeCamera;
+})(pxsim || (pxsim = {}));
+var pxsim;
+(function (pxsim) {
+    var EventValue = (function () {
+        function EventValue() {
+        }
+        return EventValue;
+    }());
+    pxsim.EventValue = EventValue;
+    var EventCoordValue = (function (_super) {
+        __extends(EventCoordValue, _super);
+        function EventCoordValue(x, y) {
+            var _this = _super.call(this) || this;
+            _this.x = x;
+            _this.y = y;
+            return _this;
+        }
+        EventCoordValue.prototype.toActionArgs = function () {
+            return [this.x, this.y];
+        };
+        return EventCoordValue;
+    }(EventValue));
+    pxsim.EventCoordValue = EventCoordValue;
+    var WorldEventBus = (function (_super) {
+        __extends(WorldEventBus, _super);
+        function WorldEventBus(runtime) {
+            return _super.call(this, runtime, function (value) { return typeof value === 'object' ? value.toActionArgs() : [value]; }) || this;
+        }
+        return WorldEventBus;
+    }(pxsim.EventBusGeneric));
+    pxsim.WorldEventBus = WorldEventBus;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
@@ -928,6 +1068,9 @@ var pxsim;
         };
         Helper.btQuaternionFromThree = function (qtr) {
             return new Ammo.btQuaternion(qtr.x, qtr.y, qtr.z, qtr.w);
+        };
+        Helper.applyFn = function (input, fn) {
+            return Array.isArray(input) ? input.map(fn) : fn(input);
         };
         Helper.safeObjectDispose = function (dispoableobject) {
             if (dispoableobject) {
@@ -997,7 +1140,7 @@ var pxsim;
             if (id === void 0) { id = 'container'; }
             var _this = _super.call(this, Renderer._instantiateReference(id), id) || this;
             _this._domElement = document.createElement('div');
-            _this._scene = null;
+            _this._scene3d = null;
             _this._camera = null;
             _this._stats = new Stats();
             _this._clock = new THREE.Clock();
@@ -1029,21 +1172,11 @@ var pxsim;
         });
         Object.defineProperty(Renderer.prototype, "scene", {
             get: function () {
-                return this._scene;
+                return this._scene3d;
             },
-            set: function (scene) {
-                this._scene = scene;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Renderer.prototype, "camera", {
-            get: function () {
-                return this._camera;
-            },
-            set: function (camera) {
-                this._camera = camera;
-                this._resizeCamera();
+            set: function (scene3d) {
+                this._scene3d = scene3d;
+                this._updateSceneCameraSize();
             },
             enumerable: true,
             configurable: true
@@ -1063,28 +1196,36 @@ var pxsim;
             configurable: true
         });
         Renderer.prototype.animate = function () {
-            if (this._scene) {
-                this._scene.animate(this._clock.getDelta());
+            if (!this._scene3d) {
+                return;
             }
+            this._scene3d.animate(this._clock.getDelta());
         };
         Renderer.prototype.render = function () {
-            if (this._scene && this._camera) {
-                this.reference.render(this._scene.reference, this._camera.reference);
+            if (!this._scene3d) {
+                return;
+            }
+            var camera = this._scene3d.camera();
+            if (camera) {
+                this.reference.render(this._scene3d.reference, camera.reference);
             }
         };
         Renderer.prototype.resize = function (width, height, devicePixelRatio) {
             this.reference.setPixelRatio(devicePixelRatio);
             this.reference.setSize(width, height);
-            this._resizeCamera();
-            this.render();
+            this._updateSceneCameraSize();
         };
         Renderer.prototype._onDispose = function () {
             this._stopRenderLoop();
         };
-        Renderer.prototype._resizeCamera = function () {
-            if (this._camera) {
+        Renderer.prototype._updateSceneCameraSize = function () {
+            if (!this._scene3d) {
+                return;
+            }
+            var camera = this._scene3d.camera();
+            if (camera) {
                 var size = this.reference.getSize();
-                this._camera.setSize(size.width, size.height);
+                camera.setSize(size.width, size.height);
             }
         };
         Renderer.prototype._runRenderLoop = function () {
@@ -1116,7 +1257,7 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
-    function btMotionStateFromObject3D(btmotionstate, object3d) {
+    function btMotionStateFromObject3d(btmotionstate, object3d) {
         var bttransform = new Ammo.btTransform();
         var btorigin, btquarternion;
         bttransform.setOrigin(btorigin = pxsim.Helper.btVector3FromThree(object3d.reference.position));
@@ -1127,8 +1268,8 @@ var pxsim;
         pxsim.Helper.safeAmmoObjectDestroy(bttransform);
         return btmotionstate;
     }
-    pxsim.btMotionStateFromObject3D = btMotionStateFromObject3D;
-    function btMotionStateToObject3D(btmotionstate, object3d) {
+    pxsim.btMotionStateFromObject3d = btMotionStateFromObject3d;
+    function btMotionStateToObject3d(btmotionstate, object3d) {
         var bttransform = new Ammo.btTransform();
         btmotionstate.getWorldTransform(bttransform);
         var btorigin = bttransform.getOrigin();
@@ -1137,7 +1278,7 @@ var pxsim;
         object3d.reference.quaternion.set(btrotation.x(), btrotation.y(), btrotation.z(), btrotation.w());
         pxsim.Helper.safeAmmoObjectDestroy(bttransform);
     }
-    pxsim.btMotionStateToObject3D = btMotionStateToObject3D;
+    pxsim.btMotionStateToObject3d = btMotionStateToObject3d;
     var RigidBody = (function (_super) {
         __extends(RigidBody, _super);
         function RigidBody(object3d, shape3d, mass) {
@@ -1192,7 +1333,7 @@ var pxsim;
         });
         RigidBody.prototype.addRigidBody = function (world) {
             this.removeRigidBody(world);
-            btMotionStateFromObject3D(this._btmotionstate, this._object3d);
+            btMotionStateFromObject3d(this._btmotionstate, this._object3d);
             this._btbody.setMotionState(this._btmotionstate);
             this._world = world;
             this._world.btWorld.addRigidBody(this._btbody);
@@ -1204,9 +1345,9 @@ var pxsim;
             this._world.btWorld.removeRigidBody(this._btbody);
             this._world = null;
         };
-        RigidBody.prototype.syncMotionStateToObject3D = function () {
+        RigidBody.prototype.syncMotionStateToObject3d = function () {
             if (!this._btbody.isStaticOrKinematicObject()) {
-                btMotionStateToObject3D(this._btbody.getMotionState(), this._object3d);
+                btMotionStateToObject3d(this._btbody.getMotionState(), this._object3d);
             }
         };
         RigidBody.prototype._toggleCollisionFlag = function (flag, on) {

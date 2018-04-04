@@ -456,21 +456,21 @@
             
     <div class="ui text">
         <h1 id="interactive-cubes">Interactive Cubes</h1><p>Click a floating cube! (NYI)</p>
-<pre><code class="lang-blocks">    let object: Mesh = null
+<pre><code class="lang-blocks">    let boxobject: Mesh3d = null
     let boxshape: Shape3d = null
     let theta = 0
     scene.onAnimate(function (msec) {
         theta += 0.1 * msec / (1 / 60)
-        world3d.camera().setPosition(math.vector(100 * Math.sin(math.degreesInRadians(theta)), 100 * Math.sin(math.degreesInRadians(theta)), 100 * Math.cos(math.degreesInRadians(theta))))
-        world3d.camera().lookAt(world3d.origin())
+        world.scene().camera().setPosition(Math.vector(100 * Math.sin(Math.degreesInRadians(theta)), 100 * Math.sin(Math.degreesInRadians(theta)), 100 * Math.cos(Math.degreesInRadians(theta))))
+        world.scene().camera().lookAt(scene.origin())
     })
     theta = 0
-    world3d.scene().setBackgroundColor(design.colorStandard(Palette.lightcyan))
-    world3d.scene().add(light.directional(design.colorPicker(0xffffff), 1), math.vector(5, 20, 0))
-    boxshape = design.box(20, 20, 20)
+    world.scene().setBackgroundColor(design.standardColor(Palette.LightCyan))
+    world.scene().add(design.directionalLight(design.colorPicker(0xffffff), 1), Math.vector(5, 20, 0))
+    boxshape = design.boxShape(20, 20, 20)
     for (let i = 0; i &lt; 2000; i++) {
-        object = object3d.from3dShape(boxshape, material.ofColor(design.colorRandom()))
-        world3d.scene().add(object, math.vector(Math.randomRange(-400, 400), Math.randomRange(-400, 400), Math.randomRange(-400, 400)))
+        boxobject = object.fromShapeAndMaterial(boxshape, design.materialOfColor(design.randomColor()))
+        world.scene().add(boxobject, Math.vector(Math.randomRange(-400, 400), Math.randomRange(-400, 400), Math.randomRange(-400, 400)))
     }</code></pre>
 <pre><code class="lang-package"></code></pre>
 

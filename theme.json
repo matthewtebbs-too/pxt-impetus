@@ -34,9 +34,7 @@
   },
   "blockColors": {
     "design": "#2680d9",
-    "object3d": "#2626d9",
-    "light": "#7f26d9",
-    "material": "#d926d9",
+    "object": "#7f26d9",
     "scene": "#d92680",
     "world": "#d92626",
     "loops": "#80d926",

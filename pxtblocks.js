@@ -6449,12 +6449,15 @@ var pxtblockly;
         function FieldColorNumber(text, params, opt_validator) {
             var _this = _super.call(this, text, opt_validator) || this;
             _this.isFieldCustom_ = true;
+            _this.valueMode_ = "rgb";
             if (params.colours)
                 _this.setColours(JSON.parse(params.colours));
             if (params.columns)
                 _this.setColumns(parseInt(params.columns));
             if (params.className)
                 _this.className_ = params.className;
+            if (params.valueMode)
+                _this.valueMode_ = params.valueMode;
             return _this;
         }
         /**
@@ -6463,8 +6466,20 @@ var pxtblockly;
          * @return {string} Current colour in '#rrggbb' format.
          */
         FieldColorNumber.prototype.getValue = function (opt_asHex) {
-            if (!opt_asHex && this.colour_.indexOf('#') > -1) {
-                return "0x" + this.colour_.replace(/^#/, '');
+            if (opt_asHex)
+                return this.colour_;
+            switch (this.valueMode_) {
+                case "hex":
+                    return "\"" + this.colour_ + "\"";
+                case "rgb":
+                    if (this.colour_.indexOf('#') > -1) {
+                        return "0x" + this.colour_.replace(/^#/, '');
+                    }
+                    else {
+                        return this.colour_;
+                    }
+                case "index":
+                    return this.getColours_().indexOf(this.colour_).toString();
             }
             return this.colour_;
         };
@@ -6475,6 +6490,19 @@ var pxtblockly;
         FieldColorNumber.prototype.setValue = function (colour) {
             if (colour.indexOf('0x') > -1) {
                 colour = "#" + colour.substr(2);
+            }
+            else if (this.valueMode_ === "index") {
+                var allColors = this.getColours_();
+                if (allColors.indexOf(colour) === -1) {
+                    // Might be the index and not the color
+                    var i = parseInt(colour);
+                    if (!isNaN(i) && i >= 0 && i < allColors.length) {
+                        colour = allColors[i];
+                    }
+                    else {
+                        colour = allColors[0];
+                    }
+                }
             }
             if (this.sourceBlock_ && Blockly.Events.isEnabled() &&
                 this.colour_ != colour) {
@@ -6489,6 +6517,9 @@ var pxtblockly;
             _super.prototype.showEditor_.call(this);
             if (this.className_ && this.colorPicker_)
                 Blockly.utils.addClass((this.colorPicker_.getElement()), this.className_);
+        };
+        FieldColorNumber.prototype.getColours_ = function () {
+            return this.colours_;
         };
         return FieldColorNumber;
     }(Blockly.FieldColour));

@@ -4073,8 +4073,9 @@ var pxsim;
     }
     pxsim.initBareRuntime = initBareRuntime;
     var EventQueue = /** @class */ (function () {
-        function EventQueue(runtime) {
+        function EventQueue(runtime, valueToArgs) {
             this.runtime = runtime;
+            this.valueToArgs = valueToArgs;
             this.max = 5;
             this.events = [];
             this.awaiters = [];
@@ -4102,9 +4103,8 @@ var pxsim;
         EventQueue.prototype.poke = function () {
             var _this = this;
             this.lock = true;
-            var top = this.events.shift();
-            this.runtime.runFiberAsync(this.handler, top)
-                .done(function () {
+            var value = this.events.shift();
+            (_a = this.runtime).runFiberAsync.apply(_a, [this.handler].concat((this.valueToArgs ? this.valueToArgs(value) : [value]))).done(function () {
                 // we're done processing the current event, if there is still something left to do, do it
                 if (_this.events.length > 0) {
                     _this.poke();
@@ -4113,18 +4113,19 @@ var pxsim;
                     _this.lock = false;
                 }
             });
+            var _a;
         };
         Object.defineProperty(EventQueue.prototype, "handler", {
             get: function () {
-                return this.mHandler;
+                return this._handler;
             },
             set: function (a) {
-                if (this.mHandler) {
-                    pxsim.pxtcore.decr(this.mHandler);
+                if (this._handler) {
+                    pxsim.pxtcore.decr(this._handler);
                 }
-                this.mHandler = a;
-                if (this.mHandler) {
-                    pxsim.pxtcore.incr(this.mHandler);
+                this._handler = a;
+                if (this._handler) {
+                    pxsim.pxtcore.incr(this._handler);
                 }
             },
             enumerable: true,
@@ -4929,44 +4930,58 @@ var pxsim;
         return res;
     }
     pxsim.mkRange = mkRange;
-    var EventBus = /** @class */ (function () {
-        function EventBus(runtime) {
+    var EventBusGeneric = /** @class */ (function () {
+        function EventBusGeneric(runtime, valueToArgs) {
             this.runtime = runtime;
+            this.valueToArgs = valueToArgs;
             this.queues = {};
             this.nextNotifyEvent = 1024;
         }
-        EventBus.prototype.setNotify = function (notifyID, notifyOneID) {
+        EventBusGeneric.prototype.setNotify = function (notifyID, notifyOneID) {
             this.notifyID = notifyID;
             this.notifyOneID = notifyOneID;
         };
-        EventBus.prototype.start = function (id, evid, create) {
+        EventBusGeneric.prototype.start = function (id, evid, create) {
             var k = id + ":" + evid;
             var queue = this.queues[k];
             if (!queue)
-                queue = this.queues[k] = new pxsim.EventQueue(this.runtime);
+                queue = this.queues[k] = new pxsim.EventQueue(this.runtime, this.valueToArgs);
             return queue;
         };
-        EventBus.prototype.listen = function (id, evid, handler) {
+        EventBusGeneric.prototype.listen = function (id, evid, handler) {
             var q = this.start(id, evid, true);
             q.handler = handler;
         };
-        EventBus.prototype.queue = function (id, evid, value) {
-            if (value === void 0) { value = 0; }
+        EventBusGeneric.prototype.queue = function (id, evid, value) {
+            if (value === void 0) { value = null; }
             // special handling for notify one
             var notifyOne = this.notifyID && this.notifyOneID && id == this.notifyOneID;
             if (notifyOne)
                 id = this.notifyID;
             // grab queue and handle
             var q = this.start(id, evid, false);
-            if (q)
+            if (q) {
                 q.push(value, notifyOne);
+            }
         };
-        EventBus.prototype.wait = function (id, evid, cb) {
+        EventBusGeneric.prototype.wait = function (id, evid, cb) {
             var q = this.start(id, evid, true);
             q.addAwaiter(cb);
         };
-        return EventBus;
+        return EventBusGeneric;
     }());
+    pxsim.EventBusGeneric = EventBusGeneric;
+    var EventBus = /** @class */ (function (_super) {
+        __extends(EventBus, _super);
+        function EventBus() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        EventBus.prototype.queue = function (id, evid, value) {
+            if (value === void 0) { value = 0; }
+            _super.prototype.queue.call(this, id, evid, value);
+        };
+        return EventBus;
+    }(EventBusGeneric));
     pxsim.EventBus = EventBus;
     var AnimationQueue = /** @class */ (function () {
         function AnimationQueue(runtime) {
