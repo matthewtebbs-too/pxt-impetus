@@ -152,13 +152,13 @@ declare namespace Math {
     function radiansInDegrees(radians: number): number;
 }
 
-//%
+//% blockNamespace=object
 declare class Object3d {
     /**
      * Look at.
      * @param position Vector
      */
-    //% blockId=object3d_look_at blockNamespace=object
+    //% blockId=object3d_look_at
     //% block="%object3d|look at %position=math_vector"
     //% shim=.lookAt
     public lookAt(position: Vector): void;
@@ -167,7 +167,7 @@ declare class Object3d {
      * Set object position.
      * @param position Vector
      */
-    //% blockId=object3d_set_position blockNamespace=object
+    //% blockId=object3d_set_position
     //% block="set %object3d position|at %position=math_vector"
     //% shim=.setPosition
     public setPosition(position: Vector): void;
@@ -176,7 +176,7 @@ declare class Object3d {
      * Set object rotation.
      * @param rotation Vector
      */
-    //% blockId=object3d_set_rotation blockNamespace=object
+    //% blockId=object3d_set_rotation
     //% block="set %object3d rotation|to %rotation=math_unit_vector"
     //% shim=.setRotation
     public setRotation(rotation: Vector): void;
@@ -185,7 +185,7 @@ declare class Object3d {
      * Set object scale.
      * @param scale Vector
      */
-    //% blockId=object3d_set_scale blockNamespace=object
+    //% blockId=object3d_set_scale
     //% block="set %object3d scale|to %scale=math_unit_vector"
     //% shim=.setScale
     public setScale(scale: Vector): void;
@@ -195,7 +195,7 @@ declare class Object3d {
      * @param axis Vector
      * @param angle number, eg: 0
      */
-    //% blockId=object3d_set_rotation_from_axis_angle blockNamespace=object
+    //% blockId=object3d_set_rotation_from_axis_angle
     //% block="set %object3d rotation|around %axis=math_vector|by %angle"
     //% shim=.setRotationFromAxisAngle
     public setRotationFromAxisAngle(axis: Vector, angle: number): void;
@@ -204,7 +204,7 @@ declare class Object3d {
      * Enable/disable physics.
      * @param enabled is physics, e.g. gravity, enabled on this object?
      */
-    //% blockId=object3d_set_physics_enabled blockNamespace=object
+    //% blockId=object3d_set_physics_enabled
     //% block="set %object3d physics %enabled=fieldeditors_toggleOnOff"
     //% shim=.setPhysicsEnabled
     public setPhysicsEnabled(enabled: boolean): void;
@@ -407,12 +407,12 @@ declare namespace camera { /* camera icon */
 declare class Mesh3d extends Object3d {
 }
 
-//%
+//% blockNamespace=scene
 declare class Scene3d extends Object3d {
     /**
      * Get active camera.
      */
-    //% blockId=scene_camera blockNamespace=scene
+    //% blockId=scene_camera
     //% block="%scene camera"
     //% shim=.camera
     public camera(): Camera;
@@ -421,7 +421,7 @@ declare class Scene3d extends Object3d {
      * Set background color.
      * @param color Color
      */
-    //% blockId=set_background_color blockNamespace=scene
+    //% blockId=set_background_color
     //% block="set %scene=world_scene|background %color=color_picker"
     //% shim=.setBackgroundColor
     public setBackgroundColor(color: Color): void;
@@ -430,7 +430,7 @@ declare class Scene3d extends Object3d {
      * Set ambient light color.
      * @param color Color
      */
-    //% blockId=set_ambientlight_color blockNamespace=scene
+    //% blockId=set_ambientlight_color
     //% block="set %scene=world_scene|ambient light %color=color_picker"
     //% shim=.setAmbientLight
     public setAmbientLight(color: Color): void;
@@ -438,7 +438,7 @@ declare class Scene3d extends Object3d {
     /**
      * Add object to scene.
      */
-    //% blockId=add_object blockNamespace=scene
+    //% blockId=add_object
     //% block="add to %scene=world_scene %object3d|at %position=world_origin"
     //% shim=.add
     public add(object3d: Object3d, position: Vector): void;
@@ -446,7 +446,7 @@ declare class Scene3d extends Object3d {
     /**
      * Remove object from scene.
      */
-    //% blockId=remove_object blockNamespace=scene
+    //% blockId=remove_object
     //% block="remove from %scene=world_scene %object3d"
     //% shim=.remove
     public remove(object3d: Object3d): void;
