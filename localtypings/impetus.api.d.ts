@@ -38,7 +38,7 @@ declare namespace console {
      * @param value to write
      */
     //% blockId=console_log_value
-    //% block="console|log value %name|= %value" weight=88 blockGap=8
+    //% block="console|log value %name|= %value" weight=88
     //% value.shadowOptions.toString=true
     //% shim=console::logValue
     function logValue(name: string, value: string): void;
@@ -51,7 +51,7 @@ declare namespace loops {
      * @param body the code to repeat
      */
     //% blockId=loops_forever
-    //% block="forever" weight=55 blockGap=8
+    //% block="forever" weight=55
     //% shim=loops::forever
     function forever(body: () => void): void;
 
