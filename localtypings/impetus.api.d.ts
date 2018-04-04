@@ -351,10 +351,6 @@ declare namespace design {
     function coneShape(radius?: number, height?: number): Shape3d;
 }
 
-//%
-declare class Light extends Object3d {
-}
-
 declare namespace design {
     /**
      * Directional light.
@@ -384,6 +380,21 @@ declare namespace design {
     function materialOfColor(color?: Color): Material;
 }
 
+//% color="#7f26d9" icon="\uf1b2" block="Object" weight=99
+declare namespace object { /* cube icon */
+    /**
+     * Create object with shape.
+     */
+    //% blockId=object3d_from_shape3d_and_material
+    //% block="object with shape %shape=shape3d_box|and material %material=material_with_color"
+    //% shim=mesh::fromShapeAndMaterial
+    function fromShapeAndMaterial(shape3d: Shape3d, material: Material): Mesh3d;
+}
+
+//%
+declare class Light extends Object3d {
+}
+
 //%
 declare class Camera extends Object3d {
 }
@@ -394,17 +405,6 @@ declare namespace camera { /* camera icon */
 
 //%
 declare class Mesh3d extends Object3d {
-}
-
-//% color="#7f26d9" icon="\uf1b2" block="Object" weight=99
-declare namespace object { /* cube icon */
-    /**
-     * Create object with shape.
-     */
-    //% blockId=object3d_from_shape3d_and_material
-    //% block="object with shape %shape=shape3d_box|and material %material=material_with_color"
-    //% shim=mesh::fromShapeAndMaterial
-    function fromShapeAndMaterial(shape3d: Shape3d, material: Material): Mesh3d;
 }
 
 //%
@@ -489,20 +489,23 @@ declare namespace world { /* globe icon */
     //% block="intersected object at %x|%y"
     //% shim=world::intersectedObjectAt
     function intersectedObjectAt(x: number, y: number): Object3d | null;
+}
 
+//% color="#B4009E" icon="\uf192" block="Input" weight=93
+declare namespace input { /* dot-circle icon */
     /**
-     * Code to run when a mouse event occurs.
+     * Code to run when a mouse move occurs.
      */
-    //% blockId=world_on_mousemove
+    //% blockId=input_on_mousemove
     //% block="on mouse move"
-    //% shim=world::onMouseMove
+    //% shim=input::onMouseMove
     function onMouseMove(cb: (x: number, y: number) => void): void;
 
     /**
-     * Code to run when a mouse event occurs.
+     * Code to run when a mouse click occurs.
      */
-    //% blockId=world_on_mouseclick
+    //% blockId=input_on_mouseclick
     //% block="on mouse %button click"
-    //% shim=world::onMouseClick
+    //% shim=input::onMouseClick
     function onMouseClick(button: MouseButton, cb: (x: number, y: number) => void): void;
 }
