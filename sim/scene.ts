@@ -20,10 +20,6 @@ namespace pxsim {
             return this._ambientlight;
         }
 
-        public get camera(): GenericCamera | null {
-            return this._camera;
-        }
-
         public get physicsWorld(): PhysicsWorld {
             return this._physicsworld;
         }
@@ -44,6 +40,10 @@ namespace pxsim {
             this._controls = new THREE.OrbitControls(this._camera.reference);
             this._controls.target.set(0, 2, 0);
             this._controls.update();
+        }
+
+        public camera(): GenericCamera | null {
+            return this._camera;
         }
 
         public setBackgroundColor(color: Color)  {

@@ -410,6 +410,14 @@ declare namespace object { /* cube icon */
 //%
 declare class Scene3d extends Object3d {
     /**
+     * Get active camera.
+     */
+    //% blockId=scene_camera blockNamespace=scene
+    //% block="camera"
+    //% shim=.camera
+    public camera(): Camera;
+
+    /**
      * Set background color.
      * @param color Color
      */
@@ -473,14 +481,6 @@ declare namespace world { /* globe icon */
     //% block="scene"
     //% shim=world::scene
     function scene(): Scene3d;
-
-    /**
-     * Get active camera.
-     */
-    //% blockId=world_camera
-    //% block="camera"
-    //% shim=world::camera
-    function camera(): Camera;
 
     /**
      * Intersect the view of the current scene with the active camera.

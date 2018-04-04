@@ -111,11 +111,6 @@ namespace pxsim.world {
         return world3d ? world3d.scene : null;
     }
 
-    export function camera(): GenericCamera | null {
-        const scene3d = pxsim.world.scene();
-        return scene3d ? scene3d.camera : null;
-    }
-
     export function intersectedObjectAt(x: number, y: number): GenericObject3d | null {
         const scene3d = pxsim.world.scene();
         const objects = scene3d ? scene3d.intersectedObjects(x, y) : null;

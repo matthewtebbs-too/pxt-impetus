@@ -81,9 +81,9 @@ namespace pxsim {
                 return;
             }
 
-            const camera = this._scene3d.camera;
+            const camera = this._scene3d.camera();
             if (camera) {
-                this.reference.render(this._scene3d.reference, camera.reference);
+                this.reference.render(this._scene3d.reference, camera. reference);
             }
         }
 
@@ -103,7 +103,7 @@ namespace pxsim {
                 return;
             }
 
-            const camera = this._scene3d.camera;
+            const camera = this._scene3d.camera();
             if (camera) {
                 const size = this.reference.getSize();
                 camera.setSize(size.width, size.height);
