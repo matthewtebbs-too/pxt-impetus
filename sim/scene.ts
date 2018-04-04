@@ -118,6 +118,10 @@ namespace pxsim {
 }
 
 namespace pxsim.scene {
+    export function origin(): Vector  {
+        return pxsim.math3d.zeroVector();
+    }
+
     export function onAnimate(handler: RefAction) {
         singletonWorldBoard().events!.listen(ScopeId.Scene, EventId.Animate, handler);
     }

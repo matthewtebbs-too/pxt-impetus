@@ -106,10 +106,6 @@ namespace pxsim.world {
         return singletonWorldBoard().world;
     }
 
-    export function origin(): Vector  {
-        return pxsim.math3d.vector();
-    }
-
     export function scene(): GenericScene3d | null {
         const world3d = pxsim.world.world();
         return world3d ? world3d.scene : null;

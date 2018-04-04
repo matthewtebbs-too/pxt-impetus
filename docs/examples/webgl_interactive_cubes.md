@@ -9,7 +9,7 @@ Click a floating cube! (NYI)
     scene.onAnimate(function (msec) {
         theta += 0.1 * msec / (1 / 60)
         world.camera().setPosition(Math.vector(100 * Math.sin(Math.degreesInRadians(theta)), 100 * Math.sin(Math.degreesInRadians(theta)), 100 * Math.cos(Math.degreesInRadians(theta))))
-        world.camera().lookAt(world.origin())
+        world.camera().lookAt(scene.origin())
     })
     theta = 0
     world.scene().setBackgroundColor(design.standardColor(Palette.LightCyan))

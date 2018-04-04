@@ -29,6 +29,10 @@ namespace pxsim.math3d {
         return new Vector(x || 0, y || 0, z || 0);
     }
 
+    export function zeroVector(): Vector  {
+        return vector();
+    }
+
     export function unitVector(): Vector  {
         return vector(1, 1, 1);
     }

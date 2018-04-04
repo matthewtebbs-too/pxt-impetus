@@ -90,6 +90,15 @@ declare namespace Math {
     function vector(x?: number, y?: number, z?: number): Vector;
 
     /**
+     * Zero vector.
+     */
+    //% blockId=math_zero_vector
+    //% block="zero vector"
+    //% group="Vector"
+    //% shim=math3d::zeroVector
+    function zeroVector(): Vector;
+
+    /**
      * Unit vector.
      */
     //% blockId="math_unit_vector"
@@ -438,24 +447,25 @@ declare class Scene3d extends Object3d {
 //% color="#d92680" icon="\uf03e" block="Scene" weight=95
 declare namespace scene { /* image icon */
     /**
+     * Origin.
+     */
+    //% blockId=scene_origin
+    //% block="scene origin"
+    //% group="Vector"
+    //% shim=scene::origin
+    function origin(): Vector;
+
+    /**
      * Code to run when the scene is animated before each frame.
      */
     //% blockId=scene_on_animate
-    //% block="on animate"
+    //% block="on scene animate"
     //% shim=scene::onAnimate
     function onAnimate(cb: (msec: number) => void): void;
 }
 
 //% color="#d92626" icon="\uf0ac" block="World" weight=94
 declare namespace world { /* globe icon */
-    /**
-     * Origin vector.
-     */
-    //% blockId=world_origin
-    //% block="origin"
-    //% shim=world::origin
-    function origin(): Vector;
-
     /**
      * Get current scene.
      */
