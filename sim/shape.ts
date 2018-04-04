@@ -56,10 +56,10 @@ namespace pxsim {
 
     export class PlaneShape3d extends Shape3d<THREE.PlaneBufferGeometry> {
         constructor(width?: number, height?: number, id?: rt.ObjId) {
-            const w = width || 100;
-            const h = height || 100;
+            width = width || 100;
+            height = height || 100;
 
-            super(new THREE.PlaneBufferGeometry(w, h).rotateX(-Math.PI / 2) as THREE.PlaneBufferGeometry, id);
+            super(new THREE.PlaneBufferGeometry(width, height).rotateX(-Math.PI / 2) as THREE.PlaneBufferGeometry, id);
 
             this._setCtorCollisionShape(() => this._createCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btBoxShape(bthalfextents)));
         }

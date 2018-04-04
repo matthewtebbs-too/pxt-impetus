@@ -159,7 +159,7 @@ declare class Object3d {
      * @param position Vector
      */
     //% blockId=object3d_look_at blockNamespace=object
-    //% block="%camera|look at %position=math_vector"
+    //% block="%object3d|look at %position=math_vector"
     //% shim=.lookAt
     public lookAt(position: Vector): void;
     
@@ -413,7 +413,7 @@ declare class Scene3d extends Object3d {
      * Get active camera.
      */
     //% blockId=scene_camera blockNamespace=scene
-    //% block="camera"
+    //% block="%scene camera"
     //% shim=.camera
     public camera(): Camera;
 
@@ -459,7 +459,6 @@ declare namespace scene { /* image icon */
      */
     //% blockId=scene_origin
     //% block="scene origin"
-    //% group="Vector"
     //% shim=scene::origin
     function origin(): Vector;
 

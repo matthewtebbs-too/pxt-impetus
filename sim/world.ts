@@ -24,7 +24,7 @@ namespace pxsim {
 
         private _renderer: Renderer;
 
-        private _scene: Scene3d | null = null;
+        private _scene: GenericScene3d | null = null;
 
         public get renderer(): Renderer {
             return this._renderer;
@@ -39,7 +39,7 @@ namespace pxsim {
 
             this._renderer = new Renderer(id);
 
-            this._scene = new Scene3d();
+            this._scene = new GenericScene3d();
             this._updateRendererScene();
 
             const container = document.getElementById(this._renderer.id as string);

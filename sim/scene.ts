@@ -7,7 +7,7 @@
 /// <reference path='object.ts'/>
 
 namespace pxsim {
-    export abstract class GenericScene3d extends Object3d<THREE.Scene> {
+    export abstract class Scene3d extends Object3d<THREE.Scene> {
         private _ambientlight: AmbientLight;
         private _camera: GenericCamera | null;
 
@@ -114,7 +114,7 @@ namespace pxsim {
         }
     }
 
-    export class Scene3d extends GenericScene3d { }
+    export class GenericScene3d extends Scene3d { }
 }
 
 namespace pxsim.scene {
