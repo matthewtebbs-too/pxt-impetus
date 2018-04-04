@@ -64,6 +64,7 @@ namespace pxsim {
 
     initCurrentRuntime = (msg: SimulatorMessage) => {
         singletonWorldBoard().postkill();               /* post-kill now */
+
         return runtime.board = singletonWorldBoard();   /* will be initialized by runtime */
     };
 
