@@ -602,9 +602,9 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
-    var GenericScene3d = (function (_super) {
-        __extends(GenericScene3d, _super);
-        function GenericScene3d(id) {
+    var Scene3d = (function (_super) {
+        __extends(Scene3d, _super);
+        function Scene3d(id) {
             var _this = _super.call(this, new THREE.Scene(), id) || this;
             _this._physicsworld = new pxsim.PhysicsWorld();
             _this._controls = null;
@@ -619,36 +619,45 @@ var pxsim;
             _this._controls.update();
             return _this;
         }
-        Object.defineProperty(GenericScene3d.prototype, "ambientLight", {
+        Object.defineProperty(Scene3d.prototype, "ambientLight", {
             get: function () {
                 return this._ambientlight;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(GenericScene3d.prototype, "physicsWorld", {
+        Object.defineProperty(Scene3d.prototype, "x", {
+            get: function () {
+                return 1969;
+            },
+            set: function (x) {
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Scene3d.prototype, "physicsWorld", {
             get: function () {
                 return this._physicsworld;
             },
             enumerable: true,
             configurable: true
         });
-        GenericScene3d.prototype.camera = function () {
+        Scene3d.prototype.camera = function () {
             return this._camera;
         };
-        GenericScene3d.prototype.setBackgroundColor = function (color) {
+        Scene3d.prototype.setBackgroundColor = function (color) {
             if (!color) {
                 return;
             }
             this.reference.background = color;
         };
-        GenericScene3d.prototype.setAmbientLight = function (color) {
+        Scene3d.prototype.setAmbientLight = function (color) {
             if (!color) {
                 return;
             }
             this.ambientLight.reference.color = color;
         };
-        GenericScene3d.prototype.add = function (object3d, position) {
+        Scene3d.prototype.add = function (object3d, position) {
             if (!object3d) {
                 return;
             }
@@ -658,19 +667,19 @@ var pxsim;
             this.reference.add(object3d.reference);
             object3d.onAdded(this);
         };
-        GenericScene3d.prototype.remove = function (object3d) {
+        Scene3d.prototype.remove = function (object3d) {
             if (!object3d) {
                 return;
             }
             object3d.onRemoved(this);
             this.reference.remove(object3d.reference);
         };
-        GenericScene3d.prototype.animate = function (timeStep) {
+        Scene3d.prototype.animate = function (timeStep) {
             _super.prototype.animate.call(this, timeStep);
             this._physicsworld.animate(timeStep);
             pxsim.singletonWorldBoard().events.queue(1, 0, timeStep);
         };
-        GenericScene3d.prototype.intersectedObjects = function (x, y) {
+        Scene3d.prototype.intersectedObjects = function (x, y) {
             if (!this._camera) {
                 return null;
             }
@@ -678,23 +687,23 @@ var pxsim;
             var intersections = this._raycaster.intersectObjects(this.reference.children);
             return intersections.length > 0 ? intersections.map(function (intersection) { return new pxsim.GenericObject3d(intersection.object); }) : null;
         };
-        GenericScene3d.prototype.setPhysicsEnabled = function (enable) {
+        Scene3d.prototype.setPhysicsEnabled = function (enable) {
         };
-        GenericScene3d.prototype._onDispose = function () {
+        Scene3d.prototype._onDispose = function () {
             this._physicsworld.dispose();
             _super.prototype._onDispose.call(this);
         };
-        return GenericScene3d;
+        return Scene3d;
     }(pxsim.Object3d));
-    pxsim.GenericScene3d = GenericScene3d;
-    var Scene3d = (function (_super) {
-        __extends(Scene3d, _super);
-        function Scene3d() {
+    pxsim.Scene3d = Scene3d;
+    var GenericScene3d = (function (_super) {
+        __extends(GenericScene3d, _super);
+        function GenericScene3d() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        return Scene3d;
-    }(GenericScene3d));
-    pxsim.Scene3d = Scene3d;
+        return GenericScene3d;
+    }(Scene3d));
+    pxsim.GenericScene3d = GenericScene3d;
 })(pxsim || (pxsim = {}));
 (function (pxsim) {
     var scene;
@@ -765,9 +774,9 @@ var pxsim;
         __extends(PlaneShape3d, _super);
         function PlaneShape3d(width, height, id) {
             var _this = this;
-            var w = width || 100;
-            var h = height || 100;
-            _this = _super.call(this, new THREE.PlaneBufferGeometry(w, h).rotateX(-Math.PI / 2), id) || this;
+            width = width || 100;
+            height = height || 100;
+            _this = _super.call(this, new THREE.PlaneBufferGeometry(width, height).rotateX(-Math.PI / 2), id) || this;
             _this._setCtorCollisionShape(function () { return _this._createCollisionShapeFromHalfExtents(function (bthalfextents) { return new Ammo.btBoxShape(bthalfextents); }); });
             return _this;
         }
@@ -879,7 +888,7 @@ var pxsim;
                 pxsim.singletonWorldBoard().events.queue(sid, evid, new pxsim.EventCoordValue(x, y));
             };
             _this._renderer = new pxsim.Renderer(id);
-            _this._scene = new pxsim.Scene3d();
+            _this._scene = new pxsim.GenericScene3d();
             _this._updateRendererScene();
             var container = document.getElementById(_this._renderer.id);
             if (container) {

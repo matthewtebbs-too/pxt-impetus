@@ -3505,6 +3505,8 @@ var ts;
                                 return getArrayLiteralExpression(n);
                             case SK.ElementAccessExpression:
                                 return getElementAccessExpression(n);
+                            case SK.TaggedTemplateExpression:
+                                return getTaggedTemplateExpression(n);
                             case SK.CallExpression:
                                 return getStatementBlock(n, undefined, undefined, true);
                             default:
@@ -3709,6 +3711,16 @@ var ts;
                 function getElementAccessExpression(n) {
                     var r = mkExpr("lists_index_get");
                     r.inputs = [getValue("LIST", n.expression), getValue("INDEX", n.argumentExpression, numberType)];
+                    return r;
+                }
+                function getTaggedTemplateExpression(t) {
+                    var callInfo = t.callInfo;
+                    var api = env.blocks.apis.byQName[callInfo.attrs.blockIdentity];
+                    var comp = pxt.blocks.compileInfo(api);
+                    var r = mkExpr(api.attributes.blockId);
+                    var text = t.template.text;
+                    // This will always be a field and not a value because we only allow no-substitution templates
+                    r.fields = [getField(comp.parameters[0].actualName, text)];
                     return r;
                 }
                 function getStatementBlock(n, next, parent, asExpression, topLevel) {
@@ -4215,7 +4227,7 @@ var ts;
                                         }
                                     }
                                 }
-                                else if (e.kind === SK.TaggedTemplateExpression) {
+                                else if (e.kind === SK.TaggedTemplateExpression && param.fieldOptions && param.fieldOptions["taggedTemplate"]) {
                                     addField(getField(vName, pxtc.Util.htmlEscape(e.getText())));
                                     return;
                                 }
@@ -4795,7 +4807,7 @@ var ts;
                                 return pxtc.Util.lf("Field editor does not support literal arguments");
                             }
                         }
-                        else if (e.kind === SK.TaggedTemplateExpression) {
+                        else if (e.kind === SK.TaggedTemplateExpression && param.fieldEditor) {
                             var tagName = param.fieldOptions && param.fieldOptions["taggedTemplate"];
                             if (!tagName) {
                                 return pxtc.Util.lf("Tagged templates only supported in custom fields with param.fieldOptions.taggedTemplate set");
@@ -4966,6 +4978,8 @@ var ts;
                         return checkPropertyAccessExpression(n, env);
                     case SK.CallExpression:
                         return checkStatement(n, env, true);
+                    case SK.TaggedTemplateExpression:
+                        return checkTaggedTemplateExpression(n, env);
                 }
                 return pxtc.Util.lf("Unsupported syntax kind for output expression block: {0}", SK[n.kind]);
                 function checkStringLiteral(n) {
@@ -5023,6 +5037,25 @@ var ts;
                     }
                     return pxtc.Util.lf("No call info found");
                 }
+            }
+            function checkTaggedTemplateExpression(t, env) {
+                var callInfo = t.callInfo;
+                if (!callInfo) {
+                    return pxtc.Util.lf("Invalid tagged template");
+                }
+                if (!callInfo.attrs.blockIdentity) {
+                    return pxtc.Util.lf("Tagged template does not have blockIdentity set");
+                }
+                var api = env.blocks.apis.byQName[callInfo.attrs.blockIdentity];
+                if (!api) {
+                    return pxtc.Util.lf("Could not find blockIdentity for tagged template");
+                }
+                var comp = pxt.blocks.compileInfo(api);
+                if (comp.parameters.length !== 1) {
+                    return pxtc.Util.lf("Tagged template functions must have 1 argument");
+                }
+                // The compiler will have already caught any invalid tags or templates
+                return undefined;
             }
             function getParent(node) {
                 if (!node.parent) {
@@ -5135,6 +5168,7 @@ var ts;
                     case SK.TrueKeyword:
                     case SK.FalseKeyword:
                     case SK.NullKeyword:
+                    case SK.TaggedTemplateExpression:
                         return true;
                     default: return false;
                 }
@@ -8985,15 +9019,20 @@ var ts;
                     }
                 }
                 function parseHexLiteral(s) {
-                    if (s == "" && currJres) {
-                        if (!currJres.dataEncoding || currJres.dataEncoding == "base64") {
-                            s = pxtc.U.toHex(pxtc.U.stringToUint8Array(ts.pxtc.decodeBase64(currJres.data)));
+                    var thisJres = currJres;
+                    if (s[0] == '_' && s[1] == '_' && opts.jres[s]) {
+                        thisJres = opts.jres[s];
+                        s = "";
+                    }
+                    if (s == "" && thisJres) {
+                        if (!thisJres.dataEncoding || thisJres.dataEncoding == "base64") {
+                            s = pxtc.U.toHex(pxtc.U.stringToUint8Array(ts.pxtc.decodeBase64(thisJres.data)));
                         }
-                        else if (currJres.dataEncoding == "hex") {
-                            s = currJres.data;
+                        else if (thisJres.dataEncoding == "hex") {
+                            s = thisJres.data;
                         }
                         else {
-                            userError(9271, lf("invalid jres encoding '{0}' on '{1}'", currJres.dataEncoding, currJres.id));
+                            userError(9271, lf("invalid jres encoding '{0}' on '{1}'", thisJres.dataEncoding, thisJres.id));
                         }
                     }
                     var res = "";
@@ -9018,6 +9057,14 @@ var ts;
                     throw unhandled(node, lf("invalid tagged template"), 9265);
                 var attrs = parseComments(decl);
                 var res;
+                var callInfo = {
+                    decl: decl,
+                    qName: decl ? pxtc.getFullName(checker, decl.symbol) : "?",
+                    attrs: attrs,
+                    args: [node.template],
+                    isExpression: true
+                };
+                node.callInfo = callInfo;
                 function handleHexLike(pp) {
                     if (node.template.kind != pxtc.SK.NoSubstitutionTemplateLiteral)
                         throw unhandled(node, lf("substitution not supported in hex literal", attrs.shim), 9265);
@@ -13003,6 +13050,9 @@ var ts;
                     if (mod.body.kind == pxtc.SK.ModuleBlock) {
                         var blk = mod.body;
                         blk.statements.forEach(collectDecls);
+                    }
+                    else if (mod.body.kind == pxtc.SK.ModuleDeclaration) {
+                        collectDecls(mod.body);
                     }
                 }
                 else if (stmt.kind == pxtc.SK.InterfaceDeclaration) {

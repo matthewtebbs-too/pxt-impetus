@@ -1702,7 +1702,7 @@ var pxt;
     var blocks;
     (function (blocks_1) {
         function saveWorkspaceXml(ws) {
-            var xml = Blockly.Xml.workspaceToDom(ws);
+            var xml = Blockly.Xml.workspaceToDom(ws, true);
             var text = Blockly.Xml.domToPrettyText(xml);
             return text;
         }
@@ -1904,8 +1904,8 @@ var pxt;
             }
             layout.patchBlocksFromOldWorkspace = patchBlocksFromOldWorkspace;
             function injectDisabledBlocks(oldWs, newWs) {
-                var oldDom = Blockly.Xml.workspaceToDom(oldWs);
-                var newDom = Blockly.Xml.workspaceToDom(newWs);
+                var oldDom = Blockly.Xml.workspaceToDom(oldWs, true);
+                var newDom = Blockly.Xml.workspaceToDom(newWs, true);
                 pxt.Util.toArray(oldDom.childNodes)
                     .filter(function (n) { return n.nodeType == Node.ELEMENT_NODE && n.localName == "block" && n.getAttribute("disabled") == "true"; })
                     .forEach(function (n) { return newDom.appendChild(newDom.ownerDocument.importNode(n, true)); });
@@ -2188,6 +2188,91 @@ var pxt;
                 defaultValue: "list"
             }
         };
+        // this keeps a bit of state for perf reasons
+        var ImageConverter = /** @class */ (function () {
+            function ImageConverter() {
+            }
+            ImageConverter.prototype.logTime = function () {
+                if (this.start) {
+                    var d = Date.now() - this.start;
+                    pxt.debug("Icon cration: " + d + "ms");
+                }
+            };
+            ImageConverter.prototype.convert = function (jresURL) {
+                if (!this.start)
+                    this.start = Date.now();
+                var data = atob(jresURL.slice(jresURL.indexOf(",") + 1));
+                var magic = data.charCodeAt(0);
+                var w = data.charCodeAt(1);
+                var h = data.charCodeAt(2);
+                if (magic != 0xf1 && magic != 0xf4)
+                    return null;
+                function htmlColorToBytes(hexColor) {
+                    var v = parseInt(hexColor.replace(/#/, ""), 16);
+                    return [(v >> 0) & 0xff, (v >> 8) & 0xff, (v >> 16) & 0xff, 0];
+                }
+                if (!this.palette) {
+                    var arrs = pxt.appTarget.runtime.palette.map(htmlColorToBytes);
+                    this.palette = new Uint8Array(arrs.length * 4);
+                    for (var i = 0; i < arrs.length; ++i) {
+                        this.palette[i * 4 + 0] = arrs[i][0];
+                        this.palette[i * 4 + 1] = arrs[i][1];
+                        this.palette[i * 4 + 2] = arrs[i][2];
+                        this.palette[i * 4 + 3] = arrs[i][3];
+                    }
+                }
+                var bpp = magic & 0xf;
+                var byteW = (w * bpp + 7) >> 8;
+                var outByteW = (w + 3) & ~3;
+                var bmpHeaderSize = 14 + 40 + this.palette.length;
+                var bmpSize = bmpHeaderSize + outByteW * h;
+                var bmp = new Uint8Array(bmpSize);
+                bmp[0] = 66;
+                bmp[1] = 77;
+                pxt.HF2.write32(bmp, 2, bmpSize);
+                pxt.HF2.write32(bmp, 10, bmpHeaderSize);
+                pxt.HF2.write32(bmp, 14, 40); // size of this header
+                pxt.HF2.write32(bmp, 18, w);
+                pxt.HF2.write32(bmp, 22, -h); // not upside down
+                pxt.HF2.write16(bmp, 26, 1); // 1 color plane
+                pxt.HF2.write16(bmp, 28, 8); // 8bpp
+                pxt.HF2.write32(bmp, 38, 2835); // 72dpi
+                pxt.HF2.write32(bmp, 42, 2835);
+                pxt.HF2.write32(bmp, 46, this.palette.length >> 2);
+                bmp.set(this.palette, 54);
+                var inP = 3;
+                var outP = bmpHeaderSize;
+                var pad = outByteW - w;
+                if (magic == 0xf1) {
+                    var mask = 0x80;
+                    var v = data.charCodeAt(inP++);
+                    for (var y = 0; y < h; ++y) {
+                        for (var x = 0; x < w; ++x) {
+                            bmp[outP++] = (v & mask) ? 1 : 0;
+                            mask >>= 1;
+                            if (mask == 0) {
+                                mask = 0x80;
+                                v = data.charCodeAt(inP++);
+                            }
+                        }
+                        outP += pad;
+                    }
+                }
+                else {
+                    for (var y = 0; y < h; ++y) {
+                        for (var x = 0; x < w; x += 2) {
+                            var v = data.charCodeAt(inP++);
+                            bmp[outP++] = (v >> 4) & 0xf;
+                            if (x != w - 1)
+                                bmp[outP++] = v & 0xf;
+                        }
+                        outP += pad;
+                    }
+                }
+                return "data:image/bmp;base64," + btoa(pxt.U.uint8ArrayToString(bmp));
+            };
+            return ImageConverter;
+        }());
         function advancedTitle() { return pxt.Util.lf("{id:category}Advanced"); }
         blocks_6.advancedTitle = advancedTitle;
         function addPackageTitle() { return pxt.Util.lf("{id:category}Extensions"); }
@@ -2246,7 +2331,7 @@ var pxt;
             var typeInfo = typeDefaults[p.type];
             shadow.setAttribute("type", shadowId || typeInfo && typeInfo.block || p.type);
             shadow.setAttribute("colour", Blockly.Colours.textField);
-            if (typeInfo && (!shadowId || typeInfo.block === shadowId)) {
+            if (typeInfo && (!shadowId || typeInfo.block === shadowId || shadowId === "math_number_minmax")) {
                 var field = document.createElement("field");
                 shadow.appendChild(field);
                 var fieldName = void 0;
@@ -2479,12 +2564,24 @@ var pxt;
                 }
                 else {
                     // if requested, wrap block into a "set variable block"
-                    if (fn.attributes.blockSetVariable && fn.retType) {
-                        var setblock = Blockly.Xml.textToDom("\n<block type=\"variables_set\" gap=\"" + pxt.Util.htmlEscape((fn.attributes.blockGap || 8) + "") + "\">\n<field name=\"VAR\" variabletype=\"\">" + pxt.Util.htmlEscape(fn.retType.toLowerCase()) + "</field>\n</block>");
+                    if (fn.attributes.blockSetVariable != undefined && fn.retType) {
+                        var rawName = fn.attributes.blockSetVariable;
+                        var varName = void 0;
+                        // By default if the API author does not put any value for blockSetVariable
+                        // then our comment parser will fill in the string "true". This gets caught
+                        // by isReservedWord() so no need to do a separate check.
+                        if (!rawName || blocks_6.isReservedWord(rawName)) {
+                            varName = pxt.Util.htmlEscape(fn.retType.toLowerCase());
+                        }
+                        else {
+                            varName = pxt.Util.htmlEscape(rawName);
+                        }
+                        var setblock = Blockly.Xml.textToDom("\n<block type=\"variables_set\" gap=\"" + pxt.Util.htmlEscape((fn.attributes.blockGap || 8) + "") + "\">\n<field name=\"VAR\" variabletype=\"\">" + varName + "</field>\n</block>");
                         {
                             var value = document.createElement('value');
                             value.setAttribute('name', 'VALUE');
                             value.appendChild(block.cloneNode(true));
+                            value.appendChild(mkFieldBlock("math_number", "NUM", "0", true));
                             setblock.appendChild(value);
                         }
                         block = setblock;
@@ -2868,6 +2965,7 @@ var pxt;
                 var anonIndex = 0;
                 var firstParam = !expanded && !!comp.thisParameter;
                 var inputs = splitInputs(def);
+                var imgConv = new ImageConverter();
                 inputs.forEach(function (inputParts) {
                     var fields = [];
                     var inputName;
@@ -2919,6 +3017,9 @@ var pxt;
                                 var dd = syms.map(function (v) {
                                     var k = v.attributes.block || v.attributes.blockId || v.name;
                                     var comb = v.attributes.blockCombine;
+                                    if (v.attributes.jresURL && !v.attributes.iconURL && pxt.U.startsWith(v.attributes.jresURL, "data:image/x-mkcd-f")) {
+                                        v.attributes.iconURL = imgConv.convert(v.attributes.jresURL);
+                                    }
                                     if (!!comb)
                                         k = k.replace(/@set/, "");
                                     return [
@@ -3019,6 +3120,7 @@ var pxt;
                     }
                     fields.forEach(function (f) { return input.appendField(f.field, f.name); });
                 });
+                imgConv.logTime();
             }
         }
         function hasArrowFunction(fn) {
@@ -5141,14 +5243,18 @@ var pxt;
             var value = document.createElement("value");
             value.setAttribute("name", "PREDICATE");
             block.appendChild(value);
-            var shadow = document.createElement("shadow");
-            shadow.setAttribute("type", "logic_boolean");
+            var shadow = mkFieldBlock("logic_boolean", "BOOL", "TRUE", true);
             value.appendChild(shadow);
-            var field = document.createElement("field");
-            field.setAttribute("name", "BOOL");
-            field.textContent = "TRUE";
-            shadow.appendChild(field);
             return block;
+        }
+        function mkFieldBlock(type, fieldName, fieldValue, isShadow) {
+            var fieldBlock = document.createElement(isShadow ? "shadow" : "block");
+            fieldBlock.setAttribute("type", pxt.Util.htmlEscape(type));
+            var field = document.createElement("field");
+            field.setAttribute("name", pxt.Util.htmlEscape(fieldName));
+            field.textContent = pxt.Util.htmlEscape(fieldValue);
+            fieldBlock.appendChild(field);
+            return fieldBlock;
         }
         var jresIconCache = {};
         function iconToFieldImage(id) {
@@ -6452,6 +6558,11 @@ var pxtblockly;
             _this.valueMode_ = "rgb";
             if (params.colours)
                 _this.setColours(JSON.parse(params.colours));
+            else if (pxt.appTarget.runtime && pxt.appTarget.runtime.palette) {
+                var p = Util.clone(pxt.appTarget.runtime.palette);
+                p[0] = "#dedede";
+                _this.setColours(p);
+            }
             if (params.columns)
                 _this.setColumns(parseInt(params.columns));
             if (params.className)

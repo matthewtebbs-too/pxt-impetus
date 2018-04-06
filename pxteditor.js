@@ -422,7 +422,7 @@ var pxt;
                 outDir: "built",
                 rootDir: ".",
                 noLib: true,
-                mouseWheelZoom: true
+                mouseWheelZoom: false
             });
             // maximum idle time
             monaco.languages.typescript.typescriptDefaults.setMaximunWorkerIdleTime(20 * 60 * 1000);
@@ -435,7 +435,7 @@ var pxt;
                 fontFamily: "'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', 'monospace'",
                 scrollBeyondLastLine: false,
                 language: "typescript",
-                mouseWheelZoom: true,
+                mouseWheelZoom: false,
                 wordBasedSuggestions: true,
                 lineNumbersMinChars: 3,
                 formatOnPaste: true,
@@ -446,7 +446,6 @@ var pxt;
                 dragAndDrop: true,
                 matchBrackets: true,
                 occurrencesHighlight: false,
-                mouseWheelScrollSensitivity: 0.5,
                 quickSuggestionsDelay: 200,
                 theme: inverted ? 'vs-dark' : 'vs',
                 //accessibilitySupport: 'on',

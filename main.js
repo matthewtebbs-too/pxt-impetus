@@ -1439,7 +1439,13 @@ var ProjectView = /** @class */ (function (_super) {
         if (devIndicator)
             devIndicator.clear();
     };
+    ProjectView.prototype.simDebug = function () {
+        pxt.tickEvent("menu.debug.sim");
+        this.stopSimulator();
+        this.runSimulator({ debug: true });
+    };
     ProjectView.prototype.hwDebug = function () {
+        pxt.tickEvent("menu.debug.hw");
         var start = Promise.resolve();
         if (!this.state.running || !simulator.driver.runOptions.debug)
             start = this.runSimulator({ debug: true });
@@ -1800,6 +1806,7 @@ var ProjectView = /** @class */ (function (_super) {
         //  ${targetTheme.accentColor ? "inverted accent " : ''}
         var settings = (Cloud.isLoggedIn() ? this.getData("cloud:me/settings?format=nonsensitive") : {}) || {};
         var targetTheme = pxt.appTarget.appTheme;
+        var simOpts = pxt.appTarget.simulator;
         var sharingEnabled = pxt.appTarget.cloud && pxt.appTarget.cloud.sharing;
         var sandbox = pxt.shell.isSandboxMode();
         var isBlocks = !this.editor.isVisible || this.getPreferredEditor() == pxt.BLOCKS_PROJECT_NAME;
@@ -1808,8 +1815,9 @@ var ProjectView = /** @class */ (function (_super) {
         var inTutorial = !!tutorialOptions && !!tutorialOptions.tutorial;
         var inHome = this.state.home && !sandbox;
         var inEditor = !!this.state.header;
+        var simDebug = (simOpts && simOpts.debugger) || pxt.options.debug;
         var hideMenuBar = targetTheme.hideMenuBar, hideEditorToolbar = targetTheme.hideEditorToolbar;
-        var isHeadless = pxt.appTarget.simulator.headless;
+        var isHeadless = simOpts && simOpts.headless;
         var selectLanguage = targetTheme.selectLanguage;
         var showEditorToolbar = !hideEditorToolbar && this.editor.hasEditorToolbar();
         var useSerialEditor = pxt.appTarget.serial && !!pxt.appTarget.serial.useEditor;
@@ -1858,7 +1866,7 @@ var ProjectView = /** @class */ (function (_super) {
                     React.createElement("div", { id: "boardview", className: "ui vertical editorFloat", role: "region", "aria-labelledby": "boardviewLabel" }),
                     React.createElement(simtoolbar.SimulatorToolbar, { parent: this }),
                     React.createElement("div", { className: "ui item portrait hide" },
-                        pxt.options.debug && !this.state.running ? React.createElement(sui.Button, { key: 'debugbtn', class: 'teal', icon: "xicon bug", text: "Sim Debug", onClick: function () { return _this.runSimulator({ debug: true }); } }) : '',
+                        simDebug ? React.createElement(sui.Button, { key: 'debugbtn', class: 'teal', icon: "xicon bug", text: "Debug", onClick: function () { return _this.simDebug(); } }) : '',
                         pxt.options.debug ? React.createElement(sui.Button, { key: 'hwdebugbtn', class: 'teal', icon: "xicon chip", text: "Dev Debug", onClick: function () { return _this.hwDebug(); } }) : ''),
                     useSerialEditor ?
                         React.createElement("div", { id: "serialPreview", className: "ui editorFloat portrait hide" },
@@ -5037,7 +5045,7 @@ function dialogAsync(options) {
     var btnno = 0;
     for (var _i = 0, buttons_1 = buttons; _i < buttons_1.length; _i++) {
         var b = buttons_1[_i];
-        html += "\n      <" + (b.url ? "a" : "button") + " class=\"ui right labeled icon button approve " + (b.class || "positive") + " focused\" data-btnid=\"" + btnno++ + "\" " + (b.url ? "href=\"" + b.url + "\"" : "") + " " + (b.fileName ? "download=\"" + Util.htmlEscape(b.fileName) + "\"" : '') + " target=\"_blank\">\n        " + Util.htmlEscape(b.label) + "\n        <i class=\"" + (b.icon || "checkmark") + " icon\"></i>\n      </" + (b.url ? "a" : "button") + ">";
+        html += "\n      <" + (b.url ? "a" : "button") + " class=\"ui right labeled icon button " + (b.class || "approve positive") + " focused\" data-btnid=\"" + btnno++ + "\" " + (b.url ? "href=\"" + b.url + "\"" : "") + " " + (b.fileName ? "download=\"" + Util.htmlEscape(b.fileName) + "\"" : '') + " target=\"_blank\">\n        " + Util.htmlEscape(b.label) + "\n        " + (b.icon ? "<i class=\"" + (b.icon || "checkmark") + " icon\"></i>" : '') + "\n      </" + (b.url ? "a" : "button") + ">";
     }
     html += "</div>";
     html += "</div>";
@@ -5119,7 +5127,7 @@ function confirmAsync(options) {
         options.buttons.push({
             label: options.agreeLbl || lf("Go ahead!"),
             class: options.agreeClass,
-            icon: options.agreeIcon,
+            icon: options.agreeIcon || "checkmark",
             onclick: function () {
                 result = 1;
             }
@@ -5161,7 +5169,7 @@ function promptAsync(options) {
         options.buttons.push({
             label: options.agreeLbl || lf("Go ahead!"),
             class: options.agreeClass,
-            icon: options.agreeIcon,
+            icon: options.agreeIcon || "checkmark",
             onclick: function () {
                 var dialogInput = document.getElementById('promptDialogInput');
                 result = dialogInput.value;
@@ -7719,6 +7727,7 @@ var Editor = /** @class */ (function (_super) {
                 _this.editor.setPosition(mouseTarget.position);
             _this.editor.focus();
         }, 200);
+        _this.uniqueBlockId = 0; // Used for hex blocks
         _this.highlightDecorations = [];
         return _this;
     }
@@ -7873,7 +7882,8 @@ var Editor = /** @class */ (function (_super) {
             var colors_1 = {};
             this.getNamespaces().forEach(function (ns) {
                 var metaData = _this.getNamespaceAttrs(ns);
-                var blocks = snippets.isBuiltin(ns) ? snippets.getBuiltinCategory(ns).blocks : _this.nsMap[ns];
+                var blocks = snippets.isBuiltin(ns) ?
+                    snippets.getBuiltinCategory(ns).blocks.concat(_this.nsMap[ns] || []) : _this.nsMap[ns];
                 if (metaData.color && blocks) {
                     var hexcolor_1 = fixColor(metaData.color);
                     blocks.forEach(function (fn) {
@@ -8240,6 +8250,7 @@ var Editor = /** @class */ (function (_super) {
             monacoHeadingText.className = "monacoFlyoutHeadingText";
             monacoHeadingText.style.display = 'inline-block';
             monacoHeadingText.style.fontSize = fontSize + 5 + "px";
+            monacoHeadingText.style.lineHeight = fontSize + 5 + "px";
             monacoHeadingText.textContent = category ? category : "" + Util.capitalize(ns);
             monacoHeadingLabel.appendChild(monacoHeadingIcon);
             monacoHeadingLabel.appendChild(monacoHeadingText);
@@ -8275,6 +8286,7 @@ var Editor = /** @class */ (function (_super) {
                 groupLabelText.className = 'monacoFlyoutLabelText';
                 groupLabelText.style.display = 'inline-block';
                 groupLabelText.style.fontSize = fontSize + "px";
+                groupLabelText.style.lineHeight = fontSize + 5 + "px";
                 groupLabelText.textContent = pxt.Util.rlf("{id:group}" + group);
                 groupLabel.appendChild(groupLabelText);
                 monacoFlyout.appendChild(groupLabel);
@@ -8354,7 +8366,6 @@ var Editor = /** @class */ (function (_super) {
     };
     Editor.prototype.createMonacoBlocks = function (monacoEditor, monacoFlyout, ns, fns, color, filters, categoryState) {
         var _this = this;
-        var uniqueBlockId = 0; // Used for hex blocks
         // Render the method blocks
         var monacoBlocks = fns.sort(function (f1, f2) {
             // sort by fn weight
@@ -8533,6 +8544,7 @@ var Editor = /** @class */ (function (_super) {
             monacoBlock.appendChild(sigToken);
             // Draw the shape of the block
             monacoBlock.style.fontSize = monacoEditor.parent.settings.editorFontSize + "px";
+            monacoBlock.style.lineHeight = monacoEditor.parent.settings.editorFontSize + 1 + "px";
             monacoBlock.style.backgroundColor = monacoBlockDisabled ?
                 "" + Blockly.PXTUtils.fadeColour(color || '#ddd', 0.8, false) :
                 "" + color;
@@ -8541,7 +8553,7 @@ var Editor = /** @class */ (function (_super) {
                 // Show a hexagonal shape
                 monacoBlock.style.borderRadius = "0px";
                 var monacoBlockHeight = monacoBlock.offsetHeight - 2; /* Take 2 off to account for the missing border */
-                var monacoHexBlockId = uniqueBlockId++;
+                var monacoHexBlockId = monacoEditor.uniqueBlockId++;
                 monacoBlock.id = "monacoHexBlock" + monacoHexBlockId;
                 monacoBlock.className += ' monacoHexBlock';
                 var styleBlock = document.createElement('style');
@@ -8781,6 +8793,8 @@ var Editor = /** @class */ (function (_super) {
         }
     };
     Editor.prototype.highlightStatement = function (brk) {
+        if (!brk)
+            this.clearHighlightedStatements();
         if (!brk || !this.currFile || this.currFile.name != brk.fileName || !this.editor)
             return;
         var position = this.editor.getModel().getPositionAt(brk.start);
@@ -8795,7 +8809,7 @@ var Editor = /** @class */ (function (_super) {
         ]);
     };
     Editor.prototype.clearHighlightedStatements = function () {
-        if (this.highlightDecorations)
+        if (this.editor && this.highlightDecorations)
             this.editor.deltaDecorations(this.highlightDecorations, []);
     };
     Editor.prototype.partitionBlocks = function () {
@@ -9813,7 +9827,10 @@ var NotificationBanner = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     NotificationBanner.prototype.renderCore = function () {
-        var cookies = !!(typeof mscc === "undefined" || mscc.hasConsent());
+        if (pxt.analytics.isCookieBannerVisible()) {
+            // don't show any banner while cookie banner is up
+            return React.createElement("div", null);
+        }
         var targetTheme = pxt.appTarget.appTheme;
         var isApp = pxt.winrt.isWinRT();
         var isLocalServe = location.hostname === "localhost";
@@ -9823,10 +9840,6 @@ var NotificationBanner = /** @class */ (function (_super) {
         var isWindows10 = pxt.BrowserUtils.isWindows10();
         var targetConfig = this.getData("target-config:");
         var showWindowsStoreBanner = isWindows10 && Cloud.isOnline() && targetConfig && targetConfig.windowsStoreLink && !isApp;
-        if (cookies) {
-            // don't show any banner while cookie banner is up
-            return React.createElement("div", null);
-        }
         if (showWindowsStoreBanner) {
             return (React.createElement(GenericBanner, { parent: this.props.parent, delayTime: 10000, displayTime: 45000, sleepTime: 604800 },
                 React.createElement(sui.Link, { class: "link", target: "_blank", ariaLabel: lf("View app in the Windows store"), href: targetConfig.windowsStoreLink, onClick: function () { return pxt.tickEvent("banner.linkClicked", undefined, { interactiveConsent: true }); } },
@@ -28695,7 +28708,7 @@ module.exports={
   "_args": [
     [
       "levelup@1.3.2",
-      "/Users/matthew/Source/git/MuddyTummy/pxt"
+      "/home/travis/build/Microsoft/pxt"
     ]
   ],
   "_development": true,
@@ -28720,7 +28733,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/levelup/-/levelup-1.3.2.tgz",
   "_spec": "1.3.2",
-  "_where": "/Users/matthew/Source/git/MuddyTummy/pxt",
+  "_where": "/home/travis/build/Microsoft/pxt",
   "browser": {
     "leveldown": false,
     "leveldown/package": false,

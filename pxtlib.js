@@ -72,8 +72,12 @@ var pxt;
             };
         }
         analytics.enable = enable;
+        function isCookieBannerVisible() {
+            return typeof mscc !== "undefined" && !mscc.hasConsent();
+        }
+        analytics.isCookieBannerVisible = isCookieBannerVisible;
         function enableCookies() {
-            if (typeof mscc !== "undefined" && !mscc.hasConsent()) {
+            if (isCookieBannerVisible()) {
                 mscc.setConsent();
             }
         }
@@ -7177,6 +7181,9 @@ var pxt;
             return initPromise
                 .then(function () { return loadDepsRecursive(_this.config.dependencies); })
                 .then(function () {
+                // get paletter config loading deps, so the more higher level packages take precedence
+                if (_this.config.palette && pxt.appTarget.runtime)
+                    pxt.appTarget.runtime.palette = pxt.U.clone(_this.config.palette);
                 if (_this.level === 0) {
                     // Check for missing packages. We need to add them 1 by 1 in case they conflict with eachother.
                     var mainTs = _this.readFile("main.ts");
@@ -7346,6 +7353,17 @@ var pxt;
                 for (var _i = 0, _a = this.sortedDeps(); _i < _a.length; _i++) {
                     var pkg = _a[_i];
                     pkg.parseJRes(this._jres);
+                }
+                if (pxt.appTarget.runtime && pxt.appTarget.runtime.palette) {
+                    var palBuf = pxt.appTarget.runtime.palette
+                        .map(function (s) { return ("000000" + parseInt(s.replace(/#/, ""), 16).toString(16)).slice(-6); })
+                        .join("");
+                    this._jres["__palette"] = {
+                        id: "__palette",
+                        data: palBuf,
+                        dataEncoding: "hex",
+                        mimeType: "application/x-palette"
+                    };
                 }
             }
             return this._jres;
@@ -7914,8 +7932,7 @@ var ts;
             "optionalVariableArgs",
             "blockHidden",
             "constantShim",
-            "blockCombine",
-            "blockSetVariable"
+            "blockCombine"
         ];
         function parseCommentString(cmt) {
             var res = {
