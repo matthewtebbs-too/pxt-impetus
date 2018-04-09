@@ -46,20 +46,20 @@ namespace pxsim {
             return this._camera;
         }
 
-        public setBackgroundColor(color: Color)  {
-            if (!color) {
+        public setBackgroundColor(value: Color)  {
+            if (!value) {
                 return;
             }
 
-            this.reference.background = color;
+            this.reference.background = value;
         }
 
-        public setAmbientLight(color: Color)  {
-            if (!color) {
+        public setAmbientLight(value: Color)  {
+            if (!value) {
                 return;
             }
 
-            this.ambientLight.reference.color = color;
+            this.ambientLight.reference.color = value;
         }
 
         public add(object3d: GenericObject3d, position?: Vector) {

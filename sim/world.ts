@@ -110,11 +110,4 @@ namespace pxsim.world {
         const world3d = pxsim.world.world();
         return world3d ? world3d.scene : null;
     }
-
-    export function intersectedObjectAt(x: number, y: number): GenericObject3d | null {
-        const scene3d = pxsim.world.scene();
-        const objects = scene3d ? scene3d.intersectedObjects(x, y) : null;
-
-        return objects && objects.length > 0 ? objects[0] : null;
-    }
 }

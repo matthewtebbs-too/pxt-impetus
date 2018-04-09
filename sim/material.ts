@@ -21,23 +21,55 @@ namespace pxsim {
 
     export class GenericMaterial extends Material<THREE.Material> { }
 
-    export class SolidMaterial extends Material<THREE.MeshPhongMaterial> {
+    export class SolidMaterial extends Material<THREE.MeshStandardMaterial> {
         public static getInstance(
             solidColor?: Color,
             id?: rt.ObjId,
         ) {
-            return this._factory.getInstance(
+            return SolidMaterial._factory.getInstanceNoCache(
                 { color: (solidColor ? solidColor.getHex() : undefined) || Palette.White },
                 id);
         }
 
         private static _factory = new rt.ObjectWithIdFactory<SolidMaterial>(SolidMaterial);
 
+        public get color(): Color {
+            return this.reference.color;
+        }
+
+        public set color(value: Color) {
+            this.reference.color = value;
+        }
+
+        public get roughness(): number {
+            return this.reference.roughness;
+        }
+
+        public set roughness(value: number) {
+            this.reference.roughness = value;
+        }
+
+        public get metalness(): number {
+            return this.reference.metalness;
+        }
+
+        public set metalness(value: number) {
+            this.reference.metalness = value;
+        }
+
+        public get emissive(): Color {
+            return this.reference.emissive;
+        }
+
+        public set emissive(value: Color) {
+            this.reference.emissive = value;
+        }
+
         constructor(
             params?: any,
             id?: rt.ObjId,
         ) {
-            super(new THREE.MeshPhongMaterial(params), id);
+            super(new THREE.MeshStandardMaterial(params), id);
         }
     }
 }

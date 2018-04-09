@@ -55,20 +55,20 @@ namespace pxsim {
             return this._btbody.isStaticObject();
         }
 
-        public set isStatic(isStatic: boolean) {
-            this._toggleCollisionFlag(Ammo.CollisionFlags.CF_STATIC_OBJECT, isStatic);
+        public set isStatic(value: boolean) {
+            this._toggleCollisionFlag(Ammo.CollisionFlags.CF_STATIC_OBJECT, value);
         }
 
         public get isKinematic(): boolean {
             return this._btbody.isKinematicObject();
         }
 
-        public set isKinematic(isKinematic: boolean) {
-            this._toggleCollisionFlag(Ammo.CollisionFlags.CF_KINEMATIC_OBJECT, isKinematic);
+        public set isKinematic(value: boolean) {
+            this._toggleCollisionFlag(Ammo.CollisionFlags.CF_KINEMATIC_OBJECT, value);
 
-            this._btbody.setActivationState(isKinematic ? Ammo.ActivationState.DISABLE_DEACTIVATION : Ammo.ActivationState.ACTIVE_TAG);
+            this._btbody.setActivationState(value ? Ammo.ActivationState.DISABLE_DEACTIVATION : Ammo.ActivationState.ACTIVE_TAG);
 
-            if (!isKinematic) {
+            if (!value) {
                 this._btbody.activate();
             }
 

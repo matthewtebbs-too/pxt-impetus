@@ -97,10 +97,17 @@ namespace rt {
 
             let instance = this._objectcache.get(hash);
             if (!instance) {
-                this._objectcache.set(hash, instance = new (this._ctor)(parameters, id));
+                this._objectcache.set(hash, instance = this.getInstanceNoCache(parameters, id));
             }
 
             return instance;
+        }
+
+        public getInstanceNoCache(
+            parameters?: any,
+            id?: ObjId,
+        ) {
+            return new (this._ctor)(parameters, id);
         }
 
         public forgetAllInstances() {

@@ -42,8 +42,8 @@ namespace pxsim {
             return this._scene3d;
         }
 
-        public set scene(scene3d: GenericScene3d | null) {
-            this._scene3d = scene3d;
+        public set scene(value: GenericScene3d | null) {
+            this._scene3d = value;
             this._updateSceneCameraSize();
         }
 
@@ -51,8 +51,8 @@ namespace pxsim {
             return this._paused;
         }
 
-        public set pause(pause: boolean) {
-            this._paused = pause;
+        public set pause(value: boolean) {
+            this._paused = value;
         }
 
         constructor(id: rt.ObjId = 'container') {
