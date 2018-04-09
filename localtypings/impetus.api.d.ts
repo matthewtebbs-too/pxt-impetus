@@ -463,6 +463,14 @@ declare namespace scene { /* image icon */
     function origin(): Vector;
 
     /**
+     * Intersect the view of the current scene with the active camera.
+     */
+    //% blockId=scene_intersect_objectat
+    //% block="intersected object at %x|%y"
+    //% shim=scene::intersectedObjectAt
+    function intersectedObjectAt(x: number, y: number): Object3d | null;
+
+    /**
      * Code to run when the scene is animated before each frame.
      */
     //% blockId=scene_on_animate
@@ -480,14 +488,6 @@ declare namespace world { /* globe icon */
     //% block="scene"
     //% shim=world::scene
     function scene(): Scene3d;
-
-    /**
-     * Intersect the view of the current scene with the active camera.
-     */
-    //% blockId=world_intersect_objectat
-    //% block="intersected object at %x|%y"
-    //% shim=world::intersectedObjectAt
-    function intersectedObjectAt(x: number, y: number): Object3d | null;
 }
 
 //% color="#B4009E" icon="\uf192" block="Input" weight=93

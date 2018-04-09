@@ -122,6 +122,13 @@ namespace pxsim.scene {
         return pxsim.math3d.zeroVector();
     }
 
+    export function intersectedObjectAt(x: number, y: number): GenericObject3d | null {
+        const scene3d = pxsim.world.scene();
+        const objects = scene3d ? scene3d.intersectedObjects(x, y) : null;
+
+        return objects && objects.length > 0 ? objects[0] : null;
+    }
+
     export function onAnimate(handler: RefAction) {
         singletonWorldBoard().events!.listen(ScopeId.Scene, EventId.Animate, handler);
     }
