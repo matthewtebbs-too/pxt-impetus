@@ -27,7 +27,12 @@ namespace pxsim {
             id?: rt.ObjId,
         ) {
             return SolidMaterial._factory.getInstanceNoCache(
-                { color: (solidColor ? solidColor.getHex() : undefined) || Palette.White },
+                {
+                    color: (solidColor ? solidColor.getHex() : undefined) || Palette.White,
+                    emmisive: 0.,
+                    metalness: 0.,
+                    roughness: .5,
+                },
                 id);
         }
 
