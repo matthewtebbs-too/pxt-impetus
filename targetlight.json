@@ -10,7 +10,8 @@
   },
   "compile": {
     "isNative": false,
-    "floatingPoint": true
+    "floatingPoint": true,
+    "vtableShift": 2
   },
   "serial": {
     "useEditor": true
@@ -67,6 +68,6 @@
   },
   "versions": {
     "target": "0.1.0",
-    "pxt": "3.8.5"
+    "pxt": "3.8.8"
   }
 }

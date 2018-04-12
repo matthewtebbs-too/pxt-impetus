@@ -91,9 +91,12 @@ var rt;
             var hash = objectHash([parameters, id], { algorithm: 'md5', encoding: 'hex', respectType: false });
             var instance = this._objectcache.get(hash);
             if (!instance) {
-                this._objectcache.set(hash, instance = new (this._ctor)(parameters, id));
+                this._objectcache.set(hash, instance = this.getInstanceNoCache(parameters, id));
             }
             return instance;
+        };
+        ObjectWithIdFactory.prototype.getInstanceNoCache = function (parameters, id) {
+            return new (this._ctor)(parameters, id);
         };
         ObjectWithIdFactory.prototype.forgetAllInstances = function () {
             this._objectcache.clear();
@@ -471,11 +474,53 @@ var pxsim;
     var SolidMaterial = (function (_super) {
         __extends(SolidMaterial, _super);
         function SolidMaterial(params, id) {
-            return _super.call(this, new THREE.MeshPhongMaterial(params), id) || this;
+            return _super.call(this, new THREE.MeshStandardMaterial(params), id) || this;
         }
         SolidMaterial.getInstance = function (solidColor, id) {
-            return this._factory.getInstance({ color: (solidColor ? solidColor.getHex() : undefined) || 16777215 }, id);
+            return SolidMaterial._factory.getInstanceNoCache({
+                color: (solidColor ? solidColor.getHex() : undefined) || 16777215,
+                emissive: 0.,
+                metalness: 0.,
+                roughness: .5,
+            }, id);
         };
+        Object.defineProperty(SolidMaterial.prototype, "color", {
+            get: function () {
+                return this.reference.color;
+            },
+            set: function (value) {
+                this.reference.color = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SolidMaterial.prototype, "emissive", {
+            get: function () {
+                return this.reference.emissive;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SolidMaterial.prototype, "roughness", {
+            get: function () {
+                return this.reference.roughness;
+            },
+            set: function (value) {
+                this.reference.roughness = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(SolidMaterial.prototype, "metalness", {
+            get: function () {
+                return this.reference.metalness;
+            },
+            set: function (value) {
+                this.reference.metalness = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
         SolidMaterial._factory = new rt.ObjectWithIdFactory(SolidMaterial);
         return SolidMaterial;
     }(Material));
@@ -626,15 +671,6 @@ var pxsim;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Scene3d.prototype, "x", {
-            get: function () {
-                return 1969;
-            },
-            set: function (x) {
-            },
-            enumerable: true,
-            configurable: true
-        });
         Object.defineProperty(Scene3d.prototype, "physicsWorld", {
             get: function () {
                 return this._physicsworld;
@@ -645,17 +681,17 @@ var pxsim;
         Scene3d.prototype.camera = function () {
             return this._camera;
         };
-        Scene3d.prototype.setBackgroundColor = function (color) {
-            if (!color) {
+        Scene3d.prototype.setBackgroundColor = function (value) {
+            if (!value) {
                 return;
             }
-            this.reference.background = color;
+            this.reference.background = value;
         };
-        Scene3d.prototype.setAmbientLight = function (color) {
-            if (!color) {
+        Scene3d.prototype.setAmbientLight = function (value) {
+            if (!value) {
                 return;
             }
-            this.ambientLight.reference.color = color;
+            this.ambientLight.reference.color = value;
         };
         Scene3d.prototype.add = function (object3d, position) {
             if (!object3d) {
@@ -712,6 +748,12 @@ var pxsim;
             return pxsim.math3d.zeroVector();
         }
         scene.origin = origin;
+        function intersectedObjectAt(x, y) {
+            var scene3d = pxsim.world.scene();
+            var objects = scene3d ? scene3d.intersectedObjects(x, y) : null;
+            return objects && objects.length > 0 ? objects[0] : null;
+        }
+        scene.intersectedObjectAt = intersectedObjectAt;
         function onAnimate(handler) {
             pxsim.singletonWorldBoard().events.listen(1, 0, handler);
         }
@@ -963,12 +1005,6 @@ var pxsim;
             return world3d ? world3d.scene : null;
         }
         world_1.scene = scene;
-        function intersectedObjectAt(x, y) {
-            var scene3d = pxsim.world.scene();
-            var objects = scene3d ? scene3d.intersectedObjects(x, y) : null;
-            return objects && objects.length > 0 ? objects[0] : null;
-        }
-        world_1.intersectedObjectAt = intersectedObjectAt;
     })(world = pxsim.world || (pxsim.world = {}));
 })(pxsim || (pxsim = {}));
 var pxsim;
@@ -1183,8 +1219,8 @@ var pxsim;
             get: function () {
                 return this._scene3d;
             },
-            set: function (scene3d) {
-                this._scene3d = scene3d;
+            set: function (value) {
+                this._scene3d = value;
                 this._updateSceneCameraSize();
             },
             enumerable: true,
@@ -1198,8 +1234,8 @@ var pxsim;
             configurable: true
         });
         Object.defineProperty(Renderer.prototype, "pause", {
-            set: function (pause) {
-                this._paused = pause;
+            set: function (value) {
+                this._paused = value;
             },
             enumerable: true,
             configurable: true
@@ -1317,8 +1353,8 @@ var pxsim;
             get: function () {
                 return this._btbody.isStaticObject();
             },
-            set: function (isStatic) {
-                this._toggleCollisionFlag(1, isStatic);
+            set: function (value) {
+                this._toggleCollisionFlag(1, value);
             },
             enumerable: true,
             configurable: true
@@ -1327,10 +1363,10 @@ var pxsim;
             get: function () {
                 return this._btbody.isKinematicObject();
             },
-            set: function (isKinematic) {
-                this._toggleCollisionFlag(2, isKinematic);
-                this._btbody.setActivationState(isKinematic ? 4 : 1);
-                if (!isKinematic) {
+            set: function (value) {
+                this._toggleCollisionFlag(2, value);
+                this._btbody.setActivationState(value ? 4 : 1);
+                if (!value) {
                     this._btbody.activate();
                 }
                 if (this._world) {

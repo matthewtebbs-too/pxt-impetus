@@ -2021,7 +2021,7 @@ var pxt;
             layout.toSvgAsync = toSvgAsync;
             function serializeNode(sg) {
                 var xmlString = new XMLSerializer().serializeToString(sg)
-                    .replace(new RegExp('&nbsp;', 'g'), '&#160;'); // Replace &nbsp; with &#160; as a workaround for having nbsp missing from SVG xml     
+                    .replace(new RegExp('&nbsp;', 'g'), '&#160;'); // Replace &nbsp; with &#160; as a workaround for having nbsp missing from SVG xml
                 return xmlString;
             }
             layout.serializeNode = serializeNode;
@@ -4685,17 +4685,6 @@ var pxt;
             Blockly.Variables.flyoutCategoryBlocks = function (workspace) {
                 var variableModelList = workspace.getVariablesOfType('');
                 variableModelList.sort(Blockly.VariableModel.compareByName);
-                // In addition to the user's variables, we also want to display the default
-                // variable name at the top.  We also don't want this duplicated if the
-                // user has created a variable of the same name.
-                for (var i = 0, tempVar = void 0; tempVar = variableModelList[i]; i++) {
-                    if (tempVar.name == varname) {
-                        variableModelList.splice(i, 1);
-                        break;
-                    }
-                }
-                var defaultVar = new Blockly.VariableModel(workspace, varname);
-                variableModelList.unshift(defaultVar);
                 var xmlList = [];
                 if (variableModelList.length > 0) {
                     // variables getters first
@@ -7206,6 +7195,15 @@ var pxtblockly;
                 Blockly.DropDownDiv.content_.removeAttribute('role');
                 Blockly.DropDownDiv.content_.removeAttribute('aria-haspopup');
                 Blockly.DropDownDiv.content_.removeAttribute('aria-activedescendant');
+                Blockly.DropDownDiv.getContentDiv().style.width = '';
+                if (this.sourceBlock_) {
+                    if (this.sourceBlock_.isShadow()) {
+                        this.sourceBlock_.setColour(this.savedPrimary_, this.sourceBlock_.getColourSecondary(), this.sourceBlock_.getColourTertiary());
+                    }
+                    else if (this.box_) {
+                        this.box_.setAttribute('fill', this.sourceBlock_.getColour());
+                    }
+                }
             };
             _this.columns_ = parseInt(options.columns);
             _this.maxRows_ = parseInt(options.maxRows) || 0;
@@ -7302,6 +7300,13 @@ var pxtblockly;
             // Offset for icon-type horizontal blocks.
             var secondaryYOffset = (-(Blockly.BlockSvg.MIN_BLOCK_Y * scale) - (Blockly.BlockSvg.FIELD_Y_OFFSET * scale));
             var renderedPrimary = Blockly.DropDownDiv.showPositionedByBlock(this, this.sourceBlock_, this.onHide_.bind(this), secondaryYOffset);
+            if (this.sourceBlock_.isShadow()) {
+                this.savedPrimary_ = this.sourceBlock_.getColour();
+                this.sourceBlock_.setColour(this.sourceBlock_.getColourTertiary(), this.sourceBlock_.getColourSecondary(), this.sourceBlock_.getColourTertiary());
+            }
+            else if (this.box_) {
+                this.box_.setAttribute('fill', this.sourceBlock_.getColourTertiary());
+            }
         };
         /**
          * Sets the text in this field.  Trigger a rerender of the source block.
@@ -7384,8 +7389,10 @@ var pxtblockly;
             this.imageElement_ = null;
             if (this.imageJson_) {
                 // Image option is selected.
-                this.imageElement_ = Blockly.utils.createSvgElement('image', { 'y': 5, 'x': 8, 'height': this.imageJson_.height + 'px',
-                    'width': this.imageJson_.width + 'px' });
+                this.imageElement_ = Blockly.utils.createSvgElement('image', {
+                    'y': 5, 'x': 8, 'height': this.imageJson_.height + 'px',
+                    'width': this.imageJson_.width + 'px'
+                });
                 this.imageElement_.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', this.imageJson_.src);
                 this.size_.height = Number(this.imageJson_.height) + 10;
                 this.textElement_.parentNode.appendChild(this.imageElement_);
@@ -7419,6 +7426,7 @@ var pxtblockly;
         function FieldImages(text, options, validator) {
             var _this = _super.call(this, text, options, validator) || this;
             _this.isFieldCustom_ = true;
+            _this.shouldSort_ = options.sort;
             return _this;
         }
         /**
@@ -7440,6 +7448,8 @@ var pxtblockly;
             contentDiv.setAttribute('role', 'menu');
             contentDiv.setAttribute('aria-haspopup', 'true');
             var options = this.getOptions();
+            if (this.shouldSort_)
+                options.sort();
             for (var i = 0, option = void 0; option = options[i]; i++) {
                 var content = options[i][0]; // Human-readable text or image.
                 var value = options[i][1]; // Language-neutral value.
@@ -7517,6 +7527,14 @@ var pxtblockly;
             // Set bounds to workspace; show the drop-down.
             Blockly.DropDownDiv.setBoundsElement(this.sourceBlock_.workspace.getParentSvg().parentNode);
             Blockly.DropDownDiv.show(this, primaryX, primaryY, secondaryX, secondaryY, this.onHide_.bind(this));
+            // Update colour to look selected.
+            if (this.sourceBlock_.isShadow()) {
+                this.savedPrimary_ = this.sourceBlock_.getColour();
+                this.sourceBlock_.setColour(this.sourceBlock_.getColourTertiary(), this.sourceBlock_.getColourSecondary(), this.sourceBlock_.getColourTertiary());
+            }
+            else if (this.box_) {
+                this.box_.setAttribute('fill', this.sourceBlock_.getColourTertiary());
+            }
         };
         return FieldImages;
     }(pxtblockly.FieldImageDropdown));

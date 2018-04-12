@@ -1723,7 +1723,6 @@ var ProjectView = /** @class */ (function (_super) {
     ProjectView.prototype.startTutorialAsync = function (tutorialId, tutorialTitle) {
         var _this = this;
         var title = tutorialTitle || tutorialId.split('/').reverse()[0].replace('-', ' '); // drop any kind of sub-paths
-        var result = [];
         sounds.initTutorial(); // pre load sounds
         return Promise.resolve()
             .then(function () {
@@ -2060,8 +2059,6 @@ var myexports = {
 };
 window.E = myexports;
 function parseHash() {
-    var hashCmd = "";
-    var hashArg = "";
     var hashM = /^#(\w+)(:([\/\-\+\=\w]+))?$/.exec(window.location.hash);
     if (hashM) {
         return { cmd: hashM[1], arg: hashM[3] || '' };
@@ -2504,7 +2501,6 @@ var baseToolbox = require("./toolbox");
 var CategoryMode = pxt.blocks.CategoryMode;
 var Util = pxt.Util;
 var lf = Util.lf;
-var iface;
 var Editor = /** @class */ (function (_super) {
     __extends(Editor, _super);
     function Editor() {
@@ -2559,7 +2555,6 @@ var Editor = /** @class */ (function (_super) {
             this.loadingXml = true;
             var loading_1 = document.createElement("div");
             loading_1.className = "ui inverted loading";
-            var editorArea = document.getElementById('blocksArea');
             var editorDiv_1 = document.getElementById("blocksEditor");
             editorDiv_1.appendChild(loading_1);
             this.loadingXmlPromise = compiler.getBlocksAsync()
@@ -2790,58 +2785,6 @@ var Editor = /** @class */ (function (_super) {
     Editor.prototype.contentSize = function () {
         return this.editor ? pxt.blocks.blocksMetrics(this.editor) : undefined;
     };
-    /**
-     * Takes the XML definition of the block that will be shown on the help card and modifies the XML
-     * so that the field names are updated to match any field names of dropdowns on the selected block
-     */
-    Editor.prototype.updateFields = function (originalXML, newFieldValues, mutation) {
-        var parser = new DOMParser();
-        var doc = parser.parseFromString(originalXML, "application/xml");
-        var blocks = doc.getElementsByTagName("block");
-        if (blocks.length >= 1) {
-            //Setting innerText doesn't work if there are no children on the node
-            var setInnerText = function (c, newValue) {
-                //Remove any existing children
-                while (c.firstChild) {
-                    c.removeChild(c.firstChild);
-                }
-                var tn = doc.createTextNode(newValue);
-                c.appendChild(tn);
-            };
-            var block = blocks[0];
-            if (newFieldValues) {
-                //Depending on the source, the nodeName may be capitalised
-                var fieldNodes = Array.prototype.filter.call(block.childNodes, function (c) { return c.nodeName == 'field' || c.nodeName == 'FIELD'; });
-                for (var i = 0; i < fieldNodes.length; i++) {
-                    if (newFieldValues.hasOwnProperty(fieldNodes[i].getAttribute('name'))) {
-                        setInnerText(fieldNodes[i], newFieldValues[fieldNodes[i].getAttribute('name')]);
-                        delete newFieldValues[fieldNodes[i].getAttribute('name')];
-                    }
-                }
-                //Now that existing field values have been reset, we can create new field values as appropriate
-                for (var p in newFieldValues) {
-                    var c = doc.createElement('field');
-                    c.setAttribute('name', p);
-                    setInnerText(c, newFieldValues[p]);
-                    block.appendChild(c);
-                }
-            }
-            else if (mutation) {
-                var existingMutation = Array.prototype.filter.call(block.childNodes, function (c) { return c.nodeName == 'mutation' || c.nodeName == 'MUTATION'; });
-                if (existingMutation.length) {
-                    block.replaceChild(mutation, existingMutation[0]);
-                }
-                else {
-                    block.appendChild(mutation);
-                }
-            }
-            var serializer = new XMLSerializer();
-            return serializer.serializeToString(doc);
-        }
-        else {
-            return originalXML;
-        }
-    };
     Editor.prototype.isIncomplete = function () {
         return this.editor ? this.editor.isDragging() : false;
     };
@@ -2883,11 +2826,6 @@ var Editor = /** @class */ (function (_super) {
                 _this.changeCallback();
             }
             if (ev.type == 'create') {
-                var lastCategory = _this.editor.toolbox_ ?
-                    (_this.editor.toolbox_.lastCategory_ ?
-                        _this.editor.toolbox_.lastCategory_.element_.innerText.trim()
-                        : 'unknown')
-                    : 'flyout';
                 var blockId = ev.xml.getAttribute('type');
                 pxt.tickActivity("blocks.create", "blocks.create." + blockId);
                 if (ev.xml.tagName == 'SHADOW')
@@ -3319,7 +3257,6 @@ var Carousel = /** @class */ (function (_super) {
         _this.arrows = [];
         _this.isDragging = false;
         _this.definitelyDragging = false;
-        _this.cancelClick = false;
         _this.currentOffset = 0;
         _this.index = 0;
         _this.childrenElements = [];
@@ -3924,7 +3861,7 @@ var pkg = require("./package");
 var hidbridge = require("./hidbridge");
 var Cloud = pxt.Cloud;
 function browserDownloadAsync(text, name, contentType) {
-    var url = pxt.BrowserUtils.browserDownloadBinText(text, name, contentType, undefined, function (e) { return core.errorNotification(lf("saving file failed...")); });
+    pxt.BrowserUtils.browserDownloadBinText(text, name, contentType, undefined, function (e) { return core.errorNotification(lf("saving file failed...")); });
     return Promise.resolve();
 }
 function browserDownloadDeployCoreAsync(resp) {
@@ -4192,7 +4129,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var sui = require("./sui");
 var blockspreview = require("./blockspreview");
-var lf = pxt.Util.lf;
 var repeat = pxt.Util.repeatMap;
 var CodeCardView = /** @class */ (function (_super) {
     __extends(CodeCardView, _super);
@@ -5933,7 +5869,7 @@ var EditorToolbar = /** @class */ (function (_super) {
     };
     EditorToolbar.prototype.render = function () {
         var _this = this;
-        var _a = this.props.parent.state, home = _a.home, tutorialOptions = _a.tutorialOptions, hideEditorFloats = _a.hideEditorFloats, collapseEditorTools = _a.collapseEditorTools, projectName = _a.projectName, showParts = _a.showParts, compiling = _a.compiling, isSaving = _a.isSaving, running = _a.running;
+        var _a = this.props.parent.state, home = _a.home, tutorialOptions = _a.tutorialOptions, hideEditorFloats = _a.hideEditorFloats, collapseEditorTools = _a.collapseEditorTools, projectName = _a.projectName, compiling = _a.compiling, isSaving = _a.isSaving, running = _a.running;
         if (home)
             return React.createElement("div", null); // Don't render if we're in the home screen
         var sandbox = pxt.shell.isSandboxMode();
@@ -6587,7 +6523,6 @@ var Extensions = /** @class */ (function (_super) {
         frame.allowFullscreen = true;
         frame.setAttribute('sandbox', 'allow-same-origin allow-scripts');
         frame.sandbox.value = "allow-scripts allow-same-origin";
-        var frameUrl = '';
         frame.frameBorder = "0";
         frame.style.display = "none";
         wrapper.appendChild(frame);
@@ -6622,9 +6557,8 @@ var Extensions = /** @class */ (function (_super) {
     };
     Extensions.prototype.renderCore = function () {
         var _this = this;
-        var _a = this.state, visible = _a.visible, extension = _a.extension, url = _a.url, consent = _a.consent, permissionRequest = _a.permissionRequest, permissionExtName = _a.permissionExtName;
+        var _a = this.state, visible = _a.visible, extension = _a.extension, consent = _a.consent, permissionRequest = _a.permissionRequest, permissionExtName = _a.permissionExtName;
         var needsConsent = !consent;
-        var theme = pxt.appTarget.appTheme;
         var action = needsConsent ? lf("Agree") : undefined;
         var actionClick = function () {
             _this.submitConsent();
@@ -7101,7 +7035,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Cloud = pxt.Cloud;
 var U = pxt.Util;
 var iface;
-var devPath;
 var HIDError = /** @class */ (function (_super) {
     __extends(HIDError, _super);
     function HIDError(msg) {
@@ -7407,8 +7340,8 @@ var allLanguages = {
     "tr": { englishName: "Turkish", localizedName: "Türkçe" },
     "uk": { englishName: "Ukrainian", localizedName: "Українська" },
     "vi": { englishName: "Vietnamese", localizedName: "Tiếng việt" },
-    "zh-CN": { englishName: "Chinese (Simplified, China)", localizedName: "简体中文 (中国)" },
-    "zh-TW": { englishName: "Chinese (Traditional, Taiwan)", localizedName: "正體中文 (臺灣)" },
+    "zh-CN": { englishName: "Chinese (Simplified)", localizedName: "简体中文" },
+    "zh-TW": { englishName: "Chinese (Traditional)", localizedName: "繁体中文" },
 };
 var pxtLangCookieId = "PXT_LANG";
 var langCookieExpirationDays = 30;
@@ -7926,21 +7859,6 @@ var Editor = /** @class */ (function (_super) {
         if (this.editor)
             this.editor.getAction('editor.action.formatDocument').run();
     };
-    Editor.prototype.textAndPosition = function (pos) {
-        var programText = this.editor.getValue();
-        var lines = pos.lineNumber;
-        var chars = pos.column;
-        var charNo = 0;
-        for (; charNo < programText.length; ++charNo) {
-            if (lines == 0) {
-                if (chars-- == 0)
-                    break;
-            }
-            else if (programText[charNo] == '\n')
-                lines--;
-        }
-        return { programText: programText, charNo: charNo };
-    };
     Editor.prototype.isIncomplete = function () {
         return this.editor && this.editor._view ?
             this.editor._view.contentWidgets._widgets["editor.widget.suggestWidget"].isVisible :
@@ -8226,14 +8144,13 @@ var Editor = /** @class */ (function (_super) {
         }
         else {
             var cat = snippets.getBuiltinCategory(ns);
-            var blocks_1 = cat.blocks || [];
-            var categoryName = cat.name;
-            blocks_1.forEach(function (b) { b.noNamespace = true; });
+            var blocks = cat.blocks || [];
+            blocks.forEach(function (b) { b.noNamespace = true; });
             if (!cat.custom && this.nsMap[ns.toLowerCase()])
-                blocks_1 = blocks_1.concat(this.nsMap[ns.toLowerCase()].filter(function (block) { return !(block.attributes.blockHidden || block.attributes.deprecated); }));
-            if (!blocks_1 || !blocks_1.length)
+                blocks = blocks.concat(this.nsMap[ns.toLowerCase()].filter(function (block) { return !(block.attributes.blockHidden || block.attributes.deprecated); }));
+            if (!blocks || !blocks.length)
                 return;
-            fns = blocks_1;
+            fns = blocks;
         }
         // Create a flyout and add the category methods in there
         // Add the heading label
@@ -8378,6 +8295,10 @@ var Editor = /** @class */ (function (_super) {
             monacoBlockDisabled = fnState == pxt.editor.FilterState.Disabled;
             if (fnState == pxt.editor.FilterState.Hidden)
                 return undefined;
+            var snippet = fn.snippet;
+            if (!snippet) {
+                return undefined;
+            }
             var monacoBlockArea = document.createElement('div');
             monacoBlockArea.className = "monacoBlock " + (monacoBlockDisabled ? 'monacoDisabledBlock' : '');
             monacoFlyout.appendChild(monacoBlockArea);
@@ -8385,7 +8306,6 @@ var Editor = /** @class */ (function (_super) {
             monacoBlock.className = 'monacoDraggableBlock';
             monacoBlock.tabIndex = 0;
             monacoBlockArea.appendChild(monacoBlock);
-            var snippet = fn.snippet;
             var comment = fn.attributes.jsDoc;
             var snippetPrefix = fn.noNamespace ? "" : ns;
             var isInstance = false;
@@ -8494,7 +8414,6 @@ var Editor = /** @class */ (function (_super) {
                 };
                 monacoBlock.ondragstart = function (e) {
                     pxt.tickEvent("monaco.toolbox.itemdrag", undefined, { interactiveConsent: true });
-                    var clone = monacoBlock.cloneNode(true);
                     setTimeout(function () {
                         monacoFlyout.style.transform = "translateX(-9999px)";
                     });
@@ -8970,8 +8889,8 @@ var MonacoToolbox = /** @class */ (function (_super) {
             }).map(function (_a) {
                 var ns = _a[0], md = _a[1];
                 if (!snippets.isBuiltin(ns)) {
-                    var blocks_2 = parent.nsMap[ns].filter(function (block) { return !(block.attributes.blockHidden || block.attributes.deprecated); });
-                    if (!filterCategory(ns, blocks_2))
+                    var blocks = parent.nsMap[ns].filter(function (block) { return !(block.attributes.blockHidden || block.attributes.deprecated); });
+                    if (!filterCategory(ns, blocks))
                         return undefined;
                     var categoryName = md.block ? md.block : undefined;
                     return {
@@ -8988,12 +8907,12 @@ var MonacoToolbox = /** @class */ (function (_super) {
                 }
                 else {
                     var cat = snippets.getBuiltinCategory(ns);
-                    var blocks_3 = cat.blocks || [];
+                    var blocks = cat.blocks || [];
                     var categoryName = cat.name;
-                    blocks_3.forEach(function (b) { b.noNamespace = true; });
+                    blocks.forEach(function (b) { b.noNamespace = true; });
                     if (!cat.custom && parent.nsMap[ns.toLowerCase()])
-                        blocks_3 = blocks_3.concat(parent.nsMap[ns.toLowerCase()].filter(function (block) { return !(block.attributes.blockHidden || block.attributes.deprecated); }));
-                    if (!filterCategory(ns, blocks_3))
+                        blocks = blocks.concat(parent.nsMap[ns.toLowerCase()].filter(function (block) { return !(block.attributes.blockHidden || block.attributes.deprecated); }));
+                    if (!filterCategory(ns, blocks))
                         return undefined;
                     return {
                         ns: ns,
@@ -9751,7 +9670,7 @@ exports.overrideToolbox = overrideToolbox;
 },{}],30:[function(require,module,exports){
 "use strict";
 /// <reference path="../../built/pxtlib.d.ts" />
-/// <reference path="../../localtypings/mscc" />
+/// <reference path="../../localtypings/mscc.d.ts" />
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -10317,48 +10236,11 @@ var Projects = /** @class */ (function (_super) {
     __extends(Projects, _super);
     function Projects(props) {
         var _this = _super.call(this, props) || this;
-        _this.prevUrlData = [];
-        _this.prevGalleries = {};
-        _this.galleryFetchErrors = {};
         _this.state = {
             visible: false
         };
         return _this;
     }
-    Projects.prototype.fetchGallery = function (tab, path) {
-        var res = this.getData("gallery:" + encodeURIComponent(path));
-        if (res) {
-            if (res instanceof Error) {
-                this.galleryFetchErrors[tab] = true;
-            }
-            else {
-                this.prevGalleries[path] = Util.concat(res.map(function (g) { return g.cards; }));
-            }
-        }
-        return this.prevGalleries[path] || [];
-    };
-    Projects.prototype.fetchUrlData = function () {
-        var scriptid = pxt.Cloud.parseScriptId(this.state.searchFor);
-        if (scriptid) {
-            var res = this.getData("cloud-search:" + scriptid);
-            if (res) {
-                if (res.statusCode !== 404) {
-                    if (!this.prevUrlData)
-                        this.prevUrlData = [res];
-                    else
-                        this.prevUrlData.push(res);
-                }
-            }
-        }
-        return this.prevUrlData;
-    };
-    Projects.prototype.fetchLocalData = function () {
-        var _this = this;
-        var headers = this.getData("header:*");
-        if (this.state.searchFor)
-            headers = headers.filter(function (hdr) { return hdr.name.toLowerCase().indexOf(_this.state.searchFor.toLowerCase()) > -1; });
-        return headers;
-    };
     Projects.prototype.shouldComponentUpdate = function (nextProps, nextState, nextContext) {
         return this.state.visible != nextState.visible
             || this.state.searchFor != nextState.searchFor
@@ -10396,7 +10278,7 @@ var Projects = /** @class */ (function (_super) {
     };
     Projects.prototype.renderCore = function () {
         var _this = this;
-        var _a = this.state, visible = _a.visible, selectedCategory = _a.selectedCategory, selectedIndex = _a.selectedIndex;
+        var _a = this.state, selectedCategory = _a.selectedCategory, selectedIndex = _a.selectedIndex;
         var targetTheme = pxt.appTarget.appTheme;
         var targetConfig = this.getData("target-config:");
         var lang = pxt.Util.userLanguage();
@@ -10411,10 +10293,6 @@ var Projects = /** @class */ (function (_super) {
         // lf("Projects")
         // lf("Examples")
         // lf("Tutorials")
-        var headers = this.fetchLocalData();
-        var urldata = this.fetchUrlData();
-        this.galleryFetchErrors = {};
-        var gals = Util.mapMap(galleries, function (k) { return _this.fetchGallery(k, galleries[k]); });
         var chgHeader = function (hdr) {
             pxt.tickEvent("projects.header");
             core.showLoading("changeheader", lf("loading..."));
@@ -10504,7 +10382,6 @@ var Projects = /** @class */ (function (_super) {
             _this.props.parent.selectLang();
         };
         var showHeroBanner = !!targetTheme.homeScreenHero;
-        var betaUrl = targetTheme.betaUrl;
         var tabClasses = sui.cx([
             'ui segment bottom attached tab active tabsegment'
         ]);
@@ -10555,7 +10432,6 @@ var ProjectsMenu = /** @class */ (function (_super) {
     ProjectsMenu.prototype.render = function () {
         var _this = this;
         var targetTheme = pxt.appTarget.appTheme;
-        var sharingEnabled = pxt.appTarget.cloud && pxt.appTarget.cloud.sharing;
         return React.createElement("div", { id: "homemenu", className: "ui borderless fixed " + (targetTheme.invertedMenu ? "inverted" : '') + " menu", role: "menubar" },
             React.createElement("div", { className: "left menu" },
                 React.createElement("a", { href: targetTheme.logoUrl, "aria-label": lf("{0} Logo", targetTheme.boardName), role: "menuitem", target: "blank", rel: "noopener", className: "ui item logo brand", onClick: function () { return _this.brandIconClick(); } },
@@ -10583,7 +10459,6 @@ var ProjectsCarousel = /** @class */ (function (_super) {
     function ProjectsCarousel(props) {
         var _this = _super.call(this, props) || this;
         _this.prevGalleries = [];
-        _this.prevHeaders = [];
         _this.hasFetchErrors = false;
         _this.state = {};
         return _this;
@@ -10609,7 +10484,6 @@ var ProjectsCarousel = /** @class */ (function (_super) {
     };
     ProjectsCarousel.prototype.fetchLocalData = function () {
         var headers = this.getData("header:*");
-        this.prevHeaders = headers || [];
         return headers;
     };
     ProjectsCarousel.prototype.newProject = function () {
@@ -10630,8 +10504,7 @@ var ProjectsCarousel = /** @class */ (function (_super) {
     };
     ProjectsCarousel.prototype.renderCore = function () {
         var _this = this;
-        var _a = this.props, name = _a.name, path = _a.path, selectedIndex = _a.selectedIndex;
-        var theme = pxt.appTarget.appTheme;
+        var _a = this.props, path = _a.path, selectedIndex = _a.selectedIndex;
         var onClick = function (scr, index) {
             if (_this.props.setSelected) {
                 // Set this item as selected
@@ -10690,7 +10563,7 @@ var ProjectsDetail = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     ProjectsDetail.prototype.renderCore = function () {
-        var _a = this.props, name = _a.name, description = _a.description, imageUrl = _a.imageUrl, largeImageUrl = _a.largeImageUrl, youTubeId = _a.youTubeId, url = _a.url, onClick = _a.onClick, cardType = _a.cardType;
+        var _a = this.props, name = _a.name, description = _a.description, imageUrl = _a.imageUrl, largeImageUrl = _a.largeImageUrl, youTubeId = _a.youTubeId, onClick = _a.onClick, cardType = _a.cardType;
         var image = largeImageUrl || imageUrl || (youTubeId ? "https://img.youtube.com/vi/" + youTubeId + "/0.jpg" : undefined);
         var clickLabel = lf("Show Instructions");
         if (cardType == "tutorial")
@@ -10757,7 +10630,7 @@ var ImportDialog = /** @class */ (function (_super) {
             _this.hide();
             _this.props.parent.importUrlDialog();
         };
-        return (React.createElement(sui.Modal, { open: this.state.visible, className: "importdialog", header: lf("Import"), size: "small", onClose: function () { return _this.close(); }, dimmer: true, closeIcon: true, closeOnDimmerClick: true, closeOnDocumentClick: true, closeOnEscape: true },
+        return (React.createElement(sui.Modal, { open: visible, className: "importdialog", header: lf("Import"), size: "small", onClose: function () { return _this.close(); }, dimmer: true, closeIcon: true, closeOnDimmerClick: true, closeOnDocumentClick: true, closeOnEscape: true },
             React.createElement("div", { className: "ui cards" },
                 pxt.appTarget.compile ?
                     React.createElement(codecard.CodeCardView, { ariaLabel: lf("Open files from your computer"), className: "focused", role: "button", key: 'import', icon: "upload", iconColor: "secondary", name: lf("Import File..."), description: lf("Open files from your computer"), onClick: function () { return importHex(); } }) : undefined,
@@ -10902,14 +10775,6 @@ var Editor = /** @class */ (function (_super) {
             c.name = v;
             _this.parent.forceUpdate();
         };
-        var deleteProject = function () {
-            _this.parent.removeProject();
-        };
-        var initCard = function () {
-            if (!c.card)
-                c.card = {};
-        };
-        var card = c.card || {};
         var userConfigs = [];
         pkg.allEditorPkgs().map(function (ep) { return ep.getKsPkg(); })
             .filter(function (dep) { return !!dep && dep.isLoaded && !!dep.config && !!dep.config.yotta && !!dep.config.yotta.userConfigs; })
@@ -10949,7 +10814,7 @@ var Editor = /** @class */ (function (_super) {
             React.createElement("h3", { className: "ui small header" },
                 React.createElement("div", { className: "content" }, lf("Project Settings"))),
             React.createElement("div", { className: "ui segment form text" },
-                React.createElement(sui.Input, { id: "fileNameInput", label: lf("Name"), ariaLabel: lf("Type a name for your project"), value: c.name, onChange: setFileName }),
+                React.createElement(sui.Input, { ref: function (e) { return _this.nameInput = e; }, id: "fileNameInput", label: lf("Name"), ariaLabel: lf("Type a name for your project"), value: c.name, onChange: setFileName }),
                 userConfigs.map(function (uc) {
                     return React.createElement(sui.Checkbox, { key: "userconfig-" + uc.description, inputLabel: uc.description, checked: isUserConfigActive(uc), onChange: function () { return applyUserConfig(uc); } });
                 }),
@@ -10985,6 +10850,8 @@ var Editor = /** @class */ (function (_super) {
     };
     Editor.prototype.loadFileAsync = function (file) {
         this.config = JSON.parse(file.content);
+        if (this.nameInput)
+            this.nameInput.clearValue();
         this.setDiagnostics(file, this.snapshotState());
         this.changeMade = false;
         return Promise.resolve();
@@ -11257,7 +11124,6 @@ var ScriptSearch = /** @class */ (function (_super) {
         var _this = _super.call(this, props) || this;
         _this.prevGhData = [];
         _this.prevUrlData = [];
-        _this.prevGalleries = [];
         _this.state = {
             searchFor: '',
             visible: false
@@ -11329,7 +11195,6 @@ var ScriptSearch = /** @class */ (function (_super) {
         var _this = this;
         if (!this.state.visible)
             return React.createElement("div", null);
-        var targetTheme = pxt.appTarget.appTheme;
         var bundles = this.fetchBundled();
         var ghdata = this.fetchGhData();
         var urldata = this.fetchUrlData();
@@ -11380,7 +11245,6 @@ var ScriptSearch = /** @class */ (function (_super) {
         var installGh = function (scr) {
             pxt.tickEvent("packages.github", { name: scr.fullName });
             _this.hide();
-            var p = pkg.mainEditorPkg();
             core.showLoading("downloadingpackage", lf("downloading package..."));
             pxt.packagesConfigAsync()
                 .then(function (config) { return pxt.github.latestVersionAsync(scr.fullName, config); })
@@ -11615,7 +11479,7 @@ var Editor = /** @class */ (function (_super) {
         var niceSource = this.sourceMap[source];
         // is this a CSV data entry
         if (/^\s*(-?\d+(\.\d*)?)(\s*,\s*(-?\d+(\.\d*)?))+\s*,?\s*$/.test(data)) {
-            var parts = data.split(/\s*,\s*/).map(function (s) { return parseFloat(s); })
+            data.split(/\s*,\s*/).map(function (s) { return parseFloat(s); })
                 .filter(function (d) { return !isNaN(d); })
                 .forEach(function (d, i) {
                 var variable = "data." + (_this.csvHeaders[i] || i);
@@ -11825,7 +11689,7 @@ var Editor = /** @class */ (function (_super) {
             React.createElement("div", { id: "serialHeader", className: "ui serialHeader" },
                 React.createElement("div", { className: "leftHeaderWrapper" },
                     React.createElement("div", { className: "leftHeader" },
-                        React.createElement(sui.Button, { title: lf("Go back"), class: "ui icon circular small button editorBack", ariaLabel: lf("Go back"), onClick: this.goBack.bind(this) },
+                        React.createElement(sui.Button, { text: lf("Go back"), title: lf("Go back to the previous editor"), class: "icon circular small editorBack left labeled", ariaLabel: lf("Go back"), onClick: this.goBack.bind(this) },
                             React.createElement(sui.Icon, { icon: "arrow left" })))),
                 React.createElement("div", { className: "rightHeader" },
                     React.createElement(sui.Button, { title: lf("Export data"), class: "ui icon blue button editorExport", ariaLabel: lf("Export data"), onClick: function () { return _this.downloadCSV(); } },
@@ -12117,8 +11981,6 @@ var ShareEditor = /** @class */ (function (_super) {
         var _this = this;
         var visible = this.state.visible;
         var targetTheme = pxt.appTarget.appTheme;
-        var cloud = pxt.appTarget.cloud || {};
-        var embedding = !!cloud.embedding;
         var header = this.props.parent.state.header;
         var advancedMenu = !!this.state.advancedMenu;
         var hideEmbed = !!targetTheme.hideShareEmbed;
@@ -12127,7 +11989,6 @@ var ShareEditor = /** @class */ (function (_super) {
         var mode = this.state.mode;
         var url = '';
         var embed = '';
-        var help = lf("Copy this HTML to your website or blog.");
         if (header) {
             var shareUrl = pxt.appTarget.appTheme.shareUrl || "https://makecode.com/";
             if (!/\/$/.test(shareUrl))
@@ -12135,8 +11996,6 @@ var ShareEditor = /** @class */ (function (_super) {
             var rootUrl = pxt.appTarget.appTheme.embedUrl;
             if (!/\/$/.test(rootUrl))
                 rootUrl += '/';
-            var isBlocks = this.props.parent.getPreferredEditor() == pxt.BLOCKS_PROJECT_NAME;
-            var pubCurrent = header ? header.pubCurrent : false;
             var currentPubId = (header ? header.pubId : undefined) || this.state.currentPubId;
             ready = (!!currentPubId && header.pubCurrent);
             if (ready) {
@@ -12221,7 +12080,7 @@ var ShareEditor = /** @class */ (function (_super) {
                 className: 'primary'
             });
         }
-        return (React.createElement(sui.Modal, { open: this.state.visible, className: "sharedialog", header: lf("Share Project"), size: "small", onClose: function () { return _this.setState({ visible: false }); }, dimmer: true, actions: actions, closeIcon: true, closeOnDimmerClick: true, closeOnDocumentClick: true, closeOnEscape: true },
+        return (React.createElement(sui.Modal, { open: visible, className: "sharedialog", header: lf("Share Project"), size: "small", onClose: function () { return _this.setState({ visible: false }); }, dimmer: true, actions: actions, closeIcon: true, closeOnDimmerClick: true, closeOnDocumentClick: true, closeOnEscape: true },
             React.createElement("div", { className: "ui form" },
                 action ?
                     React.createElement("div", null,
@@ -12314,19 +12173,15 @@ var SimulatorToolbar = /** @class */ (function (_super) {
         var isFullscreen = parentState.fullscreen;
         var isTracing = parentState.tracing;
         var isMuted = parentState.mute;
-        var isCompiling = parentState.compiling;
         var inTutorial = !!parentState.tutorialOptions && !!parentState.tutorialOptions.tutorial;
         var run = true; // !compileBtn || !pxt.appTarget.simulator.autoRun || !isBlocks;
         var restart = run && !simOpts.hideRestart;
         var trace = run && simOpts.enableTrace;
         var fullscreen = run && !inTutorial && !simOpts.hideFullscreen;
         var audio = run && !inTutorial && targetTheme.hasAudio;
-        var hideMenuBar = targetTheme.hideMenuBar, hideEditorToolbar = targetTheme.hideEditorToolbar;
         var isHeadless = simOpts.headless;
         if (isHeadless)
             return React.createElement("div", null);
-        var compileTooltip = lf("Download your code to the {0}", targetTheme.boardName);
-        var compileLoading = !!isCompiling;
         var runTooltip = isRunning ? lf("Stop the simulator") : lf("Start the simulator");
         var makeTooltip = lf("Open assembly instructions");
         var restartTooltip = lf("Restart the simulator");
@@ -13091,6 +12946,9 @@ var Input = /** @class */ (function (_super) {
     function Input() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    Input.prototype.clearValue = function () {
+        this.setState({ value: undefined });
+    };
     Input.prototype.copy = function () {
         var p = this.props;
         var el = ReactDOM.findDOMNode(this);
@@ -13449,7 +13307,6 @@ var Modal = /** @class */ (function (_super) {
                 'page modals dimmer visible active',
                 dimmerClassName
             ]);
-        var blurring = dimmer === 'blurring';
         return (React.createElement(Portal, { closeOnRootNodeClick: closeOnDimmerClick, closeOnDocumentClick: closeOnDocumentClick, closeOnEscape: closeOnEscape, className: dimmerClasses, mountNode: this.getMountNode(), onMount: this.handlePortalMount, onUnmount: this.handlePortalUnmount, onClose: this.handleClose, onOpen: this.handleOpen, open: open, allowResetFocus: allowResetFocus }, modalJSX));
     };
     return Modal;
@@ -13554,7 +13411,7 @@ var Portal = /** @class */ (function (_super) {
             this.setState(newState);
     };
     Portal.prototype.renderPortal = function () {
-        var _a = this.props, children = _a.children, className = _a.className, open = _a.open, allowResetFocus = _a.allowResetFocus;
+        var _a = this.props, children = _a.children, className = _a.className, allowResetFocus = _a.allowResetFocus;
         this.mountPortal();
         this.rootNode.className = className || '';
         ReactDOM.unstable_renderSubtreeIntoContainer(this, React.Children.only(children), this.rootNode);
@@ -13657,9 +13514,7 @@ var TutorialMenuItem = /** @class */ (function (_super) {
     };
     TutorialMenuItem.prototype.render = function () {
         var _this = this;
-        var _a = this.props.parent.state.tutorialOptions, tutorialReady = _a.tutorialReady, tutorialStepInfo = _a.tutorialStepInfo, tutorialStep = _a.tutorialStep, tutorialName = _a.tutorialName;
-        var state = this.props.parent.state;
-        var targetTheme = pxt.appTarget.appTheme;
+        var _a = this.props.parent.state.tutorialOptions, tutorialReady = _a.tutorialReady, tutorialStepInfo = _a.tutorialStepInfo, tutorialStep = _a.tutorialStep;
         var currentStep = tutorialStep;
         if (!tutorialReady)
             return React.createElement("div", null);
@@ -13839,7 +13694,6 @@ var TutorialCard = /** @class */ (function (_super) {
         var tutorialAriaLabel = tutorialStepInfo[tutorialStep].ariaLabel;
         var currentStep = tutorialStep;
         var maxSteps = tutorialStepInfo.length;
-        var hasPrevious = tutorialReady && currentStep != 0;
         var hasNext = tutorialReady && currentStep != maxSteps - 1;
         var hasFinish = currentStep == maxSteps - 1;
         var hasHint = tutorialStepInfo[tutorialStep].hasHint;
@@ -13878,7 +13732,6 @@ var iframeworkspace = require("./iframeworkspace");
 var scripts = new db.Table("script");
 var U = pxt.Util;
 var Cloud = pxt.Cloud;
-var lf = U.lf;
 var impl;
 function setupWorkspace(id) {
     U.assert(!impl, "workspace set twice");
@@ -28708,7 +28561,7 @@ module.exports={
   "_args": [
     [
       "levelup@1.3.2",
-      "/home/travis/build/Microsoft/pxt"
+      "/Users/matthew/Source/git/MuddyTummy/pxt"
     ]
   ],
   "_development": true,
@@ -28733,7 +28586,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/levelup/-/levelup-1.3.2.tgz",
   "_spec": "1.3.2",
-  "_where": "/home/travis/build/Microsoft/pxt",
+  "_where": "/Users/matthew/Source/git/MuddyTummy/pxt",
   "browser": {
     "leveldown": false,
     "leveldown/package": false,

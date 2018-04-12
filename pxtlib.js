@@ -1494,6 +1494,8 @@ var pxt;
             comp.floatingPoint = true;
             comp.needsUnboxing = true;
         }
+        if (!comp.vtableShift)
+            comp.vtableShift = 2;
         if (!pxt.appTarget.appTheme)
             pxt.appTarget.appTheme = {};
         if (!pxt.appTarget.appTheme.embedUrl)
@@ -2255,7 +2257,7 @@ var pxt;
         BrowserUtils.isEpiphany = isEpiphany;
         function isTouchEnabled() {
             return typeof window !== "undefined" &&
-                ('ontouchstart' in window // works on most browsers 
+                ('ontouchstart' in window // works on most browsers
                     || navigator.maxTouchPoints > 0); // works on IE10/11 and Surface);
         }
         BrowserUtils.isTouchEnabled = isTouchEnabled;
@@ -3526,6 +3528,8 @@ var pxt;
                 pxtConfig += "#define PXT_BOX_DEBUG 1\n";
                 pxtConfig += "#define PXT_MEMLEAK_DEBUG 1\n";
             }
+            if (compile.vtableShift)
+                pxtConfig += "#define PXT_VTABLE_SHIFT " + compile.vtableShift + "\n";
             if (compile.nativeType == pxtc.NATIVE_TYPE_AVRVM) {
                 pxtConfig += "#define PXT_VM 1\n";
             }
@@ -7754,23 +7758,29 @@ var ts;
             var combinedSet = {};
             var combinedGet = {};
             var combinedChange = {};
-            function addCombined(tp, s) {
-                var isGet = tp == "get";
-                var m = isGet ? combinedGet :
-                    tp == "set" ? combinedSet : combinedChange;
-                var ex = pxtc.U.lookup(m, s.namespace);
+            function addCombined(rtp, s) {
+                var isGet = rtp == "get";
+                var isSet = rtp == "set";
+                var m = isGet ? combinedGet : (isSet ? combinedSet : combinedChange);
+                var mkey = s.namespace + "." + s.retType;
+                var ex = pxtc.U.lookup(m, mkey);
                 if (!ex) {
+                    var tp = "@" + rtp + "@";
                     var paramName = s.namespace.toLowerCase();
-                    ex = m[s.namespace] = {
+                    var paramValue = "value=" + (s.attributes.blockCombineShadow || "");
+                    ex = m[mkey] = {
                         attributes: {
+                            blockId: mkey + "_blockCombine_" + rtp,
                             callingConvention: pxtc.ir.CallingConvention.Plain,
+                            group: s.attributes.group,
                             paramDefl: {},
                             jsDoc: isGet
                                 ? pxtc.U.lf("Read value of a property on an object")
                                 : pxtc.U.lf("Update value of property on an object")
                         },
-                        name: "@" + tp + "@",
+                        name: tp,
                         namespace: s.namespace,
+                        qName: mkey + "." + tp,
                         pkg: s.pkg,
                         kind: SymbolKind.Property,
                         parameters: [
@@ -7784,22 +7794,19 @@ var ts;
                             },
                             {
                                 name: "value",
-                                description: tp == "set" ?
+                                description: isSet ?
                                     pxtc.U.lf("the new value of the property") :
                                     pxtc.U.lf("the amount by which to change the property"),
-                                type: "number"
+                                type: s.retType,
                             }
                         ].slice(0, isGet ? 1 : 2),
-                        retType: isGet ? "number" : "void",
-                        combinedProperties: [],
+                        retType: isGet ? s.retType : "void",
+                        combinedProperties: []
                     };
-                    ex.attributes.block = isGet ? "%" + paramName + " %property" :
-                        tp == "set" ?
-                            "set %" + paramName + " %property to %value" :
-                            "change %" + paramName + " %property by %value";
-                    ex.attributes.blockId = ex.namespace + "_blockCombine_" + tp;
-                    ex.attributes.group = s.attributes.group; // first group wins
-                    ex.qName = ex.namespace + "." + ex.name;
+                    ex.attributes.block =
+                        isGet ? "%" + paramName + " %property" :
+                            isSet ? "set %" + paramName + " %property to %" + paramValue :
+                                "change %" + paramName + " %property by %" + paramValue;
                     updateBlockDef(ex.attributes);
                     blocks.push(ex);
                 }
@@ -7808,12 +7815,15 @@ var ts;
             for (var _i = 0, _a = pxtc.Util.values(info.byQName); _i < _a.length; _i++) {
                 var s = _a[_i];
                 if (s.attributes.blockCombine) {
-                    if (!s.isReadOnly) {
-                        addCombined("set", s);
-                        addCombined("change", s);
-                    }
-                    if (!/@set/.test(s.name))
+                    if (!/@set/.test(s.name)) {
                         addCombined("get", s);
+                    }
+                    if (!s.isReadOnly) {
+                        if (s.retType == 'number') {
+                            addCombined("change", s);
+                        }
+                        addCombined("set", s);
+                    }
                 }
                 else if (!!s.attributes.block
                     && !s.attributes.fixedInstance
@@ -9025,6 +9035,7 @@ var ts;
     (function (pxtc) {
         var assembler;
         (function (assembler) {
+            assembler.debug = false;
             function lf(fmt) {
                 var args = [];
                 for (var _i = 1; _i < arguments.length; _i++) {
@@ -9858,7 +9869,7 @@ var ts;
                             if (!text.trim())
                                 return;
                         }
-                        if (_this.location() == _this.buf.length)
+                        if (assembler.debug)
                             if (ln.type == "label" || ln.type == "instruction")
                                 text += " \t; 0x" + (ln.location + _this.baseOffset).toString(16);
                         res += text + "\n";

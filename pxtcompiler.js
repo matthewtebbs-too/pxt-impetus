@@ -681,7 +681,12 @@ var ts;
             };
             ProctoAssembler.prototype.work = function () {
                 var _this = this;
-                this.write("\n;\n; Function " + this.proc.getName() + "\n;\n");
+                var name = this.proc.getName();
+                if (pxtc.assembler.debug && this.proc.action) {
+                    var info = ts.pxtc.nodeLocationInfo(this.proc.action);
+                    name += " " + info.fileName + ":" + (info.line + 1);
+                }
+                this.write("\n;\n; Function " + name + "\n;\n");
                 if (this.proc.args.length <= 3)
                     this.emitLambdaWrapper(this.proc.isRoot);
                 var baseLabel = this.proc.label();
@@ -1072,11 +1077,11 @@ var ts;
                         this.write(this.t.emit_int(procid.mapIdx, "r1"));
                         if (isSet)
                             this.write(this.t.emit_int(procid.ifaceIndex, "r2"));
-                        this.emitHelper(this.t.vcall(procid.mapMethod, isSet, pxtc.vtableShift));
+                        this.emitHelper(this.t.vcall(procid.mapMethod, isSet, this.bin.options.target.vtableShift));
                         this.write(lbl + ":");
                     }
                     else {
-                        this.write(this.t.prologue_vtable(topExpr.args.length - 1, pxtc.vtableShift));
+                        this.write(this.t.prologue_vtable(topExpr.args.length - 1, this.bin.options.target.vtableShift));
                         var effIdx = procid.virtualIndex + 4;
                         if (procid.ifaceIndex != null) {
                             this.write(this.t.load_reg_src_off("r0", "r0", "#4") + " ; iface table");
@@ -2705,6 +2710,7 @@ var ts;
         function vtableToVM(info) {
             return pxtc.vtableToAsm(info);
         }
+        /* tslint:disable:no-trailing-whitespace */
         function vmEmit(bin, opts) {
             var vmsource = "; VM start\n" + pxtc.hex.hexPrelude() + "        \n    .hex 708E3B92C615A841C49866C975EE5197 ; magic number\n    .hex " + pxtc.hex.hexTemplateHash() + " ; hex template hash\n    .hex 0000000000000000 ; @SRCHASH@\n    .short " + bin.globalsWords + "   ; num. globals\n    .short 0 ; patched with number of words resulting from assembly\n    .word 0 ; reserved\n    .word 0 ; reserved\n    .word 0 ; reserved\n";
             var snip = new pxtc.AVRSnippets();
@@ -2742,6 +2748,7 @@ var ts;
             }
         }
         pxtc.vmEmit = vmEmit;
+        /* tslint:enable */
         function irToVM(bin, proc) {
             var resText = "";
             var writeRaw = function (s) { resText += s + "\n"; };
@@ -4004,7 +4011,8 @@ var ts;
                         error(left);
                         return undefined;
                     }
-                    var setter = env.blocks.blocks.find(function (b) { return b.namespace == sym.namespace && b.name == tp; });
+                    var qName = sym.namespace + "." + sym.retType + "." + tp;
+                    var setter = env.blocks.blocks.find(function (b) { return b.qName == qName; });
                     var r = right ? mkStmt(setter.attributes.blockId) : mkExpr(setter.attributes.blockId);
                     var pp = setter.attributes._def.parameters;
                     r.inputs = [getValue(pp[0].name, left.expression)];
@@ -11922,7 +11930,6 @@ var ts;
             - Checksum, two hex digits, a computed value that can be used to verify the record has no errors.
     
         */
-        pxtc.vtableShift = 2;
         // TODO should be internal
         var hex;
         (function (hex_1) {
@@ -12029,9 +12036,9 @@ var ts;
                 }
             }
             function encodeVTPtr(ptr) {
-                var vv = ptr >> pxtc.vtableShift;
+                var vv = ptr >> pxt.appTarget.compile.vtableShift;
                 pxtc.assert(vv < 0xffff);
-                pxtc.assert(vv << pxtc.vtableShift == ptr);
+                pxtc.assert(vv << pxt.appTarget.compile.vtableShift == ptr);
                 return vv;
             }
             hex_1.encodeVTPtr = encodeVTPtr;
@@ -12409,7 +12416,7 @@ var ts;
             }
         }
         function vtableToAsm(info) {
-            var s = "\n        .balign " + (1 << pxtc.vtableShift) + "\n" + info.id + "_VT:\n        .short " + (info.refmask.length * 4 + 4) + "  ; size in bytes\n        .byte " + (info.vtable.length + 2) + ", 0  ; num. methods\n";
+            var s = "\n        .balign " + (1 << pxt.appTarget.compile.vtableShift) + "\n" + info.id + "_VT:\n        .short " + (info.refmask.length * 4 + 4) + "  ; size in bytes\n        .byte " + (info.vtable.length + 2) + ", 0  ; num. methods\n";
             var ptrSz = pxtc.target.shortPointers ? ".short" : ".word";
             var addPtr = function (n) {
                 if (n != "0" && (!pxtc.isStackMachine() || n.indexOf("::") >= 0))
@@ -12805,6 +12812,9 @@ var ts;
             }
             return false;
         }
+        function isReadonly(decl) {
+            return decl.modifiers && decl.modifiers.some(function (m) { return m.kind == pxtc.SK.ReadonlyKeyword; });
+        }
         function createSymbolInfo(typechecker, qName, stmt) {
             function typeOf(tn, n, stripParams) {
                 if (stripParams === void 0) { stripParams = false; }
@@ -12860,7 +12870,7 @@ var ts;
                     pkg: pkg,
                     extendsTypes: extendsTypes,
                     retType: kind == pxtc.SymbolKind.Module ? "" : typeOf(decl.type, decl, hasParams),
-                    parameters: !hasParams ? null : (pxtc.Util.toArray(decl.parameters)).map(function (p, i) {
+                    parameters: !hasParams ? null : pxtc.Util.toArray(decl.parameters).map(function (p, i) {
                         var n = pxtc.getName(p);
                         var desc = attributes_1.paramHelp[n] || "";
                         var minVal = attributes_1.paramMin && attributes_1.paramMin[n];
@@ -12917,8 +12927,10 @@ var ts;
                     }),
                     snippet: pxtc.service.getSnippet(decl, attributes_1)
                 };
-                if (stmt.kind == pxtc.SK.GetAccessor)
+                if ((stmt.kind === pxtc.SK.GetAccessor && !ts.getDeclarationOfKind(decl.symbol, pxtc.SK.SetAccessor)) ||
+                    (stmt.kind === pxtc.SK.PropertyDeclaration && isReadonly(stmt))) {
                     r.isReadOnly = true;
+                }
                 return r;
             }
             return null;
@@ -13018,7 +13030,6 @@ var ts;
                     vs.declarationList.declarations.forEach(collectDecls);
                     return;
                 }
-                // if (!isExported(stmt as Declaration)) return; ?
                 if (isExported(stmt)) {
                     if (!stmt.symbol) {
                         console.warn("no symbol", stmt);
