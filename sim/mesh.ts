@@ -36,4 +36,13 @@ namespace pxsim.mesh {
 
         return new Mesh3d(shape3d, material);
     }
+
+    export function materialFrom(object3d: GenericObject3d): GenericMaterial | null {
+        if (!object3d || !(object3d instanceof Mesh3d)) {
+            return null;
+        }
+
+        const material = (object3d as Mesh3d).material;
+        return Array.isArray(material) ? (material.length > 0 ? material[0] : null) : material;
+    }
 }

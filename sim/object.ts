@@ -112,7 +112,8 @@ namespace pxsim {
         }
     }
 
-    export class GenericObject3d extends Object3d<THREE.Object3D> { }
+    export class GenericObject3d extends Object3d<THREE.Object3D> {
+    }
 
     export function outerObject(reference: THREE.Object3D): GenericObject3d | null {
         return reference.userData.outer as GenericObject3d || null;

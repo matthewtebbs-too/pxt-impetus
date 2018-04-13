@@ -364,8 +364,29 @@ declare namespace design {
     function directionalLight(color?: Color, intensity?: number): Light;
 }
 
-//%
+//% blockNamespace=design
 declare class Material {
+    //% blockCombine
+    //% blockCombineShadow=color_picker
+    //% group="Material"
+    //% shim=.color property
+    public color: Color;
+
+    //% blockCombine
+    //% blockCombineShadow=color_picker
+    //% group="Material"
+    //% shim=.emissive property
+    public emissive: Color;
+
+    //% blockCombine
+    //% group="Material"
+    //% shim=.roughness property
+    public roughness: number;
+
+    //% blockCombine
+    //% group="Material"
+    //% shim=.metalness property
+    public metalness: number;
 }
 
 declare namespace design {
@@ -389,6 +410,15 @@ declare namespace object { /* cube icon */
     //% block="object with shape %shape=shape3d_box|and material %material=material_with_color"
     //% shim=mesh::fromShapeAndMaterial
     function fromShapeAndMaterial(shape3d: Shape3d, material: Material): Mesh3d;
+
+    /**
+     * 
+     * Return material from the object, or null if it has none.
+     */
+    //% blockId=object3d_material_from
+    //% block="material from %object3d"
+    //% shim=mesh::materialFrom
+    function materialFrom(object3d: Object3d): Material;
 }
 
 //%

@@ -6,14 +6,20 @@ Here are some fun examples!
 
 ```codecard
 [{
+  "name": "Test",
+  "description": "Test",
+  "url":"/examples/test",
+  "cardType": "example"
+},
+{
   "name": "Interactive Cubes",
-  "description": "Interactive cubes to click! (NYI)",
+  "description": "Interactive cubes",
   "url":"/examples/webgl_interactive_cubes",
   "cardType": "example"
 },
 {
   "name": "Falling Spheres",
-  "description": "Watch the spheres fall!",
+  "description": "Watch the spheres fall",
   "url":"/examples/webgl_falling_spheres",
   "cardType": "example"
 }]
