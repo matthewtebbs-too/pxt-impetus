@@ -7,14 +7,47 @@
 /// <reference path="_runtime.ts"/>
 
 namespace pxsim {
+    interface IUserDataObject3d {
+        _rigidbody: RigidBody | null;
+    }
+
     export abstract class Object3d<T extends THREE.Object3D> extends rt.WrappedObjectWithId<T> {
-        protected _rigidbody: RigidBody | null = null;
+        protected static _applyFnToUserData(reference: THREE.Object3D, fn: (udo3d: IUserDataObject3d) => void) {
+            reference.children.forEach(childreference => Object3d._applyFnToUserData(childreference, fn));
+
+            const udo3d = Object3d.userData(reference);
+            if (udo3d) {
+                fn(udo3d);
+            }
+        }
+
+        private static _propertyUserData = 'udo3d';
+
+        private static userData(reference: THREE.Object3D): IUserDataObject3d | null {
+            return reference.userData.udo3d as IUserDataObject3d || null;
+        }
+
+        protected get _rigidbody(): RigidBody | null {
+            const udo3d = Object3d.userData(this.reference);
+            return udo3d ? udo3d._rigidbody : null;
+        }
+
+        protected set _rigidbody(rigidbody: RigidBody | null) {
+            const udo3d = Object3d.userData(this.reference);
+            if (udo3d) {
+                udo3d._rigidbody = rigidbody;
+            }
+        }
 
         constructor(reference: T, id?: rt.ObjId) {
             super(reference, id);
 
             this.reference.name = this.id as string;
-            this.reference.userData = {...this.reference.userData, outer: this};
+
+            // tslint:disable-next-line:no-string-literal
+            this.reference.userData[Object3d._propertyUserData] = {
+                rigidbody: null,
+            };
 
             if (undefined !== this.reference.castShadow) {
                 this.reference.castShadow = true;
@@ -68,16 +101,11 @@ namespace pxsim {
         }
 
         public animate(timeStep: number) {
-            this.reference.children.forEach(reference => {
-                const outer = outerObject(reference);
-                if (outer) {
-                    outer.animate(timeStep);
+            Object3d._applyFnToUserData(this.reference, udo3d => {
+                if (udo3d._rigidbody) {
+                    udo3d._rigidbody.syncMotionStateToObject3d();
                 }
             });
-
-            if (this._rigidbody) {
-                this._rigidbody!.syncMotionStateToObject3d();
-            }
         }
 
         public onAdded(scene3d: GenericScene3d) {
@@ -97,26 +125,17 @@ namespace pxsim {
         }
 
         protected _onDispose() {
-            this.reference.children.forEach(reference => {
-                const outer = outerObject(reference);
-                if (outer) {
-                    outer.dispose();
+            Object3d._applyFnToUserData(this.reference, udo3d => {
+                if (udo3d._rigidbody) {
+                    udo3d._rigidbody.dispose();
                 }
             });
 
-            if (this._rigidbody) {
-                this._rigidbody.dispose();
-            }
-
-            this.reference.userData = {...this.reference.userData, outer: null};
+            delete this.reference.userData.udo3d;
         }
     }
 
     export class GenericObject3d extends Object3d<THREE.Object3D> {
-    }
-
-    export function outerObject(reference: THREE.Object3D): GenericObject3d | null {
-        return reference.userData.outer as GenericObject3d || null;
     }
 }
 
