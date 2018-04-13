@@ -29,7 +29,7 @@ namespace pxsim {
             return SolidMaterial._factory.getInstanceNoCache(
                 {
                     color: (solidColor ? solidColor.getHex() : undefined) || Palette.White,
-                    emmisive: 0.,
+                    emissive: 0.,
                     metalness: 0.,
                     roughness: .5,
                 },
@@ -46,6 +46,14 @@ namespace pxsim {
             this.reference.color = value;
         }
 
+        public get emissive(): Color {
+            return this.reference.emissive;
+        }
+
+        public set emissive(value: Color) {
+            this.reference.emissive = value;
+        }
+
         public get roughness(): number {
             return this.reference.roughness;
         }
@@ -60,14 +68,6 @@ namespace pxsim {
 
         public set metalness(value: number) {
             this.reference.metalness = value;
-        }
-
-        public get emissive(): Color {
-            return this.reference.emissive;
-        }
-
-        public set emissive(value: Color) {
-            this.reference.emissive = value;
         }
 
         constructor(
