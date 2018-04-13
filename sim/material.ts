@@ -8,6 +8,10 @@
 
 namespace pxsim {
     export abstract class Material<T extends THREE.Material> extends rt.WrappedObjectWithId<T>  {
+        public static instantiate(reference: THREE.Material) {
+            return new SolidMaterial(reference);
+        }
+
         private _density = 1;
 
         public get density(): number {
@@ -19,7 +23,7 @@ namespace pxsim {
         }
     }
 
-    export class GenericMaterial extends Material<THREE.Material> { }
+    export type GenericMaterial = Material<THREE.Material>;
 
     export class SolidMaterial extends Material<THREE.MeshStandardMaterial> {
         public static getInstance(

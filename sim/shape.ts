@@ -8,8 +8,12 @@
 
 namespace pxsim {
     export abstract class Shape3d<T extends THREE.Geometry | THREE.BufferGeometry> extends rt.WrappedObjectWithId<T> {
-        public static radialSegments = 32;
-        public static collisionMargin = 0.05;
+        public static instantiate(reference: THREE.Geometry | THREE.BufferGeometry) {
+            return new GenericShape3d(reference);
+        }
+
+        protected static _radialSegments = 32;
+        protected static _collisionMargin = 0.05;
 
         private _volume = 0;
         private _ctorCollisionShape: (() => Ammo.btCollisionShape) | null = null;
@@ -44,7 +48,7 @@ namespace pxsim {
             const bthalfextents = Helper.btVector3FromThree(this._getBounds(new THREE.Vector3()).divideScalar(2));
 
             const btshape = ctor(bthalfextents);
-            btshape.setMargin(Shape3d.collisionMargin);
+            btshape.setMargin(Shape3d._collisionMargin);
 
             Helper.safeAmmoObjectDestroy(bthalfextents);
 
@@ -94,7 +98,7 @@ namespace pxsim {
             radius = radius || .5;
             height = height || 1;
 
-            super(new THREE.CylinderBufferGeometry(radius, radius, height, Shape3d.radialSegments, 1, openEnded || false), id);
+            super(new THREE.CylinderBufferGeometry(radius, radius, height, Shape3d._radialSegments, 1, openEnded || false), id);
 
             this._setShapeVolume(Math.PI * Math.pow(radius, 2) * height);
             this._setCtorCollisionShape(() => this._createCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btCylinderShape(bthalfextents)));
@@ -105,7 +109,7 @@ namespace pxsim {
         constructor(radius?: number, id?: rt.ObjId) {
             radius = radius || .5;
 
-            super(new THREE.SphereBufferGeometry(radius, Shape3d.radialSegments, Shape3d.radialSegments), id);
+            super(new THREE.SphereBufferGeometry(radius, Shape3d._radialSegments, Shape3d._radialSegments), id);
 
             this._setShapeVolume(4 / 3 * Math.PI * Math.pow(radius, 3));
             this._setCtorCollisionShape(() => new Ammo.btSphereShape(radius!));
@@ -117,7 +121,7 @@ namespace pxsim {
             radius = radius || .5;
             height = height || 1;
 
-            super(new THREE.ConeBufferGeometry(radius, height, Shape3d.radialSegments), id);
+            super(new THREE.ConeBufferGeometry(radius, height, Shape3d._radialSegments), id);
 
             this._setShapeVolume(Math.PI * Math.pow(radius, 2) * height / 3);
             this._setCtorCollisionShape(() => new Ammo.btConeShape(radius!, height!));

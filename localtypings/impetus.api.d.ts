@@ -415,10 +415,10 @@ declare namespace object { /* cube icon */
      * 
      * Return material from the object, or null if it has none.
      */
-    //% blockId=object3d_material_from
-    //% block="material from %object3d"
-    //% shim=mesh::materialFrom
-    function materialFrom(object3d: Object3d): Material;
+    //% blockId=object3d_material_of
+    //% block="material of %object3d"
+    //% shim=mesh::materialOf
+    function materialOf(object3d: Object3d): Material;
 }
 
 //%

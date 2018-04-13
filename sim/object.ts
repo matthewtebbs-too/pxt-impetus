@@ -12,6 +12,10 @@ namespace pxsim {
     }
 
     export abstract class Object3d<T extends THREE.Object3D> extends rt.WrappedObjectWithId<T> {
+        public static instantiate(reference: THREE.Object3D) {
+            return new GenericObject3d(reference);
+        }
+
         protected static _applyFnToUserData(reference: THREE.Object3D, fn: (udo3d: IUserDataObject3d) => void) {
             reference.children.forEach(childreference => Object3d._applyFnToUserData(childreference, fn));
 

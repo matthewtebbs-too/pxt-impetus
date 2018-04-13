@@ -9,11 +9,11 @@
 namespace pxsim {
     export class Mesh3d extends Object3d<THREE.Mesh> {
         public get shape3d(): GenericShape3d {
-            return new GenericShape3d(this.reference.geometry);
+            return Shape3d.instantiate(this.reference.geometry);
         }
 
         public get material(): GenericMaterial[] | GenericMaterial {
-            return Helper.applyFn(this.reference.material, ref => new GenericMaterial(ref));
+            return Helper.applyFn(this.reference.material, ref => Material.instantiate(ref));
         }
 
         constructor(
@@ -37,7 +37,7 @@ namespace pxsim.mesh {
         return new Mesh3d(shape3d, material);
     }
 
-    export function materialFrom(object3d: GenericObject3d): GenericMaterial | null {
+    export function materialOf(object3d: GenericObject3d): GenericMaterial | null {
         if (!object3d || !(object3d instanceof Mesh3d)) {
             return null;
         }

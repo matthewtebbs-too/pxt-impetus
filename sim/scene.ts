@@ -100,7 +100,7 @@ namespace pxsim {
             this._raycaster.setFromCamera(new THREE.Vector2(x, y), this._camera.reference);
             const intersections = this._raycaster.intersectObjects(this.reference.children);
 
-            return intersections.length > 0 ? intersections.map(intersection => new GenericObject3d(intersection.object)) : null;
+            return intersections.length > 0 ? intersections.map(intersection => Object3d.instantiate(intersection.object)) : null;
         }
 
         public setPhysicsEnabled(enable: boolean) {
