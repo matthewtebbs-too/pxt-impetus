@@ -26,11 +26,11 @@ namespace pxsim {
     export type GenericMaterial = Material<THREE.Material>;
 
     export class SolidMaterial extends Material<THREE.MeshStandardMaterial> {
-        public static getInstance(
+        public static instantiateN(
             solidColor?: Color,
             id?: rt.ObjId,
         ) {
-            return SolidMaterial._factory.getInstanceNoCache(
+            return SolidMaterial._factory.instantiate(
                 {
                     color: (solidColor ? solidColor.getHex() : undefined) || Palette.White,
                     emissive: 0.,
@@ -85,6 +85,6 @@ namespace pxsim {
 
 namespace pxsim.material {
     export function materialOfColor(color?: Color): SolidMaterial {
-        return SolidMaterial.getInstance(color);
+        return SolidMaterial.instantiateN(color);
     }
 }

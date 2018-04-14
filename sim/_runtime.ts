@@ -89,7 +89,14 @@ namespace rt {
             ObjectWithIdFactory._factories.push(this);
         }
 
-        public getInstance(
+        public instantiate(
+            parameters?: any,
+            id?: ObjId,
+        ) {
+            return new (this._ctor)(parameters, id);
+        }
+
+        public instantiateWithCache(
             parameters?: any,
             id?: ObjId,
         ) {
@@ -97,17 +104,10 @@ namespace rt {
 
             let instance = this._objectcache.get(hash);
             if (!instance) {
-                this._objectcache.set(hash, instance = this.getInstanceNoCache(parameters, id));
+                this._objectcache.set(hash, instance = this.instantiate(parameters, id));
             }
 
             return instance;
-        }
-
-        public getInstanceNoCache(
-            parameters?: any,
-            id?: ObjId,
-        ) {
-            return new (this._ctor)(parameters, id);
         }
 
         public forgetAllInstances() {
