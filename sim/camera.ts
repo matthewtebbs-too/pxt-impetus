@@ -20,13 +20,12 @@ namespace pxsim {
             fov?: number,
             near?: number,
             far?: number,
-            id?: rt.ObjId,
         ) {
             fov = fov || 60;
             near = near || .2;
             far = far || 2000;
 
-            super(new THREE.PerspectiveCamera(fov, 1, near, far), id);
+            super(new THREE.PerspectiveCamera(fov, 1, near, far));
         }
 
         public setSize(width: number, height: number) {

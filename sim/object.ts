@@ -11,7 +11,7 @@ namespace pxsim {
         _rigidbody: RigidBody | null;
     }
 
-    export abstract class Object3d<T extends THREE.Object3D> extends rt.WrappedObjectWithId<T> {
+    export abstract class Object3d<T extends THREE.Object3D> extends rt.ProxyObjectWithId<T> {
         public static instantiate(reference: THREE.Object3D) {
             return new GenericObject3d(reference);
         }
@@ -43,10 +43,8 @@ namespace pxsim {
             }
         }
 
-        constructor(reference: T, id?: rt.ObjId) {
-            super(reference, id);
-
-            this.reference.name = this.id as string;
+        constructor(reference: T) {
+            super(reference);
 
             // tslint:disable-next-line:no-string-literal
             this.reference.userData[Object3d._propertyUserData] = {

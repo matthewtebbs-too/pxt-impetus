@@ -7,7 +7,7 @@
 /// <reference path="_runtime.ts"/>
 
 namespace pxsim {
-    export class World3d extends rt.ObjectDisposable {
+    export class World3d extends rt.DisposableObject {
         protected static _sidFromMouseButtonEvent(event: MouseEvent): ScopeId | undefined {
             let sid;
 

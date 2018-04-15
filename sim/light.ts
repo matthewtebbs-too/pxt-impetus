@@ -25,22 +25,22 @@ namespace pxsim {
     export type GenericLight = Light<THREE.Light>;
 
     export class AmbientLight extends Light<THREE.AmbientLight> {
-        constructor(color?: Color, intensity?: number, id?: rt.ObjId) {
-            super(new THREE.AmbientLight(color || Palette.SoftWhite, intensity || 1), id);
+        constructor(color?: Color, intensity?: number) {
+            super(new THREE.AmbientLight(color || Palette.SoftWhite, intensity || 1));
         }
     }
 
     export class DirectionalLight extends Light<THREE.DirectionalLight> {
-        constructor(color?: Color, intensity?: number, id?: rt.ObjId) {
-            super(new THREE.DirectionalLight(color || Palette.White, intensity || 1), id);
+        constructor(color?: Color, intensity?: number) {
+            super(new THREE.DirectionalLight(color || Palette.White, intensity || 1));
 
             this._configureShadow();
         }
     }
 
     export class HemisphereLight extends Light<THREE.HemisphereLight> {
-        constructor(colorSky?: Color, colorGround?: Color, intensity?: number, id?: rt.ObjId) {
-            super(new THREE.HemisphereLight(colorSky || NaturePalette.Sky, NaturePalette.Ground, intensity || 0.6), id);
+        constructor(colorSky?: Color, colorGround?: Color, intensity?: number) {
+            super(new THREE.HemisphereLight(colorSky || NaturePalette.Sky, NaturePalette.Ground, intensity || 0.6));
         }
     }
 
@@ -49,9 +49,8 @@ namespace pxsim {
             color?: Color, intensity?: number,
             distance?: number,
             decay?: number,
-            id?: rt.ObjId,
         ) {
-            super(new THREE.PointLight(color || Palette.White, intensity || 1, distance || 0, decay || 2), id);
+            super(new THREE.PointLight(color || Palette.White, intensity || 1, distance || 0, decay || 2));
 
             this._configureShadow();
         }
@@ -62,7 +61,6 @@ namespace pxsim {
             color?: Color, intensity?: number,
             distance?: number, angle?: number,
             penumbra?: number, decay?: number,
-            id?: rt.ObjId,
         ) {
             super(
                 new THREE.SpotLight
@@ -71,7 +69,6 @@ namespace pxsim {
                     distance || 0, angle || Math.PI / 3,
                     penumbra || 0, decay || 2,
                 ),
-                id,
             );
 
             this._configureShadow();

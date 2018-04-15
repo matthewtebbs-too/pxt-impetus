@@ -37,7 +37,7 @@ namespace pxsim {
         Helper.safeAmmoObjectDestroy(bttransform);
     }
 
-    export class RigidBody extends rt.ObjectDisposable {
+    export class RigidBody extends rt.DisposableObject {
         private static _minMass = 0;
         private static _maxMass = 100;
         private static _defaultFriction = .75;

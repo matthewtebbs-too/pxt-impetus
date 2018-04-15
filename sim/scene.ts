@@ -24,8 +24,8 @@ namespace pxsim {
             return this._physicsworld;
         }
 
-        constructor(id?: rt.ObjId) {
-            super(new THREE.Scene(), id);
+        constructor() {
+            super(new THREE.Scene());
 
             this.reference.background = new THREE.Color(Palette.LightGray);
 

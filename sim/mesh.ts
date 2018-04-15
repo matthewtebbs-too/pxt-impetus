@@ -19,9 +19,8 @@ namespace pxsim {
         constructor(
             shape3d: GenericShape3d,
             material: GenericMaterial,
-            id?: rt.ObjId,
         ) {
-            super(new THREE.Mesh(shape3d.reference, material.reference), id);
+            super(new THREE.Mesh(shape3d.reference, material.reference));
 
             this._rigidbody = new RigidBody(this, shape3d, shape3d.volume * material.density);
         }

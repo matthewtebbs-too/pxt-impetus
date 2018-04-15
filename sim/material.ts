@@ -7,7 +7,7 @@
 /// <reference path="_runtime.ts"/>
 
 namespace pxsim {
-    export abstract class Material<T extends THREE.Material> extends rt.WrappedObjectWithId<T>  {
+    export abstract class Material<T extends THREE.Material> extends rt.ProxyObjectWithId<T>  {
         public static instantiate(reference: THREE.Material) {
             return new SolidMaterial(reference);
         }
@@ -36,11 +36,12 @@ namespace pxsim {
                     emissive: 0.,
                     metalness: 0.,
                     roughness: .5,
-                },
-                id);
+                });
         }
 
-        private static _factory = new rt.ObjectWithIdFactory<SolidMaterial>(SolidMaterial);
+        private static _factory = new rt.ObjectFactory<SolidMaterial>(
+            parameters => new SolidMaterial(parameters),
+        );
 
         public get color(): Color {
             return this.reference.color;
@@ -74,11 +75,8 @@ namespace pxsim {
             this.reference.metalness = value;
         }
 
-        constructor(
-            params?: any,
-            id?: rt.ObjId,
-        ) {
-            super(new THREE.MeshStandardMaterial(params), id);
+        constructor(parameters?: any) {
+            super(new THREE.MeshStandardMaterial(parameters));
         }
     }
 }

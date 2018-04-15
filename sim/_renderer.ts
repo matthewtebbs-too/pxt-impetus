@@ -7,7 +7,7 @@
 /// <reference path="_runtime.ts"/>
 
 namespace pxsim {
-    export class Renderer extends rt.WrappedObjectWithId<THREE.WebGLRenderer> {
+    export class Renderer extends rt.ProxyObject<THREE.WebGLRenderer> {
         private static _renderers: _Map<rt.ObjId, THREE.WebGLRenderer> = new Map<rt.ObjId, THREE.WebGLRenderer>();
 
         private static _instantiateReference(id: rt.ObjId): THREE.WebGLRenderer {
@@ -22,6 +22,8 @@ namespace pxsim {
             return webglrenderer;
         }
 
+        private _id: rt.ObjId;
+
         private _domElement: HTMLElement = document.createElement('div');
 
         private _scene3d: GenericScene3d | null = null;
@@ -33,6 +35,10 @@ namespace pxsim {
         private _paused: boolean = false;
 
         private _callbackRequestId: number = 0;
+
+        public get id(): rt.ObjId {
+            return this._id;
+        }
 
         public get domElement(): HTMLElement {
             return this._domElement;
@@ -56,7 +62,9 @@ namespace pxsim {
         }
 
         constructor(id: rt.ObjId = 'container') {
-            super(Renderer._instantiateReference(id), id);
+            super(Renderer._instantiateReference(id));
+
+            this._id = id;
 
             this._domElement.appendChild(this.reference.domElement);
             this._domElement.appendChild(this._stats.dom);

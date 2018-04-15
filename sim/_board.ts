@@ -47,7 +47,7 @@ namespace pxsim {
         }
 
         public postkill() {
-            rt.ObjectWithIdFactory.forgetAllInstances();
+            rt.ObjectFactory.forgetAllInstances();
 
             Helper.safeObjectDispose(this._world3d);
             this._world3d = null;

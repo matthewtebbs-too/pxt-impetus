@@ -7,7 +7,7 @@
 /// <reference path="_runtime.ts"/>
 
 namespace pxsim {
-    export class PhysicsWorld /* rigid body physics */ extends rt.ObjectDisposable {
+    export class PhysicsWorld /* rigid body physics */ extends rt.DisposableObject {
         private static _numIterationsSolver = 4;
         private static _maxStepSimulation = 3;      /* min 20 fps */
         private static _fixedTimeStep = 1 / 60;     /* normal 60 fps */
