@@ -9,6 +9,7 @@
     "max-classes-per-file": false,
     "max-line-length": false,
     "no-bitwise": false,
+    "no-empty-interface": false,
     "no-namespace": false,
     "no-reference": false,
     "no-var-requires": false,
