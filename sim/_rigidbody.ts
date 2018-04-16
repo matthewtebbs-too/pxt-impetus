@@ -7,7 +7,7 @@
 /// <reference path="_physics.ts"/>
 
 namespace pxsim {
-    export function btMotionStateFromObject3d(btmotionstate: Ammo.btMotionState, object3d: GenericObject3d) {
+    export function btMotionStateFromObject3d(btmotionstate: Ammo.btMotionState, object3d: Object3dImpl<THREE.Object3D>) {
         const bttransform = new Ammo.btTransform();
         let btorigin, btquarternion;
 
@@ -23,7 +23,7 @@ namespace pxsim {
         return btmotionstate;
     }
 
-    export function btMotionStateToObject3d(btmotionstate: Ammo.btMotionState, object3d: GenericObject3d): void {
+    export function btMotionStateToObject3d(btmotionstate: Ammo.btMotionState, object3d: Object3dImpl<THREE.Object3D>): void {
         const bttransform = new Ammo.btTransform();
 
         btmotionstate.getWorldTransform(bttransform);
@@ -44,7 +44,7 @@ namespace pxsim {
 
         private _world: PhysicsWorld | null = null;
 
-        private _object3d: GenericObject3d;
+        private _object3d: Object3dImpl<THREE.Object3D>;
 
         private _btbody: Ammo.btRigidBody;
         private _btshape: Ammo.btCollisionShape;
@@ -78,8 +78,8 @@ namespace pxsim {
         }
 
         constructor(
-            object3d: GenericObject3d,
-            shape3d: GenericShape3d,
+            object3d: Object3dImpl<THREE.Object3D>,
+            shape3d: Shape3dImpl<THREE.Geometry | THREE.BufferGeometry>,
             mass: number,
         ) {
             super();

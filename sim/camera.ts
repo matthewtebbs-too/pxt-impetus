@@ -4,18 +4,16 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path='object.ts'/>
+/// <reference path="object.ts"/>
 
 namespace pxsim {
-    export abstract class Camera<T extends THREE.Camera> extends Object3d<T> {
+    export class CameraImpl<T extends THREE.Camera> extends Object3dImpl<T> implements Camera {
         public setSize(width: number, height: number) {
             /* do nothing */
         }
     }
 
-    export type GenericCamera = Camera<THREE.Camera>;
-
-    export class PerspectiveCamera extends Camera<THREE.PerspectiveCamera> {
+    export class PerspectiveCamera extends CameraImpl<THREE.PerspectiveCamera> {
         constructor(
             fov?: number,
             near?: number,

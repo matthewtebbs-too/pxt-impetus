@@ -16,7 +16,7 @@ namespace pxsim {
             return this._board;
         }
 
-        public get world(): World3d | null {
+        public get world(): World3dImpl | null {
             return this._world3d;
         }
 
@@ -24,7 +24,7 @@ namespace pxsim {
             return this._events;
         }
 
-        private _world3d: World3d | null = null;
+        private _world3d: World3dImpl | null = null;
         private _events: WorldEventBus | null = null;
 
         public initAsync(msg: SimulatorRunMessage): Promise<void> {
@@ -36,7 +36,7 @@ namespace pxsim {
         public init() {
             this.postkill();
 
-            this._world3d = new World3d();
+            this._world3d = new World3dImpl();
             this._events = new WorldEventBus(runtime);
         }
 

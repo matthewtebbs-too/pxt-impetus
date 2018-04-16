@@ -7,9 +7,9 @@
 /// <reference path='object.ts'/>
 
 namespace pxsim {
-    export abstract class Scene3d extends Object3d<THREE.Scene> {
+    export class Scene3dImpl extends Object3dImpl<THREE.Scene> implements Scene3d {
         private _ambientlight: AmbientLight;
-        private _camera: GenericCamera | null;
+        private _camera: CameraImpl<THREE.Camera>;
 
         private _physicsworld: PhysicsWorld = new PhysicsWorld();
 
@@ -30,7 +30,7 @@ namespace pxsim {
             this.reference.background = new THREE.Color(Palette.LightGray);
 
             this._ambientlight = new AmbientLight();
-            this.add(this._ambientlight);
+            this.add(this._ambientlight, math3d.zeroVector());
 
             this._camera = new PerspectiveCamera();
             this.add(this._camera, new Vector(-40, 20, 15));
@@ -42,8 +42,12 @@ namespace pxsim {
             this._controls.update();
         }
 
-        public camera(): GenericCamera | null {
+        public get camera(): CameraImpl<THREE.Camera> {
             return this._camera;
+        }
+
+        public set camera(camera: CameraImpl<THREE.Camera>) {
+            this._camera = camera;
         }
 
         public setBackgroundColor(value: Color)  {
@@ -62,20 +66,18 @@ namespace pxsim {
             this.ambientLight.reference.color = value;
         }
 
-        public add(object3d: GenericObject3d, position?: Vector) {
+        public add(object3d: Object3dImpl<THREE.Object3D>, position: Vector) {
             if (!object3d) {
                 return;
             }
 
-            if (position) {
-                object3d.setPosition(position);
-            }
+            object3d.setPosition(position);
 
             this.reference.add(object3d.reference);
             object3d.onAdded(this);
         }
 
-        public remove(object3d: GenericObject3d) {
+        public remove(object3d: Object3dImpl<THREE.Object3D>) {
             if (!object3d) {
                 return;
             }
@@ -92,7 +94,7 @@ namespace pxsim {
             singletonWorldBoard().events!.queue(ScopeId.Scene, EventId.Animate, timeStep);
         }
 
-        public intersectedObjects(x: number, y: number): GenericObject3d[] | null {
+        public intersectedObjects(x: number, y: number): Object3d[] | null {
             if (!this._camera) {
                 return null;
             }
@@ -100,7 +102,7 @@ namespace pxsim {
             this._raycaster.setFromCamera(new THREE.Vector2(x, y), this._camera.reference);
             const intersections = this._raycaster.intersectObjects(this.reference.children);
 
-            return intersections.length > 0 ? intersections.map(intersection => Object3d.instantiate(intersection.object)) : null;
+            return intersections.length > 0 ? intersections.map(intersection => Object3dImpl.instantiate(intersection.object)) : null;
         }
 
         public setPhysicsEnabled(enable: boolean) {
@@ -113,8 +115,6 @@ namespace pxsim {
             super._onDispose();
         }
     }
-
-    export class GenericScene3d extends Scene3d { }
 }
 
 namespace pxsim.scene {
@@ -122,7 +122,7 @@ namespace pxsim.scene {
         return pxsim.math3d.zeroVector();
     }
 
-    export function intersectedObjectAt(x: number, y: number): GenericObject3d | null {
+    export function intersectedObjectAt(x: number, y: number): Object3d | null {
         const scene3d = pxsim.world.scene();
         const objects = scene3d ? scene3d.intersectedObjects(x, y) : null;
 

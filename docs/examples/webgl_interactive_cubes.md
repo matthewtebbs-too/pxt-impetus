@@ -11,8 +11,8 @@ Click a floating cube! (NYI)
     let theta = 0
     scene.onAnimate(function (msec) {
         theta += 0.1 * msec / (1 / 60)
-        world.scene().camera().setPosition(Math.vector(100 * Math.sin(Math.degreesInRadians(theta)), 100 * Math.sin(Math.degreesInRadians(theta)), 100 * Math.cos(Math.degreesInRadians(theta))))
-        world.scene().camera().lookAt(scene.origin())
+        world.scene().camera.setPosition(Math.vector(100 * Math.sin(Math.degreesInRadians(theta)), 100 * Math.sin(Math.degreesInRadians(theta)), 100 * Math.cos(Math.degreesInRadians(theta))))
+        world.scene().camera.lookAt(scene.origin())
         intersected = scene.intersectedObjectAt(mouseX, mouseY)
     })
     input.onMouseMove(function (x, y) {

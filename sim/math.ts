@@ -42,15 +42,16 @@ namespace pxsim.math3d {
 
         switch (op) {
             case MathOp.Add:
-                return result.addVectors(a, b);
+                return result.addVectors(a, b) as Vector;
 
             case MathOp.Subtract:
-                return result.subVectors(a, b);
+                return result.subVectors(a, b) as Vector;
 
             case MathOp.Multiply:
-                return result.multiplyVectors(a, b);
+                return result.multiplyVectors(a, b) as Vector;
         }
 
+        // @ts-ignore
         throw new Error();
     }
 
@@ -59,16 +60,16 @@ namespace pxsim.math3d {
 
         switch (op) {
             case MathOp.Add:
-                return result.addScalar(s);
+                return result.addScalar(s) as Vector;
 
             case MathOp.Subtract:
-                return result.subScalar(s);
+                return result.subScalar(s) as Vector;
 
             case MathOp.Multiply:
-                return result.multiplyScalar(s);
+                return result.multiplyScalar(s) as Vector;
 
             case MathOp.Divide:
-                return result.divideScalar(s);
+                return result.divideScalar(s) as Vector;
         }
     }
 }

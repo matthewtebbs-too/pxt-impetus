@@ -7,14 +7,14 @@
 /// <reference path="object.ts"/>
 
 namespace pxsim {
-    export abstract class Light<T extends THREE.Light> extends Object3d<T> {
+    export class LightImpl<T extends THREE.Light> extends Object3dImpl<T> implements Light {
         public static distFrustum = 100;
 
         protected _configureShadow() {
-            (this.reference.shadow.camera as THREE.OrthographicCamera).left = -Light.distFrustum;
-            (this.reference.shadow.camera as THREE.OrthographicCamera).right = Light.distFrustum;
-            (this.reference.shadow.camera as THREE.OrthographicCamera).top = Light.distFrustum;
-            (this.reference.shadow.camera as THREE.OrthographicCamera).bottom = -Light.distFrustum;
+            (this.reference.shadow.camera as THREE.OrthographicCamera).left = -LightImpl.distFrustum;
+            (this.reference.shadow.camera as THREE.OrthographicCamera).right = LightImpl.distFrustum;
+            (this.reference.shadow.camera as THREE.OrthographicCamera).top = LightImpl.distFrustum;
+            (this.reference.shadow.camera as THREE.OrthographicCamera).bottom = -LightImpl.distFrustum;
 
             this.reference.shadow.bias = 0.0001;
             this.reference.shadow.mapSize.width = 2048;
@@ -22,15 +22,13 @@ namespace pxsim {
         }
     }
 
-    export type GenericLight = Light<THREE.Light>;
-
-    export class AmbientLight extends Light<THREE.AmbientLight> {
+    export class AmbientLight extends LightImpl<THREE.AmbientLight> {
         constructor(color?: Color, intensity?: number) {
             super(new THREE.AmbientLight(color || Palette.SoftWhite, intensity || 1));
         }
     }
 
-    export class DirectionalLight extends Light<THREE.DirectionalLight> {
+    export class DirectionalLight extends LightImpl<THREE.DirectionalLight> {
         constructor(color?: Color, intensity?: number) {
             super(new THREE.DirectionalLight(color || Palette.White, intensity || 1));
 
@@ -38,13 +36,13 @@ namespace pxsim {
         }
     }
 
-    export class HemisphereLight extends Light<THREE.HemisphereLight> {
+    export class HemisphereLight extends LightImpl<THREE.HemisphereLight> {
         constructor(colorSky?: Color, colorGround?: Color, intensity?: number) {
-            super(new THREE.HemisphereLight(colorSky || NaturePalette.Sky, NaturePalette.Ground, intensity || 0.6));
+            super(new THREE.HemisphereLight(colorSky || NaturePalette.Sky, colorGround || NaturePalette.Ground, intensity || 0.6));
         }
     }
 
-    export class PointLight extends Light<THREE.PointLight> {
+    export class PointLight extends LightImpl<THREE.PointLight> {
         constructor(
             color?: Color, intensity?: number,
             distance?: number,
@@ -56,7 +54,7 @@ namespace pxsim {
         }
     }
 
-    export class SpotLight extends Light<THREE.SpotLight> {
+    export class SpotLight extends LightImpl<THREE.SpotLight> {
         constructor(
             color?: Color, intensity?: number,
             distance?: number, angle?: number,

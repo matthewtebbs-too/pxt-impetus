@@ -11,15 +11,15 @@ namespace pxsim {
         _rigidbody: RigidBody | null;
     }
 
-    export abstract class Object3d<T extends THREE.Object3D> extends rt.ProxyObjectWithId<T> {
+    export class Object3dImpl<T extends THREE.Object3D> extends rt.ProxyObjectWithId<T> implements Object3d {
         public static instantiate(reference: THREE.Object3D) {
-            return new GenericObject3d(reference);
+            return new Object3dImpl(reference);
         }
 
         protected static _applyFnToUserData(reference: THREE.Object3D, fn: (udo3d: IUserDataObject3d) => void) {
-            reference.children.forEach(childreference => Object3d._applyFnToUserData(childreference, fn));
+            reference.children.forEach(childreference => Object3dImpl._applyFnToUserData(childreference, fn));
 
-            const udo3d = Object3d.userData(reference);
+            const udo3d = Helper.getUserData<IUserDataObject3d>(reference, Object3dImpl._propertyUserData);
             if (udo3d) {
                 fn(udo3d);
             }
@@ -27,17 +27,13 @@ namespace pxsim {
 
         private static _propertyUserData = 'udo3d';
 
-        private static userData(reference: THREE.Object3D): IUserDataObject3d | null {
-            return reference.userData.udo3d as IUserDataObject3d || null;
-        }
-
         protected get _rigidbody(): RigidBody | null {
-            const udo3d = Object3d.userData(this.reference);
+            const udo3d = Helper.getUserData<IUserDataObject3d>(this.reference, Object3dImpl._propertyUserData);
             return udo3d ? udo3d._rigidbody : null;
         }
 
         protected set _rigidbody(rigidbody: RigidBody | null) {
-            const udo3d = Object3d.userData(this.reference);
+            const udo3d = Helper.getUserData<IUserDataObject3d>(this.reference, Object3dImpl._propertyUserData);
             if (udo3d) {
                 udo3d._rigidbody = rigidbody;
             }
@@ -47,7 +43,7 @@ namespace pxsim {
             super(reference);
 
             // tslint:disable-next-line:no-string-literal
-            this.reference.userData[Object3d._propertyUserData] = {
+            this.reference.userData[Object3dImpl._propertyUserData] = {
                 rigidbody: null,
             };
 
@@ -103,20 +99,20 @@ namespace pxsim {
         }
 
         public animate(timeStep: number) {
-            Object3d._applyFnToUserData(this.reference, udo3d => {
+            Object3dImpl._applyFnToUserData(this.reference, udo3d => {
                 if (udo3d._rigidbody) {
                     udo3d._rigidbody.syncMotionStateToObject3d();
                 }
             });
         }
 
-        public onAdded(scene3d: GenericScene3d) {
+        public onAdded(scene3d: Scene3dImpl) {
             if (this._rigidbody) {
                 this._rigidbody.addRigidBody(scene3d.physicsWorld);
             }
         }
 
-        public onRemoved(scene3d: GenericScene3d) {
+        public onRemoved(scene3d: Scene3dImpl) {
             if (this._rigidbody) {
                 this._rigidbody.removeRigidBody(scene3d.physicsWorld);
             }
@@ -127,7 +123,7 @@ namespace pxsim {
         }
 
         protected _onDispose() {
-            Object3d._applyFnToUserData(this.reference, udo3d => {
+            Object3dImpl._applyFnToUserData(this.reference, udo3d => {
                 if (udo3d._rigidbody) {
                     udo3d._rigidbody.dispose();
                 }
@@ -135,9 +131,6 @@ namespace pxsim {
 
             delete this.reference.userData.udo3d;
         }
-    }
-
-    export class GenericObject3d extends Object3d<THREE.Object3D> {
     }
 }
 

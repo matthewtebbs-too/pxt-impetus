@@ -7,7 +7,7 @@
 /// <reference path="_runtime.ts"/>
 
 namespace pxsim {
-    export class World3d extends rt.DisposableObject {
+    export class World3dImpl extends rt.DisposableObject {
         protected static _sidFromMouseButtonEvent(event: MouseEvent): ScopeId | undefined {
             let sid;
 
@@ -24,14 +24,18 @@ namespace pxsim {
 
         private _renderer: Renderer;
 
-        private _scene: GenericScene3d | null = null;
+        private _scene: Scene3dImpl;
 
         public get renderer(): Renderer {
             return this._renderer;
         }
 
-        public get scene(): GenericScene3d | null {
+        public get scene(): Scene3dImpl {
             return this._scene;
+        }
+
+        public set scene(scene: Scene3dImpl) {
+            this._scene = scene;
         }
 
         constructor(id: rt.ObjId = 'container') {
@@ -39,7 +43,7 @@ namespace pxsim {
 
             this._renderer = new Renderer(id);
 
-            this._scene = new GenericScene3d();
+            this._scene = new Scene3dImpl();
             this._updateRendererScene();
 
             const container = document.getElementById(this._renderer.id as string);
@@ -84,7 +88,7 @@ namespace pxsim {
         }
 
         protected _onDocumentMouseMove = (event: MouseEvent) => this._onDocumentMouseEvent(ScopeId.MouseDevice, EventId.Move, event);
-        protected _onDocumentMouseClick = (event: MouseEvent) => this._onDocumentMouseEvent(World3d._sidFromMouseButtonEvent(event), EventId.Click, event);
+        protected _onDocumentMouseClick = (event: MouseEvent) => this._onDocumentMouseEvent(World3dImpl._sidFromMouseButtonEvent(event), EventId.Click, event);
 
         protected _onDocumentMouseEvent = (sid: ScopeId | undefined, evid: EventId, event: MouseEvent) => {
             event.preventDefault();
@@ -102,11 +106,11 @@ namespace pxsim {
 }
 
 namespace pxsim.world {
-    export function world(): World3d | null {
+    export function world(): World3dImpl | null {
         return singletonWorldBoard().world;
     }
 
-    export function scene(): GenericScene3d | null {
+    export function scene(): Scene3dImpl | null {
         const world3d = pxsim.world.world();
         return world3d ? world3d.scene : null;
     }

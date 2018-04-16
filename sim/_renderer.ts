@@ -26,8 +26,8 @@ namespace pxsim {
 
         private _domElement: HTMLElement = document.createElement('div');
 
-        private _scene3d: GenericScene3d | null = null;
-        private _camera: GenericCamera | null = null;
+        private _scene3d: Scene3dImpl | null = null;
+        private _camera: CameraImpl<THREE.Camera> | null = null;
         private _stats: Stats = new Stats();
 
         private _clock: THREE.Clock = new THREE.Clock();
@@ -44,11 +44,11 @@ namespace pxsim {
             return this._domElement;
         }
 
-        public get scene(): GenericScene3d | null {
+        public get scene(): Scene3dImpl | null {
             return this._scene3d;
         }
 
-        public set scene(value: GenericScene3d | null) {
+        public set scene(value: Scene3dImpl | null) {
             this._scene3d = value;
             this._updateSceneCameraSize();
         }
@@ -89,9 +89,9 @@ namespace pxsim {
                 return;
             }
 
-            const camera = this._scene3d.camera();
+            const camera = this._scene3d.camera;
             if (camera) {
-                this.reference.render(this._scene3d.reference, camera. reference);
+                this.reference.render(this._scene3d.reference, camera.reference);
             }
         }
 
@@ -111,7 +111,7 @@ namespace pxsim {
                 return;
             }
 
-            const camera = this._scene3d.camera();
+            const camera = this._scene3d.camera;
             if (camera) {
                 const size = this.reference.getSize();
                 camera.setSize(size.width, size.height);

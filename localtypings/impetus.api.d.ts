@@ -18,32 +18,6 @@ declare namespace fieldeditors {
     function onOff(on: boolean): boolean;
 }
 
-//@ts-ignore
-//% color="#002050" icon="\uf120" block="Console" weight=0
-//% advanced=true
-declare namespace console {
-    /**
-     * Write a line of text to the console output.
-     * @param value to send
-     */
-    //% blockId=console_log
-    //% block="console|log %text" weight=90
-    //% text.shadowOptions.toString=true
-    //% shim=console::log
-    function log(text: string): void;
-
-    /**
-     * Write a name:value pair as a line of text to the console output.
-     * @param name of the value, eg: "x"
-     * @param value to write
-     */
-    //% blockId=console_log_value
-    //% block="console|log value %name|= %value" weight=88
-    //% value.shadowOptions.toString=true
-    //% shim=console::logValue
-    function logValue(name: string, value: string): void;
-}
-
 //% color="#80d926" icon="\uf01e" block="Loops"
 declare namespace loops {
     /**
@@ -65,95 +39,22 @@ declare namespace loops {
     function pauseAsync(ms: number): void;
 }
 
-//% color="#2699d9" icon="\uf074" block="Loops"
+//% color="#2699d9" icon="\uf074" block="Logic"
 declare namespace logic {
 }
 
 //%
 declare class Vector {
+    //% blockId=vector_x
+    //% shim=.x property
+    x: number;
+    
     //% shim=.toString
-    public toString(): string;
-}
-
-//@ts-ignore
-declare namespace Math {
-    /**
-     * Create vector.
-     * @param x value, eg: 0
-     * @param y value, eg: 0
-     * @param z value, eg: 0
-     */
-    //% blockId="math_vector"
-    //% block="X %x|Y %y|Z %z"
-    //% group="Vector"
-    //% shim=math3d::vector
-    function vector(x?: number, y?: number, z?: number): Vector;
-
-    /**
-     * Zero vector.
-     */
-    //% blockId=math_zero_vector
-    //% block="zero vector"
-    //% group="Vector"
-    //% shim=math3d::zeroVector
-    function zeroVector(): Vector;
-
-    /**
-     * Unit vector.
-     */
-    //% blockId="math_unit_vector"
-    //% block="unit vector"
-    //% group="Vector"
-    //% shim=math3d::unitVector
-    function unitVector(): Vector;
-
-    /**
-     * Vector operations.
-     * @param a vector operand
-     * @param op vector operation
-     * @param b vector operand
-     */
-    //% blockId="math_vector_op"
-    //% block="%a=math_unit_vector|%op|%b=math_unit_vector"
-    //% group="Vector"
-    //% shim=math3d::vectorOp
-    function vectorOp(a: Vector, op: MathOp, b: Vector): Vector;
-
-    /**
-     * Vector scalar operations.
-     * @param a vector operand
-     * @param op scalar operation
-     * @param s scalar operand, eg: 0
-     */
-    //% blockId="math_vector_scalar_op"
-    //% block="%a=math_unit_vector|%op|scalar %s"
-    //% group="Vector"
-    //% shim=math3d::vectorScalarOp
-    function vectorScalarOp(a: Vector, op: MathOp, s: number): Vector;
-
-    /**
-     * Convert degress to radians.
-     * @param degrees number, e.g. 0
-     */
-    //% blockId="math_deg_to_rad"
-    //% block="%degrees degrees in radians"
-    //% shim=math::degreesInRadians
-    //% advanced=true
-    function degreesInRadians(degrees: number): number;
-
-    /**
-     * Convert radians to degrees.
-     * @param radians number, e.g. 0
-     */
-    //% blockId="math_rad_to_deg"
-    //% block="%radians radians in degrees"
-    //% shim=math::radiansInDegrees
-    //% advanced=true
-    function radiansInDegrees(radians: number): number;
+    toString(): string;
 }
 
 //% blockNamespace=object
-declare class Object3d {
+declare interface Object3d {
     /**
      * Look at.
      * @param position Vector
@@ -161,7 +62,7 @@ declare class Object3d {
     //% blockId=object3d_look_at
     //% block="%object3d|look at %position=math_vector"
     //% shim=.lookAt
-    public lookAt(position: Vector): void;
+    lookAt(position: Vector): void;
     
     /**
      * Set object position.
@@ -170,7 +71,7 @@ declare class Object3d {
     //% blockId=object3d_set_position
     //% block="set %object3d position|at %position=math_vector"
     //% shim=.setPosition
-    public setPosition(position: Vector): void;
+    setPosition(position: Vector): void;
 
     /**
      * Set object rotation.
@@ -179,7 +80,7 @@ declare class Object3d {
     //% blockId=object3d_set_rotation
     //% block="set %object3d rotation|to %rotation=math_unit_vector"
     //% shim=.setRotation
-    public setRotation(rotation: Vector): void;
+    setRotation(rotation: Vector): void;
 
     /**
      * Set object scale.
@@ -188,7 +89,7 @@ declare class Object3d {
     //% blockId=object3d_set_scale
     //% block="set %object3d scale|to %scale=math_unit_vector"
     //% shim=.setScale
-    public setScale(scale: Vector): void;
+    setScale(scale: Vector): void;
 
     /**
      * Rotate object by angle around axis.
@@ -198,7 +99,7 @@ declare class Object3d {
     //% blockId=object3d_set_rotation_from_axis_angle
     //% block="set %object3d rotation|around %axis=math_vector|by %angle"
     //% shim=.setRotationFromAxisAngle
-    public setRotationFromAxisAngle(axis: Vector, angle: number): void;
+    setRotationFromAxisAngle(axis: Vector, angle: number): void;
 
     /**
      * Enable/disable physics.
@@ -207,7 +108,7 @@ declare class Object3d {
     //% blockId=object3d_set_physics_enabled
     //% block="set %object3d physics %enabled=fieldeditors_toggleOnOff"
     //% shim=.setPhysicsEnabled
-    public setPhysicsEnabled(enabled: boolean): void;
+    setPhysicsEnabled(enabled: boolean): void;
 }
 
 //%
@@ -215,7 +116,7 @@ declare class Color {
 }
 
 //%
-declare class Shape3d {
+declare interface Shape3d {
 }
 
 //% color="#2680d9" icon="\uf1fc" block="Design" weight=100
@@ -365,28 +266,28 @@ declare namespace design {
 }
 
 //% blockNamespace=design
-declare class Material {
+declare interface Material {
     //% blockCombine
     //% blockCombineShadow=color_picker
     //% group="Material"
     //% shim=.color property
-    public color: Color;
+    color: Color;
 
     //% blockCombine
     //% blockCombineShadow=color_picker
     //% group="Material"
     //% shim=.emissive property
-    public emissive: Color;
+    emissive: Color;
 
     //% blockCombine
     //% group="Material"
     //% shim=.roughness property
-    public roughness: number;
+    roughness: number;
 
     //% blockCombine
     //% group="Material"
     //% shim=.metalness property
-    public metalness: number;
+    metalness: number;
 }
 
 declare namespace design {
@@ -422,11 +323,11 @@ declare namespace object { /* cube icon */
 }
 
 //%
-declare class Light extends Object3d {
+declare interface Light extends Object3d {
 }
 
 //%
-declare class Camera extends Object3d {
+declare interface Camera extends Object3d {
 }
 
 //% color="#ffffff" icon="\uf030" block="Camera" weight=96
@@ -434,18 +335,17 @@ declare namespace camera { /* camera icon */
 }
 
 //%
-declare class Mesh3d extends Object3d {
+declare interface Mesh3d extends Object3d {
 }
 
 //% blockNamespace=scene
-declare class Scene3d extends Object3d {
+declare interface Scene3d extends Object3d {
     /**
-     * Get active camera.
+     * Active camera.
      */
     //% blockId=scene_camera
-    //% block="%scene camera"
-    //% shim=.camera
-    public camera(): Camera;
+    //% shim=.camera property
+    camera: Camera;
 
     /**
      * Set background color.
@@ -454,7 +354,7 @@ declare class Scene3d extends Object3d {
     //% blockId=set_background_color
     //% block="set %scene=world_scene|background %color=color_picker"
     //% shim=.setBackgroundColor
-    public setBackgroundColor(color: Color): void;
+    setBackgroundColor(color: Color): void;
 
     /**
      * Set ambient light color.
@@ -463,7 +363,7 @@ declare class Scene3d extends Object3d {
     //% blockId=set_ambientlight_color
     //% block="set %scene=world_scene|ambient light %color=color_picker"
     //% shim=.setAmbientLight
-    public setAmbientLight(color: Color): void;
+    setAmbientLight(color: Color): void;
 
     /**
      * Add object to scene.
@@ -471,7 +371,7 @@ declare class Scene3d extends Object3d {
     //% blockId=add_object
     //% block="add to %scene=world_scene %object3d|at %position=world_origin"
     //% shim=.add
-    public add(object3d: Object3d, position: Vector): void;
+    add(object3d: Object3d, position: Vector): void;
 
     /**
      * Remove object from scene.
@@ -479,7 +379,7 @@ declare class Scene3d extends Object3d {
     //% blockId=remove_object
     //% block="remove from %scene=world_scene %object3d"
     //% shim=.remove
-    public remove(object3d: Object3d): void;
+    remove(object3d: Object3d): void;
 }
 
 //% color="#d92680" icon="\uf03e" block="Scene" weight=95
