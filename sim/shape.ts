@@ -126,7 +126,7 @@ namespace pxsim {
     }
 }
 
-namespace pxsim.shape3d {
+namespace pxsim.shape {
     export function planeShape(width?: number, height?: number): PlaneShape3d {
         return new PlaneShape3d(width, height);
     }

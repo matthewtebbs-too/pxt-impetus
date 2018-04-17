@@ -204,7 +204,7 @@ declare namespace design {
     //% blockId=shape3d_plane
     //% block="plane of width %radius|height %height"
     //% group="Shape"
-    //% shim=shape3d::planeShape
+    //% shim=shape::planeShape
     function planeShape(width?: number, height?: number): Shape3d;
 
     /**
@@ -216,7 +216,7 @@ declare namespace design {
     //% blockId=shape3d_box
     //% block="box of width %width|height %height|depth %depth"
     //% group="Shape"
-    //% shim=shape3d::boxShape
+    //% shim=shape::boxShape
     function boxShape(width?: number, height?: number, depth?: number): Shape3d;
 
     /**
@@ -227,7 +227,7 @@ declare namespace design {
     //% blockId=shape3d_cylinder 
     //% block="cylinder of radius %radius|height %height"
     //% group="Shape"
-    //% shim=shape3d::cylinderShape
+    //% shim=shape::cylinderShape
     function cylinderShape(radius?: number, height?: number): Shape3d;
 
     /**
@@ -237,7 +237,7 @@ declare namespace design {
     //% blockId=shape3d_sphere 
     //% block="sphere of radius %radius"
     //% group="Shape"
-    //% shim=shape3d::sphereShape
+    //% shim=shape::sphereShape
     function sphereShape(radius?: number): Shape3d;
 
     /**
@@ -248,7 +248,7 @@ declare namespace design {
     //% blockId=shape3d_cone 
     //% block="cone of radius %radius|height %height"
     //% group="Shape"
-    //% shim=shape3d::coneShape
+    //% shim=shape::coneShape
     function coneShape(radius?: number, height?: number): Shape3d;
 }
 
