@@ -4,9 +4,9 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-//@ts-ignore
 //% color="#002050" icon="\uf120" block="Console" weight=0
 //% advanced=true
+//@ts-ignore
 declare namespace console {
     /**
      * Write a line of text to the console output.
