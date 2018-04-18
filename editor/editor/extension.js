@@ -1,4 +1,3 @@
-var lf = pxt.Util.lf;
 var impetus;
 (function (impetus) {
     var defaultToolboxXml = "";

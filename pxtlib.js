@@ -7761,6 +7761,7 @@ var ts;
             function addCombined(rtp, s) {
                 var isGet = rtp == "get";
                 var isSet = rtp == "set";
+                var isNumberType = s.retType == "number";
                 var m = isGet ? combinedGet : (isSet ? combinedSet : combinedChange);
                 var mkey = s.namespace + "." + s.retType;
                 var ex = pxtc.U.lookup(m, mkey);
@@ -7770,7 +7771,7 @@ var ts;
                     var paramValue = "value=" + (s.attributes.blockCombineShadow || "");
                     ex = m[mkey] = {
                         attributes: {
-                            blockId: mkey + "_blockCombine_" + rtp,
+                            blockId: (isNumberType ? s.namespace : mkey) + "_blockCombine_" + rtp,
                             callingConvention: pxtc.ir.CallingConvention.Plain,
                             group: s.attributes.group,
                             paramDefl: {},

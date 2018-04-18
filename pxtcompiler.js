@@ -106,6 +106,7 @@ var pxt;
                     case SK.MethodDeclaration:
                         emitFunctionDeclaration(mem);
                         break;
+                    case SK.PropertySignature:
                     case SK.PropertyDeclaration:
                         emitPropertyDeclaration(mem);
                         break;
@@ -205,6 +206,7 @@ var pxt;
                     return stmt.statements.forEach(doStmt);
                 case SK.FunctionDeclaration:
                     return emitFunctionDeclaration(stmt);
+                case SK.InterfaceDeclaration:
                 case SK.ClassDeclaration:
                     return emitClassDeclaration(stmt);
             }
@@ -12927,7 +12929,7 @@ var ts;
                     }),
                     snippet: pxtc.service.getSnippet(decl, attributes_1)
                 };
-                if ((stmt.kind === pxtc.SK.GetAccessor && !ts.getDeclarationOfKind(decl.symbol, pxtc.SK.SetAccessor)) ||
+                if (stmt.kind === pxtc.SK.GetAccessor ||
                     (stmt.kind === pxtc.SK.PropertyDeclaration && isReadonly(stmt))) {
                     r.isReadOnly = true;
                 }

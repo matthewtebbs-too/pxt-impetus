@@ -9,112 +9,106 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
-};
 var rt;
 (function (rt) {
-    var ObjectDisposable = (function () {
-        function ObjectDisposable() {
+    var DisposableObject = (function () {
+        function DisposableObject() {
             this._isDisposed = false;
         }
-        ObjectDisposable.prototype.dispose = function () {
+        DisposableObject.prototype.dispose = function () {
             if (!this._isDisposed) {
                 this._onDispose();
                 this._isDisposed = true;
             }
         };
-        return ObjectDisposable;
+        return DisposableObject;
     }());
-    rt.ObjectDisposable = ObjectDisposable;
-    var ObjectWithId = (function (_super) {
-        __extends(ObjectWithId, _super);
-        function ObjectWithId(id) {
+    rt.DisposableObject = DisposableObject;
+    var ProxyObject = (function (_super) {
+        __extends(ProxyObject, _super);
+        function ProxyObject(reference) {
             var _this = _super.call(this) || this;
-            _this._id = id || '';
-            return _this;
-        }
-        Object.defineProperty(ObjectWithId.prototype, "id", {
-            get: function () { return this._id; },
-            enumerable: true,
-            configurable: true
-        });
-        return ObjectWithId;
-    }(ObjectDisposable));
-    rt.ObjectWithId = ObjectWithId;
-    var ObjectWithIdDictionary = (function () {
-        function ObjectWithIdDictionary() {
-            this._objs = new Map();
-        }
-        ObjectWithIdDictionary.prototype.set = function (obj) {
-            return this._objs.set(obj.id, obj);
-        };
-        ObjectWithIdDictionary.prototype.retrieve = function (id) {
-            return this._objs.get(id) || null;
-        };
-        ObjectWithIdDictionary.prototype.delete = function (obj) {
-            return this._objs.delete(obj.id);
-        };
-        return ObjectWithIdDictionary;
-    }());
-    rt.ObjectWithIdDictionary = ObjectWithIdDictionary;
-    var WrappedObjectWithId = (function (_super) {
-        __extends(WrappedObjectWithId, _super);
-        function WrappedObjectWithId(reference, id) {
-            var _this = _super.call(this, id) || this;
             _this._reference = reference;
             return _this;
         }
-        Object.defineProperty(WrappedObjectWithId.prototype, "reference", {
+        Object.defineProperty(ProxyObject.prototype, "reference", {
             get: function () { return this._reference; },
             enumerable: true,
             configurable: true
         });
-        return WrappedObjectWithId;
-    }(ObjectWithId));
-    rt.WrappedObjectWithId = WrappedObjectWithId;
-    var ObjectWithIdFactory = (function () {
-        function ObjectWithIdFactory(ctor) {
-            this._objectcache = new Map();
-            this._ctor = ctor;
-            ObjectWithIdFactory._factories.push(this);
+        return ProxyObject;
+    }(DisposableObject));
+    rt.ProxyObject = ProxyObject;
+    var ProxyObjectWithId = (function (_super) {
+        __extends(ProxyObjectWithId, _super);
+        function ProxyObjectWithId() {
+            return _super !== null && _super.apply(this, arguments) || this;
         }
-        ObjectWithIdFactory.forgetAllInstances = function () {
-            ObjectWithIdFactory._factories.forEach(function (factory) { return factory.forgetAllInstances(); });
+        Object.defineProperty(ProxyObjectWithId.prototype, "id", {
+            get: function () {
+                return this.reference.id;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return ProxyObjectWithId;
+    }(ProxyObject));
+    rt.ProxyObjectWithId = ProxyObjectWithId;
+    var ProxyNameableObjectWithId = (function (_super) {
+        __extends(ProxyNameableObjectWithId, _super);
+        function ProxyNameableObjectWithId() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        Object.defineProperty(ProxyNameableObjectWithId.prototype, "name", {
+            get: function () {
+                return this.reference.name;
+            },
+            set: function (name) {
+                this.reference.name = name;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return ProxyNameableObjectWithId;
+    }(ProxyObjectWithId));
+    rt.ProxyNameableObjectWithId = ProxyNameableObjectWithId;
+    var ObjectFactory = (function () {
+        function ObjectFactory(creator) {
+            this._objectcache = new Map();
+            this._creator = creator;
+            ObjectFactory._factories.push(this);
+        }
+        ObjectFactory.forgetAllInstances = function () {
+            ObjectFactory._factories.forEach(function (factory) { return factory.forgetAllInstances(); });
         };
-        ObjectWithIdFactory.prototype.getInstance = function (parameters, id) {
-            var hash = objectHash([parameters, id], { algorithm: 'md5', encoding: 'hex', respectType: false });
+        ObjectFactory.prototype.instantiate = function (parameters) {
+            return this._creator(parameters);
+        };
+        ObjectFactory.prototype.instantiateWithCache = function (parameters) {
+            var hash = objectHash(parameters || {}, { algorithm: 'md5', encoding: 'hex', respectType: false });
             var instance = this._objectcache.get(hash);
             if (!instance) {
-                this._objectcache.set(hash, instance = this.getInstanceNoCache(parameters, id));
+                this._objectcache.set(hash, instance = this.instantiate(parameters));
             }
             return instance;
         };
-        ObjectWithIdFactory.prototype.getInstanceNoCache = function (parameters, id) {
-            return new (this._ctor)(parameters, id);
-        };
-        ObjectWithIdFactory.prototype.forgetAllInstances = function () {
+        ObjectFactory.prototype.forgetAllInstances = function () {
             this._objectcache.clear();
         };
-        ObjectWithIdFactory._factories = new Array();
-        return ObjectWithIdFactory;
+        ObjectFactory._factories = new Array();
+        return ObjectFactory;
     }());
-    rt.ObjectWithIdFactory = ObjectWithIdFactory;
+    rt.ObjectFactory = ObjectFactory;
 })(rt || (rt = {}));
 var pxsim;
 (function (pxsim) {
-    var Object3d = (function (_super) {
-        __extends(Object3d, _super);
-        function Object3d(reference, id) {
-            var _this = _super.call(this, reference, id) || this;
-            _this._rigidbody = null;
-            _this.reference.name = _this.id;
-            _this.reference.userData = __assign({}, _this.reference.userData, { outer: _this });
+    var Object3dImpl = (function (_super) {
+        __extends(Object3dImpl, _super);
+        function Object3dImpl(reference) {
+            var _this = _super.call(this, reference) || this;
+            _this.reference.userData[Object3dImpl._propertyUserData] = {
+                rigidbody: null,
+            };
             if (undefined !== _this.reference.castShadow) {
                 _this.reference.castShadow = true;
             }
@@ -123,110 +117,115 @@ var pxsim;
             }
             return _this;
         }
-        Object3d.prototype.lookAt = function (position) {
+        Object3dImpl.instantiate = function (reference) {
+            return new Object3dImpl(reference);
+        };
+        Object3dImpl._applyFnToUserData = function (reference, fn) {
+            reference.children.forEach(function (childreference) { return Object3dImpl._applyFnToUserData(childreference, fn); });
+            var udo3d = pxsim.Helper.getUserData(reference, Object3dImpl._propertyUserData);
+            if (udo3d) {
+                fn(udo3d);
+            }
+        };
+        Object.defineProperty(Object3dImpl.prototype, "_rigidbody", {
+            get: function () {
+                var udo3d = pxsim.Helper.getUserData(this.reference, Object3dImpl._propertyUserData);
+                return udo3d ? udo3d._rigidbody : null;
+            },
+            set: function (rigidbody) {
+                var udo3d = pxsim.Helper.getUserData(this.reference, Object3dImpl._propertyUserData);
+                if (udo3d) {
+                    udo3d._rigidbody = rigidbody;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object3dImpl.prototype.lookAt = function (position) {
             if (!position) {
                 return;
             }
             this.reference.lookAt(position);
         };
-        Object3d.prototype.setPosition = function (position) {
+        Object3dImpl.prototype.setPosition = function (position) {
             if (!position) {
                 return;
             }
             this.reference.position.set(position.x, position.y, position.z);
         };
-        Object3d.prototype.setRotation = function (rotation) {
+        Object3dImpl.prototype.setRotation = function (rotation) {
             if (!rotation) {
                 return;
             }
             this.reference.rotation.set(THREE.Math.degToRad(rotation.x), THREE.Math.degToRad(rotation.y), THREE.Math.degToRad(rotation.z));
         };
-        Object3d.prototype.setScale = function (scale) {
+        Object3dImpl.prototype.setScale = function (scale) {
             this.reference.scale.set(scale.x, scale.y, scale.z);
         };
-        Object3d.prototype.setRotationFromAxisAngle = function (axis, angle) {
+        Object3dImpl.prototype.setRotationFromAxisAngle = function (axis, angle) {
             if (!axis) {
                 return;
             }
             this.reference.setRotationFromAxisAngle(axis, THREE.Math.degToRad(angle));
         };
-        Object3d.prototype.setPhysicsEnabled = function (enable) {
+        Object3dImpl.prototype.setPhysicsEnabled = function (enable) {
             if (this._rigidbody) {
                 this._rigidbody.isKinematic = !enable;
             }
         };
-        Object3d.prototype.animate = function (timeStep) {
-            this.reference.children.forEach(function (reference) {
-                var outer = outerObject(reference);
-                if (outer) {
-                    outer.animate(timeStep);
+        Object3dImpl.prototype.animate = function (timeStep) {
+            Object3dImpl._applyFnToUserData(this.reference, function (udo3d) {
+                if (udo3d._rigidbody) {
+                    udo3d._rigidbody.syncMotionStateToObject3d();
                 }
             });
-            if (this._rigidbody) {
-                this._rigidbody.syncMotionStateToObject3d();
-            }
         };
-        Object3d.prototype.onAdded = function (scene3d) {
+        Object3dImpl.prototype.onAdded = function (scene3d) {
             if (this._rigidbody) {
                 this._rigidbody.addRigidBody(scene3d.physicsWorld);
             }
         };
-        Object3d.prototype.onRemoved = function (scene3d) {
+        Object3dImpl.prototype.onRemoved = function (scene3d) {
             if (this._rigidbody) {
                 this._rigidbody.removeRigidBody(scene3d.physicsWorld);
             }
         };
-        Object3d.prototype._constructRigidBody = function () {
+        Object3dImpl.prototype._constructRigidBody = function () {
             return null;
         };
-        Object3d.prototype._onDispose = function () {
-            this.reference.children.forEach(function (reference) {
-                var outer = outerObject(reference);
-                if (outer) {
-                    outer.dispose();
+        Object3dImpl.prototype._onDispose = function () {
+            Object3dImpl._applyFnToUserData(this.reference, function (udo3d) {
+                if (udo3d._rigidbody) {
+                    udo3d._rigidbody.dispose();
                 }
             });
-            if (this._rigidbody) {
-                this._rigidbody.dispose();
-            }
-            this.reference.userData = __assign({}, this.reference.userData, { outer: null });
+            delete this.reference.userData.udo3d;
         };
-        return Object3d;
-    }(rt.WrappedObjectWithId));
-    pxsim.Object3d = Object3d;
-    var GenericObject3d = (function (_super) {
-        __extends(GenericObject3d, _super);
-        function GenericObject3d() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        return GenericObject3d;
-    }(Object3d));
-    pxsim.GenericObject3d = GenericObject3d;
-    function outerObject(reference) {
-        return reference.userData.outer || null;
-    }
-    pxsim.outerObject = outerObject;
+        Object3dImpl._propertyUserData = 'udo3d';
+        return Object3dImpl;
+    }(rt.ProxyObjectWithId));
+    pxsim.Object3dImpl = Object3dImpl;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
-    var Camera = (function (_super) {
-        __extends(Camera, _super);
-        function Camera() {
+    var CameraImpl = (function (_super) {
+        __extends(CameraImpl, _super);
+        function CameraImpl() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        Camera.prototype.setSize = function (width, height) {
+        CameraImpl.prototype.setSize = function (width, height) {
         };
-        return Camera;
-    }(pxsim.Object3d));
-    pxsim.Camera = Camera;
+        return CameraImpl;
+    }(pxsim.Object3dImpl));
+    pxsim.CameraImpl = CameraImpl;
     var PerspectiveCamera = (function (_super) {
         __extends(PerspectiveCamera, _super);
-        function PerspectiveCamera(fov, near, far, id) {
+        function PerspectiveCamera(fov, near, far) {
             var _this = this;
             fov = fov || 60;
             near = near || .2;
             far = far || 2000;
-            _this = _super.call(this, new THREE.PerspectiveCamera(fov, 1, near, far), id) || this;
+            _this = _super.call(this, new THREE.PerspectiveCamera(fov, 1, near, far)) || this;
             return _this;
         }
         PerspectiveCamera.prototype.setSize = function (width, height) {
@@ -235,7 +234,7 @@ var pxsim;
             this.reference.updateProjectionMatrix();
         };
         return PerspectiveCamera;
-    }(Camera));
+    }(CameraImpl));
     pxsim.PerspectiveCamera = PerspectiveCamera;
 })(pxsim || (pxsim = {}));
 (function (pxsim) {
@@ -346,69 +345,69 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
-    var Light = (function (_super) {
-        __extends(Light, _super);
-        function Light() {
+    var LightImpl = (function (_super) {
+        __extends(LightImpl, _super);
+        function LightImpl() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
-        Light.prototype._configureShadow = function () {
-            this.reference.shadow.camera.left = -Light.distFrustum;
-            this.reference.shadow.camera.right = Light.distFrustum;
-            this.reference.shadow.camera.top = Light.distFrustum;
-            this.reference.shadow.camera.bottom = -Light.distFrustum;
+        LightImpl.prototype._configureShadow = function () {
+            this.reference.shadow.camera.left = -LightImpl.distFrustum;
+            this.reference.shadow.camera.right = LightImpl.distFrustum;
+            this.reference.shadow.camera.top = LightImpl.distFrustum;
+            this.reference.shadow.camera.bottom = -LightImpl.distFrustum;
             this.reference.shadow.bias = 0.0001;
             this.reference.shadow.mapSize.width = 2048;
             this.reference.shadow.mapSize.height = 2048;
         };
-        Light.distFrustum = 100;
-        return Light;
-    }(pxsim.Object3d));
-    pxsim.Light = Light;
+        LightImpl.distFrustum = 100;
+        return LightImpl;
+    }(pxsim.Object3dImpl));
+    pxsim.LightImpl = LightImpl;
     var AmbientLight = (function (_super) {
         __extends(AmbientLight, _super);
-        function AmbientLight(color, intensity, id) {
-            return _super.call(this, new THREE.AmbientLight(color || 4210752, intensity || 1), id) || this;
+        function AmbientLight(color, intensity) {
+            return _super.call(this, new THREE.AmbientLight(color || 4210752, intensity || 1)) || this;
         }
         return AmbientLight;
-    }(Light));
+    }(LightImpl));
     pxsim.AmbientLight = AmbientLight;
     var DirectionalLight = (function (_super) {
         __extends(DirectionalLight, _super);
-        function DirectionalLight(color, intensity, id) {
-            var _this = _super.call(this, new THREE.DirectionalLight(color || 16777215, intensity || 1), id) || this;
+        function DirectionalLight(color, intensity) {
+            var _this = _super.call(this, new THREE.DirectionalLight(color || 16777215, intensity || 1)) || this;
             _this._configureShadow();
             return _this;
         }
         return DirectionalLight;
-    }(Light));
+    }(LightImpl));
     pxsim.DirectionalLight = DirectionalLight;
     var HemisphereLight = (function (_super) {
         __extends(HemisphereLight, _super);
-        function HemisphereLight(colorSky, colorGround, intensity, id) {
-            return _super.call(this, new THREE.HemisphereLight(colorSky || 3310847, 16763007, intensity || 0.6), id) || this;
+        function HemisphereLight(colorSky, colorGround, intensity) {
+            return _super.call(this, new THREE.HemisphereLight(colorSky || 3310847, colorGround || 16763007, intensity || 0.6)) || this;
         }
         return HemisphereLight;
-    }(Light));
+    }(LightImpl));
     pxsim.HemisphereLight = HemisphereLight;
     var PointLight = (function (_super) {
         __extends(PointLight, _super);
-        function PointLight(color, intensity, distance, decay, id) {
-            var _this = _super.call(this, new THREE.PointLight(color || 16777215, intensity || 1, distance || 0, decay || 2), id) || this;
+        function PointLight(color, intensity, distance, decay) {
+            var _this = _super.call(this, new THREE.PointLight(color || 16777215, intensity || 1, distance || 0, decay || 2)) || this;
             _this._configureShadow();
             return _this;
         }
         return PointLight;
-    }(Light));
+    }(LightImpl));
     pxsim.PointLight = PointLight;
     var SpotLight = (function (_super) {
         __extends(SpotLight, _super);
-        function SpotLight(color, intensity, distance, angle, penumbra, decay, id) {
-            var _this = _super.call(this, new THREE.SpotLight(color || 16777215, intensity || 1, distance || 0, angle || Math.PI / 3, penumbra || 0, decay || 2), id) || this;
+        function SpotLight(color, intensity, distance, angle, penumbra, decay) {
+            var _this = _super.call(this, new THREE.SpotLight(color || 16777215, intensity || 1, distance || 0, angle || Math.PI / 3, penumbra || 0, decay || 2)) || this;
             _this._configureShadow();
             return _this;
         }
         return SpotLight;
-    }(Light));
+    }(LightImpl));
     pxsim.SpotLight = SpotLight;
 })(pxsim || (pxsim = {}));
 (function (pxsim) {
@@ -444,47 +443,24 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
-    var Material = (function (_super) {
-        __extends(Material, _super);
-        function Material() {
-            var _this = _super !== null && _super.apply(this, arguments) || this;
+    var MaterialImpl = (function (_super) {
+        __extends(MaterialImpl, _super);
+        function MaterialImpl(parameters) {
+            var _this = _super.call(this, new THREE.MeshStandardMaterial(parameters)) || this;
             _this._density = 1;
             return _this;
         }
-        Object.defineProperty(Material.prototype, "density", {
+        MaterialImpl.instantiate = function (reference) {
+            return new SolidMaterial(reference);
+        };
+        Object.defineProperty(MaterialImpl.prototype, "density", {
             get: function () {
                 return this._density;
             },
             enumerable: true,
             configurable: true
         });
-        Material.prototype._onDispose = function () {
-        };
-        return Material;
-    }(rt.WrappedObjectWithId));
-    pxsim.Material = Material;
-    var GenericMaterial = (function (_super) {
-        __extends(GenericMaterial, _super);
-        function GenericMaterial() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        return GenericMaterial;
-    }(Material));
-    pxsim.GenericMaterial = GenericMaterial;
-    var SolidMaterial = (function (_super) {
-        __extends(SolidMaterial, _super);
-        function SolidMaterial(params, id) {
-            return _super.call(this, new THREE.MeshStandardMaterial(params), id) || this;
-        }
-        SolidMaterial.getInstance = function (solidColor, id) {
-            return SolidMaterial._factory.getInstanceNoCache({
-                color: (solidColor ? solidColor.getHex() : undefined) || 16777215,
-                emissive: 0.,
-                metalness: 0.,
-                roughness: .5,
-            }, id);
-        };
-        Object.defineProperty(SolidMaterial.prototype, "color", {
+        Object.defineProperty(MaterialImpl.prototype, "color", {
             get: function () {
                 return this.reference.color;
             },
@@ -494,14 +470,17 @@ var pxsim;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(SolidMaterial.prototype, "emissive", {
+        Object.defineProperty(MaterialImpl.prototype, "emissive", {
             get: function () {
                 return this.reference.emissive;
+            },
+            set: function (value) {
+                this.reference.emissive = value;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(SolidMaterial.prototype, "roughness", {
+        Object.defineProperty(MaterialImpl.prototype, "roughness", {
             get: function () {
                 return this.reference.roughness;
             },
@@ -511,7 +490,7 @@ var pxsim;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(SolidMaterial.prototype, "metalness", {
+        Object.defineProperty(MaterialImpl.prototype, "metalness", {
             get: function () {
                 return this.reference.metalness;
             },
@@ -521,16 +500,34 @@ var pxsim;
             enumerable: true,
             configurable: true
         });
-        SolidMaterial._factory = new rt.ObjectWithIdFactory(SolidMaterial);
+        MaterialImpl.prototype._onDispose = function () {
+        };
+        return MaterialImpl;
+    }(rt.ProxyObjectWithId));
+    pxsim.MaterialImpl = MaterialImpl;
+    var SolidMaterial = (function (_super) {
+        __extends(SolidMaterial, _super);
+        function SolidMaterial() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        SolidMaterial.instantiate_ = function (solidColor, id) {
+            return SolidMaterial._factory.instantiate({
+                color: (solidColor ? solidColor.getHex() : undefined) || 16777215,
+                emissive: 0.,
+                metalness: 0.,
+                roughness: .5,
+            });
+        };
+        SolidMaterial._factory = new rt.ObjectFactory(function (parameters) { return new SolidMaterial(parameters); });
         return SolidMaterial;
-    }(Material));
+    }(MaterialImpl));
     pxsim.SolidMaterial = SolidMaterial;
 })(pxsim || (pxsim = {}));
 (function (pxsim) {
     var material;
     (function (material) {
         function materialOfColor(color) {
-            return pxsim.SolidMaterial.getInstance(color);
+            return pxsim.SolidMaterial.instantiate_(color);
         }
         material.materialOfColor = materialOfColor;
     })(material = pxsim.material || (pxsim.material = {}));
@@ -608,30 +605,30 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
-    var Mesh3d = (function (_super) {
-        __extends(Mesh3d, _super);
-        function Mesh3d(shape3d, material, id) {
-            var _this = _super.call(this, new THREE.Mesh(shape3d.reference, material.reference), id) || this;
+    var Mesh3dImpl = (function (_super) {
+        __extends(Mesh3dImpl, _super);
+        function Mesh3dImpl(shape3d, material) {
+            var _this = _super.call(this, new THREE.Mesh(shape3d.reference, material.reference)) || this;
             _this._rigidbody = new pxsim.RigidBody(_this, shape3d, shape3d.volume * material.density);
             return _this;
         }
-        Object.defineProperty(Mesh3d.prototype, "shape3d", {
+        Object.defineProperty(Mesh3dImpl.prototype, "shape3d", {
             get: function () {
-                return new pxsim.GenericShape3d(this.reference.geometry);
+                return pxsim.Shape3dImpl.instantiate(this.reference.geometry);
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Mesh3d.prototype, "material", {
+        Object.defineProperty(Mesh3dImpl.prototype, "material", {
             get: function () {
-                return pxsim.Helper.applyFn(this.reference.material, function (ref) { return new pxsim.GenericMaterial(ref); });
+                return pxsim.Helper.applyFn(this.reference.material, function (ref) { return pxsim.MaterialImpl.instantiate(ref); });
             },
             enumerable: true,
             configurable: true
         });
-        return Mesh3d;
-    }(pxsim.Object3d));
-    pxsim.Mesh3d = Mesh3d;
+        return Mesh3dImpl;
+    }(pxsim.Object3dImpl));
+    pxsim.Mesh3dImpl = Mesh3dImpl;
 })(pxsim || (pxsim = {}));
 (function (pxsim) {
     var mesh;
@@ -640,22 +637,30 @@ var pxsim;
             if (!shape3d || !material) {
                 return null;
             }
-            return new pxsim.Mesh3d(shape3d, material);
+            return new pxsim.Mesh3dImpl(shape3d, material);
         }
         mesh.fromShapeAndMaterial = fromShapeAndMaterial;
+        function materialOf(object3d) {
+            if (!object3d || !(object3d instanceof pxsim.Mesh3dImpl)) {
+                return null;
+            }
+            var material = object3d.material;
+            return Array.isArray(material) ? (material.length > 0 ? material[0] : null) : material;
+        }
+        mesh.materialOf = materialOf;
     })(mesh = pxsim.mesh || (pxsim.mesh = {}));
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
-    var Scene3d = (function (_super) {
-        __extends(Scene3d, _super);
-        function Scene3d(id) {
-            var _this = _super.call(this, new THREE.Scene(), id) || this;
+    var Scene3dImpl = (function (_super) {
+        __extends(Scene3dImpl, _super);
+        function Scene3dImpl() {
+            var _this = _super.call(this, new THREE.Scene()) || this;
             _this._physicsworld = new pxsim.PhysicsWorld();
             _this._controls = null;
             _this.reference.background = new THREE.Color(13882323);
             _this._ambientlight = new pxsim.AmbientLight();
-            _this.add(_this._ambientlight);
+            _this.add(_this._ambientlight, pxsim.math3d.zeroVector());
             _this._camera = new pxsim.PerspectiveCamera();
             _this.add(_this._camera, new pxsim.Vector(-40, 20, 15));
             _this._raycaster = new THREE.Raycaster();
@@ -664,82 +669,79 @@ var pxsim;
             _this._controls.update();
             return _this;
         }
-        Object.defineProperty(Scene3d.prototype, "ambientLight", {
+        Object.defineProperty(Scene3dImpl.prototype, "ambientLight", {
             get: function () {
                 return this._ambientlight;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Scene3d.prototype, "physicsWorld", {
+        Object.defineProperty(Scene3dImpl.prototype, "physicsWorld", {
             get: function () {
                 return this._physicsworld;
             },
             enumerable: true,
             configurable: true
         });
-        Scene3d.prototype.camera = function () {
-            return this._camera;
-        };
-        Scene3d.prototype.setBackgroundColor = function (value) {
+        Object.defineProperty(Scene3dImpl.prototype, "camera", {
+            get: function () {
+                return this._camera;
+            },
+            set: function (camera) {
+                this._camera = camera;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Scene3dImpl.prototype.setBackgroundColor = function (value) {
             if (!value) {
                 return;
             }
             this.reference.background = value;
         };
-        Scene3d.prototype.setAmbientLight = function (value) {
+        Scene3dImpl.prototype.setAmbientLight = function (value) {
             if (!value) {
                 return;
             }
             this.ambientLight.reference.color = value;
         };
-        Scene3d.prototype.add = function (object3d, position) {
+        Scene3dImpl.prototype.add = function (object3d, position) {
             if (!object3d) {
                 return;
             }
-            if (position) {
-                object3d.setPosition(position);
-            }
+            object3d.setPosition(position);
             this.reference.add(object3d.reference);
             object3d.onAdded(this);
         };
-        Scene3d.prototype.remove = function (object3d) {
+        Scene3dImpl.prototype.remove = function (object3d) {
             if (!object3d) {
                 return;
             }
             object3d.onRemoved(this);
             this.reference.remove(object3d.reference);
         };
-        Scene3d.prototype.animate = function (timeStep) {
+        Scene3dImpl.prototype.animate = function (timeStep) {
             _super.prototype.animate.call(this, timeStep);
             this._physicsworld.animate(timeStep);
             pxsim.singletonWorldBoard().events.queue(1, 0, timeStep);
         };
-        Scene3d.prototype.intersectedObjects = function (x, y) {
+        Scene3dImpl.prototype.intersectedObjects = function (x, y) {
             if (!this._camera) {
                 return null;
             }
             this._raycaster.setFromCamera(new THREE.Vector2(x, y), this._camera.reference);
             var intersections = this._raycaster.intersectObjects(this.reference.children);
-            return intersections.length > 0 ? intersections.map(function (intersection) { return new pxsim.GenericObject3d(intersection.object); }) : null;
+            return intersections.length > 0 ? intersections.map(function (intersection) { return pxsim.Object3dImpl.instantiate(intersection.object); }) : null;
         };
-        Scene3d.prototype.setPhysicsEnabled = function (enable) {
+        Scene3dImpl.prototype.setPhysicsEnabled = function (enable) {
         };
-        Scene3d.prototype._onDispose = function () {
+        Scene3dImpl.prototype._onDispose = function () {
             this._physicsworld.dispose();
             _super.prototype._onDispose.call(this);
         };
-        return Scene3d;
-    }(pxsim.Object3d));
-    pxsim.Scene3d = Scene3d;
-    var GenericScene3d = (function (_super) {
-        __extends(GenericScene3d, _super);
-        function GenericScene3d() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        return GenericScene3d;
-    }(Scene3d));
-    pxsim.GenericScene3d = GenericScene3d;
+        return Scene3dImpl;
+    }(pxsim.Object3dImpl));
+    pxsim.Scene3dImpl = Scene3dImpl;
 })(pxsim || (pxsim = {}));
 (function (pxsim) {
     var scene;
@@ -762,164 +764,158 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
-    var Shape3d = (function (_super) {
-        __extends(Shape3d, _super);
-        function Shape3d() {
+    var Shape3dImpl = (function (_super) {
+        __extends(Shape3dImpl, _super);
+        function Shape3dImpl() {
             var _this = _super !== null && _super.apply(this, arguments) || this;
             _this._volume = 0;
             _this._ctorCollisionShape = null;
             return _this;
         }
-        Object.defineProperty(Shape3d.prototype, "volume", {
+        Shape3dImpl.instantiate = function (reference) {
+            return new Shape3dImpl(reference);
+        };
+        Object.defineProperty(Shape3dImpl.prototype, "volume", {
             get: function () {
                 return this._volume;
             },
             enumerable: true,
             configurable: true
         });
-        Shape3d.prototype.createCollisionShape = function () {
+        Shape3dImpl.prototype.createCollisionShape = function () {
             return this._ctorCollisionShape ? this._ctorCollisionShape() : null;
         };
-        Shape3d.prototype._onDispose = function () {
+        Shape3dImpl.prototype._onDispose = function () {
         };
-        Shape3d.prototype._setShapeVolume = function (volume) {
+        Shape3dImpl.prototype._setShapeVolume = function (volume) {
             this._volume = volume;
         };
-        Shape3d.prototype._setCtorCollisionShape = function (ctor) {
+        Shape3dImpl.prototype._setCtorCollisionShape = function (ctor) {
             this._ctorCollisionShape = ctor;
         };
-        Shape3d.prototype._getBounds = function (target) {
+        Shape3dImpl.prototype._getBounds = function (target) {
             this.reference.computeBoundingBox();
             return this.reference.boundingBox.getSize(target);
         };
-        Shape3d.prototype._createCollisionShapeFromHalfExtents = function (ctor) {
+        Shape3dImpl.prototype._createCollisionShapeFromHalfExtents = function (ctor) {
             var bthalfextents = pxsim.Helper.btVector3FromThree(this._getBounds(new THREE.Vector3()).divideScalar(2));
             var btshape = ctor(bthalfextents);
-            btshape.setMargin(Shape3d.collisionMargin);
+            btshape.setMargin(Shape3dImpl._collisionMargin);
             pxsim.Helper.safeAmmoObjectDestroy(bthalfextents);
             return btshape;
         };
-        Shape3d.radialSegments = 32;
-        Shape3d.collisionMargin = 0.05;
-        return Shape3d;
-    }(rt.WrappedObjectWithId));
-    pxsim.Shape3d = Shape3d;
-    var GenericShape3d = (function (_super) {
-        __extends(GenericShape3d, _super);
-        function GenericShape3d() {
-            return _super !== null && _super.apply(this, arguments) || this;
-        }
-        return GenericShape3d;
-    }(Shape3d));
-    pxsim.GenericShape3d = GenericShape3d;
+        Shape3dImpl._radialSegments = 32;
+        Shape3dImpl._collisionMargin = 0.05;
+        return Shape3dImpl;
+    }(rt.ProxyObjectWithId));
+    pxsim.Shape3dImpl = Shape3dImpl;
     var PlaneShape3d = (function (_super) {
         __extends(PlaneShape3d, _super);
-        function PlaneShape3d(width, height, id) {
+        function PlaneShape3d(width, height) {
             var _this = this;
             width = width || 100;
             height = height || 100;
-            _this = _super.call(this, new THREE.PlaneBufferGeometry(width, height).rotateX(-Math.PI / 2), id) || this;
+            _this = _super.call(this, new THREE.PlaneBufferGeometry(width, height).rotateX(-Math.PI / 2)) || this;
             _this._setCtorCollisionShape(function () { return _this._createCollisionShapeFromHalfExtents(function (bthalfextents) { return new Ammo.btBoxShape(bthalfextents); }); });
             return _this;
         }
         return PlaneShape3d;
-    }(Shape3d));
+    }(Shape3dImpl));
     pxsim.PlaneShape3d = PlaneShape3d;
     var BoxShape3d = (function (_super) {
         __extends(BoxShape3d, _super);
-        function BoxShape3d(width, height, depth, openEnded, id) {
+        function BoxShape3d(width, height, depth, openEnded) {
             var _this = this;
             width = width || 1;
             height = height || 1;
             depth = depth || 1;
-            _this = _super.call(this, new THREE.BoxBufferGeometry(width, height, depth), id) || this;
+            _this = _super.call(this, new THREE.BoxBufferGeometry(width, height, depth)) || this;
             _this._setShapeVolume(width * height * depth);
             _this._setCtorCollisionShape(function () { return _this._createCollisionShapeFromHalfExtents(function (bthalfextents) { return new Ammo.btBoxShape(bthalfextents); }); });
             return _this;
         }
         return BoxShape3d;
-    }(Shape3d));
+    }(Shape3dImpl));
     pxsim.BoxShape3d = BoxShape3d;
     var CylinderShape3d = (function (_super) {
         __extends(CylinderShape3d, _super);
-        function CylinderShape3d(radius, height, openEnded, id) {
+        function CylinderShape3d(radius, height, openEnded) {
             var _this = this;
             radius = radius || .5;
             height = height || 1;
-            _this = _super.call(this, new THREE.CylinderBufferGeometry(radius, radius, height, Shape3d.radialSegments, 1, openEnded || false), id) || this;
+            _this = _super.call(this, new THREE.CylinderBufferGeometry(radius, radius, height, Shape3dImpl._radialSegments, 1, openEnded || false)) || this;
             _this._setShapeVolume(Math.PI * Math.pow(radius, 2) * height);
             _this._setCtorCollisionShape(function () { return _this._createCollisionShapeFromHalfExtents(function (bthalfextents) { return new Ammo.btCylinderShape(bthalfextents); }); });
             return _this;
         }
         return CylinderShape3d;
-    }(Shape3d));
+    }(Shape3dImpl));
     pxsim.CylinderShape3d = CylinderShape3d;
     var SphereShape3d = (function (_super) {
         __extends(SphereShape3d, _super);
-        function SphereShape3d(radius, id) {
+        function SphereShape3d(radius) {
             var _this = this;
             radius = radius || .5;
-            _this = _super.call(this, new THREE.SphereBufferGeometry(radius, Shape3d.radialSegments, Shape3d.radialSegments), id) || this;
+            _this = _super.call(this, new THREE.SphereBufferGeometry(radius, Shape3dImpl._radialSegments, Shape3dImpl._radialSegments)) || this;
             _this._setShapeVolume(4 / 3 * Math.PI * Math.pow(radius, 3));
             _this._setCtorCollisionShape(function () { return new Ammo.btSphereShape(radius); });
             return _this;
         }
         return SphereShape3d;
-    }(Shape3d));
+    }(Shape3dImpl));
     pxsim.SphereShape3d = SphereShape3d;
     var ConeShape3d = (function (_super) {
         __extends(ConeShape3d, _super);
-        function ConeShape3d(radius, height, id) {
+        function ConeShape3d(radius, height) {
             var _this = this;
             radius = radius || .5;
             height = height || 1;
-            _this = _super.call(this, new THREE.ConeBufferGeometry(radius, height, Shape3d.radialSegments), id) || this;
+            _this = _super.call(this, new THREE.ConeBufferGeometry(radius, height, Shape3dImpl._radialSegments)) || this;
             _this._setShapeVolume(Math.PI * Math.pow(radius, 2) * height / 3);
             _this._setCtorCollisionShape(function () { return new Ammo.btConeShape(radius, height); });
             return _this;
         }
         return ConeShape3d;
-    }(Shape3d));
+    }(Shape3dImpl));
     pxsim.ConeShape3d = ConeShape3d;
 })(pxsim || (pxsim = {}));
 (function (pxsim) {
-    var shape3d;
-    (function (shape3d) {
+    var shape;
+    (function (shape) {
         function planeShape(width, height) {
             return new pxsim.PlaneShape3d(width, height);
         }
-        shape3d.planeShape = planeShape;
+        shape.planeShape = planeShape;
         function boxShape(width, height, depth) {
             return new pxsim.BoxShape3d(width, height, depth);
         }
-        shape3d.boxShape = boxShape;
+        shape.boxShape = boxShape;
         function cylinderShape(radius, height) {
             return new pxsim.CylinderShape3d(radius, height);
         }
-        shape3d.cylinderShape = cylinderShape;
+        shape.cylinderShape = cylinderShape;
         function sphereShape(radius) {
             return new pxsim.SphereShape3d(radius);
         }
-        shape3d.sphereShape = sphereShape;
+        shape.sphereShape = sphereShape;
         function coneShape(radius, height) {
             return new pxsim.ConeShape3d(radius, height);
         }
-        shape3d.coneShape = coneShape;
-    })(shape3d = pxsim.shape3d || (pxsim.shape3d = {}));
+        shape.coneShape = coneShape;
+    })(shape = pxsim.shape || (pxsim.shape = {}));
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
-    var World3d = (function (_super) {
-        __extends(World3d, _super);
-        function World3d(id) {
+    var World3dImpl = (function (_super) {
+        __extends(World3dImpl, _super);
+        function World3dImpl(id) {
             if (id === void 0) { id = 'container'; }
             var _this = _super.call(this) || this;
-            _this._scene = null;
             _this._onWindowResize = function () {
                 _this._renderer.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio);
             };
             _this._onDocumentMouseMove = function (event) { return _this._onDocumentMouseEvent(2, 1, event); };
-            _this._onDocumentMouseClick = function (event) { return _this._onDocumentMouseEvent(World3d._sidFromMouseButtonEvent(event), 2, event); };
+            _this._onDocumentMouseClick = function (event) { return _this._onDocumentMouseEvent(World3dImpl._sidFromMouseButtonEvent(event), 2, event); };
             _this._onDocumentMouseEvent = function (sid, evid, event) {
                 event.preventDefault();
                 if (!sid) {
@@ -930,7 +926,7 @@ var pxsim;
                 pxsim.singletonWorldBoard().events.queue(sid, evid, new pxsim.EventCoordValue(x, y));
             };
             _this._renderer = new pxsim.Renderer(id);
-            _this._scene = new pxsim.GenericScene3d();
+            _this._scene = new pxsim.Scene3dImpl();
             _this._updateRendererScene();
             var container = document.getElementById(_this._renderer.id);
             if (container) {
@@ -948,7 +944,7 @@ var pxsim;
             document.addEventListener('click', _this._onDocumentMouseClick, false);
             return _this;
         }
-        World3d._sidFromMouseButtonEvent = function (event) {
+        World3dImpl._sidFromMouseButtonEvent = function (event) {
             var sid;
             if (0 === event.button) {
                 sid = 3;
@@ -961,21 +957,24 @@ var pxsim;
             }
             return sid;
         };
-        Object.defineProperty(World3d.prototype, "renderer", {
+        Object.defineProperty(World3dImpl.prototype, "renderer", {
             get: function () {
                 return this._renderer;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(World3d.prototype, "scene", {
+        Object.defineProperty(World3dImpl.prototype, "scene", {
             get: function () {
                 return this._scene;
+            },
+            set: function (scene) {
+                this._scene = scene;
             },
             enumerable: true,
             configurable: true
         });
-        World3d.prototype._onDispose = function () {
+        World3dImpl.prototype._onDispose = function () {
             document.removeEventListener('click', this._onDocumentMouseClick, false);
             document.removeEventListener('mousemove', this._onDocumentMouseMove, false);
             window.removeEventListener('resize', this._onWindowResize, false);
@@ -986,12 +985,12 @@ var pxsim;
             pxsim.Helper.safeObjectDispose(this._renderer.scene);
             this._renderer.dispose();
         };
-        World3d.prototype._updateRendererScene = function () {
+        World3dImpl.prototype._updateRendererScene = function () {
             this._renderer.scene = this._scene;
         };
-        return World3d;
-    }(rt.ObjectDisposable));
-    pxsim.World3d = World3d;
+        return World3dImpl;
+    }(rt.DisposableObject));
+    pxsim.World3dImpl = World3dImpl;
 })(pxsim || (pxsim = {}));
 (function (pxsim) {
     var world;
@@ -1044,7 +1043,7 @@ var pxsim;
         };
         WorldBoard.prototype.init = function () {
             this.postkill();
-            this._world3d = new pxsim.World3d();
+            this._world3d = new pxsim.World3dImpl();
             this._events = new pxsim.WorldEventBus(pxsim.runtime);
         };
         WorldBoard.prototype.kill = function () {
@@ -1053,7 +1052,7 @@ var pxsim;
             }
         };
         WorldBoard.prototype.postkill = function () {
-            rt.ObjectWithIdFactory.forgetAllInstances();
+            rt.ObjectFactory.forgetAllInstances();
             pxsim.Helper.safeObjectDispose(this._world3d);
             this._world3d = null;
         };
@@ -1117,14 +1116,20 @@ var pxsim;
         Helper.applyFn = function (input, fn) {
             return Array.isArray(input) ? input.map(fn) : fn(input);
         };
-        Helper.safeObjectDispose = function (dispoableobject) {
-            if (dispoableobject) {
-                dispoableobject.dispose();
+        Helper.getUserData = function (object, key) {
+            return object.userData[key];
+        };
+        Helper.setUserData = function (object, key, data) {
+            object.userData[key] = data;
+        };
+        Helper.safeObjectDispose = function (object) {
+            if (object) {
+                object.dispose();
             }
         };
-        Helper.safeAmmoObjectDestroy = function (ammoobject) {
-            if (ammoobject) {
-                Ammo.destroy(ammoobject);
+        Helper.safeAmmoObjectDestroy = function (object) {
+            if (object) {
+                Ammo.destroy(object);
             }
         };
         return Helper;
@@ -1174,7 +1179,7 @@ var pxsim;
         PhysicsWorld._maxStepSimulation = 3;
         PhysicsWorld._fixedTimeStep = 1 / 60;
         return PhysicsWorld;
-    }(rt.ObjectDisposable));
+    }(rt.DisposableObject));
     pxsim.PhysicsWorld = PhysicsWorld;
 })(pxsim || (pxsim = {}));
 var pxsim;
@@ -1183,7 +1188,7 @@ var pxsim;
         __extends(Renderer, _super);
         function Renderer(id) {
             if (id === void 0) { id = 'container'; }
-            var _this = _super.call(this, Renderer._instantiateReference(id), id) || this;
+            var _this = _super.call(this, Renderer._instantiateReference(id)) || this;
             _this._domElement = document.createElement('div');
             _this._scene3d = null;
             _this._camera = null;
@@ -1191,6 +1196,7 @@ var pxsim;
             _this._clock = new THREE.Clock();
             _this._paused = false;
             _this._callbackRequestId = 0;
+            _this._id = id;
             _this._domElement.appendChild(_this.reference.domElement);
             _this._domElement.appendChild(_this._stats.dom);
             _this.reference.shadowMap.enabled = true;
@@ -1208,6 +1214,13 @@ var pxsim;
             }
             return webglrenderer;
         };
+        Object.defineProperty(Renderer.prototype, "id", {
+            get: function () {
+                return this._id;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(Renderer.prototype, "domElement", {
             get: function () {
                 return this._domElement;
@@ -1250,7 +1263,7 @@ var pxsim;
             if (!this._scene3d) {
                 return;
             }
-            var camera = this._scene3d.camera();
+            var camera = this._scene3d.camera;
             if (camera) {
                 this.reference.render(this._scene3d.reference, camera.reference);
             }
@@ -1267,7 +1280,7 @@ var pxsim;
             if (!this._scene3d) {
                 return;
             }
-            var camera = this._scene3d.camera();
+            var camera = this._scene3d.camera;
             if (camera) {
                 var size = this.reference.getSize();
                 camera.setSize(size.width, size.height);
@@ -1297,7 +1310,7 @@ var pxsim;
         };
         Renderer._renderers = new Map();
         return Renderer;
-    }(rt.WrappedObjectWithId));
+    }(rt.ProxyObject));
     pxsim.Renderer = Renderer;
 })(pxsim || (pxsim = {}));
 var pxsim;
@@ -1415,6 +1428,6 @@ var pxsim;
         RigidBody._maxMass = 100;
         RigidBody._defaultFriction = .75;
         return RigidBody;
-    }(rt.ObjectDisposable));
+    }(rt.DisposableObject));
     pxsim.RigidBody = RigidBody;
 })(pxsim || (pxsim = {}));
