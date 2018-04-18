@@ -25,6 +25,11 @@ namespace rt {
         dispose(): void;
     }
 
+    export interface ICloneableObject {
+        clone(recursive?: boolean): this;
+        copy(source: this, recursive?: boolean): this;
+    }
+
     export abstract class DisposableObject implements IDisposableObject {
         private _isDisposed = false;
 
