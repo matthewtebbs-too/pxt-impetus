@@ -175,6 +175,7 @@
   "Palette.YellowGreen|block": "yellow green",
   "Palette.Yellow|block": "yellow",
   "Scene3d.add|block": "add to %scene=world_scene %object3d|at %position=world_origin",
+  "Scene3d.camera|block": "%scene=world_scene camera",
   "Scene3d.remove|block": "remove from %scene=world_scene %object3d",
   "Scene3d.setAmbientLight|block": "set %scene=world_scene|ambient light %color=color_picker",
   "Scene3d.setBackgroundColor|block": "set %scene=world_scene|background %color=color_picker",

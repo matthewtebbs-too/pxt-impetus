@@ -118,6 +118,14 @@ namespace pxsim {
 }
 
 namespace pxsim.scene {
+    export function camera(scene3d: Scene3d, value?: Camera): Camera {
+        if (value) {
+            scene3d.camera = value;
+        }
+
+        return scene3d.camera;
+    }
+
     export function origin(): Vector  {
         return pxsim.math3d.zeroVector();
     }

@@ -84,4 +84,12 @@ namespace pxsim.material {
     export function materialOfColor(color?: Color): SolidMaterial {
         return SolidMaterial.instantiate_(color);
     }
+
+    export function emissive(material: Material, value?: Color): Color {
+        if (value) {
+            material.emissive = value;
+        }
+
+        return material.emissive as pxsim.Color;
+    }
 }

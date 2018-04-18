@@ -45,10 +45,6 @@ declare namespace logic {
 
 //%
 declare class Vector {
-    //% blockId=vector_x
-    //% shim=.x property
-    x: number;
-    
     //% shim=.toString
     toString(): string;
 }
@@ -270,23 +266,23 @@ declare interface Material {
     //% blockCombine
     //% blockCombineShadow=color_picker
     //% group="Material"
-    //% shim=.color property
+    //% shim=material::color property
     color: Color;
 
     //% blockCombine
     //% blockCombineShadow=color_picker
     //% group="Material"
-    //% shim=.emissive property
+    //% shim=material::emissive property
     emissive: Color;
 
     //% blockCombine
     //% group="Material"
-    //% shim=.roughness property
+    //% shim=material::roughness property
     roughness: number;
 
     //% blockCombine
     //% group="Material"
-    //% shim=.metalness property
+    //% shim=material::metalness property
     metalness: number;
 }
 
@@ -344,7 +340,8 @@ declare interface Scene3d extends Object3d {
      * Active camera.
      */
     //% blockId=scene_camera
-    //% shim=.camera property
+    //% block="%scene=world_scene camera"
+    //% shim=scene::camera
     camera: Camera;
 
     /**
@@ -405,6 +402,7 @@ declare namespace scene { /* image icon */
      */
     //% blockId=scene_on_animate
     //% block="on scene animate"
+    //% afterOnStart=true
     //% shim=scene::onAnimate
     function onAnimate(cb: (msec: number) => void): void;
 }
@@ -427,6 +425,7 @@ declare namespace input { /* dot-circle icon */
      */
     //% blockId=input_on_mousemove
     //% block="on mouse move"
+    //% afterOnStart=true
     //% shim=input::onMouseMove
     function onMouseMove(cb: (x: number, y: number) => void): void;
 
@@ -435,6 +434,7 @@ declare namespace input { /* dot-circle icon */
      */
     //% blockId=input_on_mouseclick
     //% block="on mouse %button click"
+    //% afterOnStart=true
     //% shim=input::onMouseClick
     function onMouseClick(button: MouseButton, cb: (x: number, y: number) => void): void;
 }
