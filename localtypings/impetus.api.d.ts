@@ -43,8 +43,13 @@ declare namespace loops {
 declare namespace logic {
 }
 
-//%
+//% blockNamespace=vector
 declare class Vector {
+    //% blockId=vector_x
+    //% block="vector% x"
+    //% shim=.x property
+    readonly x: number;
+
     //% shim=.toString
     toString(): string;
 }
@@ -284,6 +289,11 @@ declare interface Material {
     //% group="Material"
     //% shim=material::metalness property
     metalness: number;
+
+    //% blockCombine
+    //% group="Material"
+    //% shim=material::density property
+    density: number;
 }
 
 declare namespace design {
@@ -339,10 +349,17 @@ declare interface Scene3d extends Object3d {
     /**
      * Active camera.
      */
-    //% blockId=scene_camera
-    //% block="%scene=world_scene camera"
+    //% blockCombine
+    //% blockCombineShadow=world_scene
     //% shim=scene::camera
     camera: Camera;
+
+    /**
+     * Origin.
+     */
+    //% blockCombine
+    //% shim=scene::origin
+    readonly origin: Vector;
 
     /**
      * Set background color.
@@ -381,14 +398,6 @@ declare interface Scene3d extends Object3d {
 
 //% color="#d92680" icon="\uf03e" block="Scene" weight=95
 declare namespace scene { /* image icon */
-    /**
-     * Origin.
-     */
-    //% blockId=scene_origin
-    //% block="scene origin"
-    //% shim=scene::origin
-    function origin(): Vector;
-
     /**
      * Intersect the view of the current scene with the active camera.
      */

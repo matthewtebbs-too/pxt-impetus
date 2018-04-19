@@ -123,6 +123,7 @@
   "Object3d.setScale|param|scale": "Vector",
   "Scene3d.add": "Add object to scene.",
   "Scene3d.camera": "Active camera.",
+  "Scene3d.origin": "Origin.",
   "Scene3d.remove": "Remove object from scene.",
   "Scene3d.setAmbientLight": "Set ambient light color.",
   "Scene3d.setAmbientLight|param|color": "Color",
@@ -193,6 +194,5 @@
   "parseInt": "Convert a string to an integer.",
   "scene.intersectedObjectAt": "Intersect the view of the current scene with the active camera.",
   "scene.onAnimate": "Code to run when the scene is animated before each frame.",
-  "scene.origin": "Origin.",
   "world.scene": "Get current scene."
 }

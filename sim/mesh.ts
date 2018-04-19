@@ -13,14 +13,14 @@ namespace pxsim {
         }
 
         public get material(): Material[] | Material {
-            return Helper.applyFn(this.reference.material, ref => MaterialImpl.instantiate(ref));
+            return this.reference.material as any;
         }
 
         constructor(
             shape3d: Shape3dImpl<THREE.Geometry | THREE.BufferGeometry>,
-            material: MaterialImpl,
+            material: Material,
         ) {
-            super(new THREE.Mesh(shape3d.reference, material.reference));
+            super(new THREE.Mesh(shape3d.reference, material as any));
 
             this._rigidbody = new RigidBody(this, shape3d, shape3d.volume * material.density);
         }
