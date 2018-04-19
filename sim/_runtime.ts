@@ -76,12 +76,12 @@ namespace rt {
 
     export type ObjectCreator<T> = (parameters?: any) => T;
 
-    export class ObjectFactory<T extends DisposableObject> {
+    export class ObjectFactory<T> {
         public static forgetAllInstances() {
             ObjectFactory._factories.forEach(factory => factory.forgetAllInstances());
         }
 
-        private static _factories = new Array<ObjectFactory<DisposableObject>>();
+        private static _factories = new Array<ObjectFactory<any>>();
 
         private _creator: ObjectCreator<T>;
         private _objectcache = new Map<ObjId, T>();
@@ -91,11 +91,11 @@ namespace rt {
             ObjectFactory._factories.push(this);
         }
 
-        public instantiate(parameters?: any) {
+        public instantiate(parameters?: any): T {
             return this._creator(parameters);
         }
 
-        public instantiateWithCache(parameters?: any) {
+        public instantiateWithCache(parameters?: any): T {
             const hash = objectHash(parameters || {}, { algorithm: 'md5', encoding: 'hex', respectType: false } as any);
 
             let instance = this._objectcache.get(hash);
