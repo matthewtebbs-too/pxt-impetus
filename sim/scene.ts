@@ -119,9 +119,9 @@ namespace pxsim {
         }
 
         protected _onDispose() {
-            this._physicsworld.dispose();
-
             super._onDispose();
+
+            this._physicsworld.dispose();
         }
     }
 }

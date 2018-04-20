@@ -8,8 +8,10 @@
 
 namespace pxsim {
     export function Object3dMixin<T extends rt.ObjectConstructor<THREE.Object3D>>(base: T) {
-        return rt.DisposableObjectMixin(class extends base implements rt.ICloneableObject {
+        return class extends base implements rt.IDisposableObject, rt.ICloneableObject {
             protected _rigidbody: RigidBody | null = null;
+
+            private _isDisposed = false;
 
             constructor(...args: any[]) {
                 super(...args);
@@ -108,12 +110,19 @@ namespace pxsim {
                 throw Error();
             }
 
+            public dispose() {
+                if (!this._isDisposed) {
+                    this._onDispose();
+                    this._isDisposed = true;
+                }
+            }
+
             protected _onDispose() {
                 this.children.forEach(child => (child as Object3d).dispose());
 
                 Helper.safeObjectDispose(this._rigidbody);
             }
-        });
+        };
     }
 
     export class Object3d extends Object3dMixin(THREE.Object3D) { }

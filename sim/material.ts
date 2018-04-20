@@ -13,7 +13,7 @@ namespace pxsim {
     }
 
     export function MaterialMixin<T extends rt.ObjectConstructor<THREE.MeshStandardMaterial>>(base: T) {
-        return rt.DisposableObjectMixin(class extends base implements rt.ICloneableObject {
+        return class extends base implements rt.ICloneableObject {
             private _density: number = 1;
 
             public get density(): number {
@@ -34,7 +34,7 @@ namespace pxsim {
                 this.density = source.density;
                 return this;
             }
-        });
+        };
     }
 
     export class Material extends MaterialMixin(THREE.MeshStandardMaterial) { }

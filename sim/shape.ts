@@ -8,7 +8,7 @@
 
 namespace pxsim {
     export function ShapeMixin<T extends rt.ObjectConstructor<THREE.BufferGeometry>>(base: T) {
-        return rt.DisposableObjectMixin(class extends base implements rt.ICloneableObject {
+        return class extends base implements rt.ICloneableObject {
             protected static _radialSegments = 32;
             protected static _collisionMargin = 0.05;
 
@@ -53,7 +53,7 @@ namespace pxsim {
 
                 return btshape;
             }
-        });
+        };
     }
 
     export class Shape3d extends ShapeMixin(THREE.BufferGeometry) { }

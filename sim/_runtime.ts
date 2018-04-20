@@ -47,23 +47,6 @@ namespace rt {
 
     export type ObjectCreator<T> = (parameters?: any) => T;
 
-    export function DisposableObjectMixin<T extends rt.ObjectConstructor>(base: T) {
-        return class extends base {
-            private _isDisposed = false;
-
-            public dispose() {
-                if (!this._isDisposed) {
-                    this._onDispose();
-                    this._isDisposed = true;
-                }
-            }
-
-            protected _onDispose(): void {
-                /* do nothing */
-            }
-        };
-    }
-
     export abstract class DisposableObject {
         private _isDisposed = false;
 
