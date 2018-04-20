@@ -264,6 +264,10 @@ var pxsim;
 (function (pxsim) {
     var color;
     (function (color_1) {
+        function colorToString(color) {
+            return "(" + color.r * 255 + ", " + color.g * 255 + ", " + color.b * 255 + ")";
+        }
+        color_1.colorToString = colorToString;
         function standardColor(rgb) {
             return new pxsim.ColorConstructor(rgb);
         }
@@ -471,12 +475,6 @@ var pxsim;
                 }
                 var _this = _super.apply(this, args) || this;
                 _this._density = 1;
-                if (args.length) {
-                    var parameters = args[0];
-                    if (parameters.density) {
-                        _this.density = parameters.density;
-                    }
-                }
                 return _this;
             }
             Object.defineProperty(class_5.prototype, "density", {
@@ -514,7 +512,6 @@ var pxsim;
         SolidMaterial.instantiate = function (solidColor) {
             return SolidMaterial._factory.instantiate({
                 color: (solidColor ? solidColor.getHex() : undefined) || 16777215,
-                density: 1,
                 emissive: 0.,
                 metalness: 0.,
                 roughness: .5,
