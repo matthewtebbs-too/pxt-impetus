@@ -79,11 +79,11 @@ namespace pxsim {
             }
 
             public animate(timeStep: number) {
-                this.children.forEach(child => (child as Object3d).animate(timeStep));
-
                 if (this._rigidbody) {
                     this._rigidbody.syncMotionStateToObject3d();
                 }
+
+                this.children.forEach(child => (child as Object3d).animate(timeStep));
             }
 
             public onAdded(scene3d: Scene3d) {
