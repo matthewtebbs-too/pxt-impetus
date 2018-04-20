@@ -643,7 +643,6 @@ var pxt;
         var workspace;
         (function (workspace) {
             var U = pxt.Util;
-            var lf = U.lf;
             var folder;
             var allScripts = [];
             var currentTarget;

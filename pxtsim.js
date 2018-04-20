@@ -1612,8 +1612,17 @@ var pxsim;
                 case "object":
                     if (!v)
                         return null;
-                    if (v instanceof pxsim.RefObject)
-                        return { id: v.id };
+                    if (v instanceof pxsim.RefObject) {
+                        var value = undefined;
+                        try {
+                            value = JSON.stringify(pxsim.RefObject.toAny(v));
+                        }
+                        catch (e) { }
+                        return {
+                            id: v.id,
+                            value: value
+                        };
+                    }
                     return { text: "(object)" };
                 default:
                     throw new Error();
@@ -1843,7 +1852,6 @@ var pxsim;
         StoppedState.prototype.getFrames = function () {
             var _this = this;
             return this._message.stackframes.map(function (s, i) {
-                ;
                 var bp = _this._map.getById(s.breakpointId);
                 if (bp) {
                     _this._frames[s.breakpointId] = s;
@@ -1928,14 +1936,22 @@ var pxsim;
 /// <reference path="../localtypings/pxtparts.d.ts"/>
 var pxsim;
 (function (pxsim) {
-    function print() {
-        try {
-            window.print();
+    function print(delay) {
+        if (delay === void 0) { delay = 0; }
+        function p() {
+            try {
+                window.print();
+            }
+            catch (e) {
+                // oops
+            }
         }
-        catch (e) {
-            // oops
-        }
+        if (delay)
+            setTimeout(p, delay);
+        else
+            p();
     }
+    pxsim.print = print;
     var Embed;
     (function (Embed) {
         function start() {
@@ -4602,8 +4618,30 @@ var pxsim;
         SimulatorDriver.prototype.setState = function (state) {
             if (this.state != state) {
                 this.state = state;
+                this.freeze(this.state == SimulatorState.Paused); // don't allow interaction when pause
                 if (this.options.onStateChanged)
                     this.options.onStateChanged(this.state);
+            }
+        };
+        SimulatorDriver.prototype.freeze = function (value) {
+            var cls = "pause-overlay";
+            if (!value) {
+                this.container.querySelectorAll("div.simframe div." + cls)
+                    .forEach(function (overlay) { return overlay.parentElement.removeChild(overlay); });
+            }
+            else {
+                this.container.querySelectorAll("div.simframe")
+                    .forEach(function (frame) {
+                    if (frame.querySelector("div." + cls))
+                        return;
+                    var div = document.createElement("div");
+                    div.className = cls;
+                    div.onclick = function (ev) {
+                        ev.preventDefault();
+                        return false;
+                    };
+                    frame.appendChild(div);
+                });
             }
         };
         SimulatorDriver.prototype.postMessage = function (msg, source) {
@@ -5085,6 +5123,9 @@ var pxsim;
             if (_vca)
                 _vca.gain.value = 0;
             _frequency = 0;
+            if (audio) {
+                audio.pause();
+            }
         }
         AudioContextManager.stop = stop;
         function frequency() {
@@ -5131,6 +5172,7 @@ var pxsim;
                 res += String.fromCharCode(input[i]);
             return res;
         }
+        var audio;
         function playBufferAsync(buf) {
             if (!buf)
                 return Promise.resolve();
@@ -5141,7 +5183,7 @@ var pxsim;
                     resolve = undefined;
                 }
                 var url = "data:audio/wav;base64," + window.btoa(uint8ArrayToString(buf.data));
-                var audio = new Audio(url);
+                audio = new Audio(url);
                 if (_mute)
                     audio.volume = 0;
                 audio.onended = function () { return res(); };

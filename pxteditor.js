@@ -8,6 +8,8 @@ var pxt;
             FilterState[FilterState["Visible"] = 1] = "Visible";
             FilterState[FilterState["Disabled"] = 2] = "Disabled";
         })(FilterState = editor.FilterState || (editor.FilterState = {}));
+        editor.initExtensionsAsync = function (opts) { return Promise.resolve({}); };
+        editor.initFieldExtensionsAsync = function (opts) { return Promise.resolve({}); };
     })(editor = pxt.editor || (pxt.editor = {}));
 })(pxt || (pxt = {}));
 var pxt;
@@ -215,7 +217,7 @@ var pxt;
         function postHostMessageAsync(msg) {
             return new Promise(function (resolve, reject) {
                 var env = pxt.Util.clone(msg);
-                env.id = pxt.Util.guidGen();
+                env.id = ts.pxtc.Util.guidGen();
                 if (msg.response)
                     pendingRequests[env.id] = { resolve: resolve, reject: reject };
                 window.parent.postMessage(env, "*");

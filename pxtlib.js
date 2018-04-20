@@ -1457,6 +1457,7 @@ var pxtc = ts.pxtc;
         })(BrowserImpl = pxtc.BrowserImpl || (pxtc.BrowserImpl = {}));
     })(pxtc = ts.pxtc || (ts.pxtc = {}));
 })(ts || (ts = {}));
+var lf = ts.pxtc.Util.lf;
 /// <reference path="../localtypings/pxtpackage.d.ts"/>
 /// <reference path="../localtypings/pxtparts.d.ts"/>
 /// <reference path="../localtypings/pxtarget.d.ts"/>
@@ -1467,7 +1468,6 @@ var pxt;
 (function (pxt) {
     pxt.U = pxtc.Util;
     pxt.Util = pxtc.Util;
-    var lf = pxt.U.lf;
     var savedAppTarget;
     function setAppTarget(trg) {
         pxt.appTarget = trg || {};
@@ -1505,6 +1505,11 @@ var pxt;
             if (cs.yottaTarget && !cs.yottaBinary)
                 cs.yottaBinary = "pxt-microbit-app-combined.hex";
         }
+        // patch cdn
+        var theme = pxt.appTarget.appTheme;
+        var targetImages = Object.keys(theme)
+            .filter(function (k) { return /(logo|hero)$/i.test(k) && /^@cdnUrl@/.test(theme[k]); })
+            .forEach(function (k) { return theme[k] = pxt.BrowserUtils.patchCdn(theme[k]); });
         savedAppTarget = pxt.U.clone(pxt.appTarget);
     }
     pxt.setAppTarget = setAppTarget;
@@ -2515,11 +2520,45 @@ var pxt;
             });
         }
         BrowserUtils.loadImageAsync = loadImageAsync;
-        function loadScriptAsync(url) {
+        function resolveCdnUrl(path) {
+            var monacoPaths = window.MonacoPaths || {};
+            var url = monacoPaths[path] || (pxt.webConfig.commitCdnUrl + path);
+            return url;
+        }
+        function loadStyleAsync(path, rtl) {
+            if (rtl)
+                path = "rtl" + path;
+            var id = "style-" + path;
+            if (document.getElementById(id))
+                return Promise.resolve();
+            var url = resolveCdnUrl(path);
+            var links = pxt.Util.toArray(document.head.getElementsByTagName("link"));
+            var link = links.filter(function (l) { return l.getAttribute("href") == url; })[0];
+            if (link) {
+                if (!link.id)
+                    link.id = id;
+                return Promise.resolve();
+            }
+            return new Promise(function (resolve, reject) {
+                var el = document.createElement("link");
+                el.href = url;
+                el.rel = "stylesheet";
+                el.type = "text/css";
+                el.id = id;
+                el.addEventListener('load', function () { return resolve(); });
+                el.addEventListener('error', function (e) { return reject(e); });
+                document.head.appendChild(el);
+            });
+        }
+        BrowserUtils.loadStyleAsync = loadStyleAsync;
+        function loadScriptAsync(path) {
+            var url = resolveCdnUrl(path);
+            pxt.debug("script: loading " + url);
             return new Promise(function (resolve, reject) {
                 var script = document.createElement('script');
                 script.type = 'text/javascript';
                 script.src = url;
+                script.async = true;
                 script.addEventListener('load', function () { return resolve(); });
                 script.addEventListener('error', function (e) { return reject(e); });
                 document.body.appendChild(script);
@@ -2544,12 +2583,31 @@ var pxt;
             });
         }
         BrowserUtils.loadAjaxAsync = loadAjaxAsync;
-        function initTheme() {
-            function patchCdn(url) {
-                if (!url)
-                    return url;
-                return url.replace("@cdnUrl@", pxt.getOnlineCdnUrl());
+        var loadBlocklyPromise;
+        function loadBlocklyAsync() {
+            if (!loadBlocklyPromise) {
+                if (typeof Blockly === "undefined") {
+                    pxt.debug("blockly: delay load");
+                    loadBlocklyPromise =
+                        pxt.BrowserUtils.loadStyleAsync("blockly.css", ts.pxtc.Util.isUserLanguageRtl())
+                            .then(function () { return pxt.BrowserUtils.loadScriptAsync("pxtblockly.js"); })
+                            .then(function () {
+                            pxt.debug("blockly: loaded");
+                        });
+                }
+                else
+                    loadBlocklyPromise = Promise.resolve();
             }
+            return loadBlocklyPromise;
+        }
+        BrowserUtils.loadBlocklyAsync = loadBlocklyAsync;
+        function patchCdn(url) {
+            if (!url)
+                return url;
+            return url.replace("@cdnUrl@", pxt.getOnlineCdnUrl());
+        }
+        BrowserUtils.patchCdn = patchCdn;
+        function initTheme() {
             var theme = pxt.appTarget.appTheme;
             if (theme) {
                 if (theme.accentColor) {
@@ -2558,9 +2616,6 @@ var pxt;
                     style.innerHTML = ".ui.accent { color: " + theme.accentColor + "; }\n                .ui.inverted.menu .accent.active.item, .ui.inverted.accent.menu  { background-color: " + theme.accentColor + "; }";
                     document.getElementsByTagName('head')[0].appendChild(style);
                 }
-                theme.appLogo = patchCdn(theme.appLogo);
-                theme.cardLogo = patchCdn(theme.cardLogo);
-                theme.homeScreenHero = patchCdn(theme.homeScreenHero);
             }
             // RTL languages
             if (pxt.Util.isUserLanguageRtl()) {
@@ -2577,13 +2632,14 @@ var pxt;
                         semanticLink.setAttribute("href", semanticHref);
                     }
                 }
-                // replace blockly.css with rtlblockly.css
+                // replace blockly.css with rtlblockly.css if possible
                 var blocklyLink = links.filter(function (l) { return pxt.Util.endsWith(l.getAttribute("href"), "blockly.css"); })[0];
                 if (blocklyLink) {
                     var blocklyHref = blocklyLink.getAttribute("data-rtl");
                     if (blocklyHref) {
                         pxt.debug("swapping to " + blocklyHref);
                         blocklyLink.setAttribute("href", blocklyHref);
+                        blocklyLink.removeAttribute("data-rtl");
                     }
                 }
             }
@@ -2635,32 +2691,41 @@ var pxt;
         commands.browserDownloadAsync = undefined;
         commands.saveOnlyAsync = undefined;
         commands.showUploadInstructionsAsync = undefined;
+        commands.saveProjectAsync = undefined;
     })(commands = pxt.commands || (pxt.commands = {}));
 })(pxt || (pxt = {}));
 /// <reference path="../localtypings/pxtarget.d.ts"/>
 var pxt;
 (function (pxt) {
+    var lzmaPromise;
     function getLzmaAsync() {
-        if (pxt.U.isNodeJS)
-            return Promise.resolve(require("lzma"));
-        else {
-            var lz = window.LZMA;
-            if (lz)
-                return Promise.resolve(lz);
-            var monacoPaths = window.MonacoPaths;
-            return pxt.BrowserUtils.loadScriptAsync(monacoPaths['lzma/lzma_worker-min.js'])
-                .then(function () { return window.LZMA; });
+        var lzmaPromise;
+        if (!lzmaPromise) {
+            if (pxt.U.isNodeJS)
+                lzmaPromise = Promise.resolve(require("lzma"));
+            else
+                lzmaPromise = Promise.resolve(window.LZMA);
+            lzmaPromise.then(function (res) {
+                if (!res)
+                    pxt.reportError('lzma', 'failed to load');
+                return res;
+            });
         }
+        return lzmaPromise;
     }
     function lzmaDecompressAsync(buf) {
         return getLzmaAsync()
             .then(function (lzma) { return new Promise(function (resolve, reject) {
             try {
                 lzma.decompress(buf, function (res, error) {
+                    if (error)
+                        pxt.debug("lzma decompression failed");
                     resolve(error ? undefined : res);
                 });
             }
             catch (e) {
+                if (e)
+                    pxt.debug("lzma decompression failed");
                 resolve(undefined);
             }
         }); });
@@ -2671,10 +2736,13 @@ var pxt;
             .then(function (lzma) { return new Promise(function (resolve, reject) {
             try {
                 lzma.compress(text, 7, function (res, error) {
+                    if (error)
+                        pxt.reportException(error);
                     resolve(error ? undefined : new Uint8Array(res));
                 });
             }
             catch (e) {
+                pxt.reportException(e);
                 resolve(undefined);
             }
         }); });
@@ -2811,6 +2879,7 @@ var pxt;
                 sourcePath = "/pxtapp/";
             var pxtConfig = "// Configuration defines\n";
             var pointersInc = "\nPXT_SHIMS_BEGIN\n";
+            var abiInc = "";
             var includesInc = "#include \"pxt.h\"\n";
             var fullCS = "";
             var thisErrors = "";
@@ -3113,6 +3182,19 @@ var pxt;
                         }
                         return;
                     }
+                    m = /^PXT_ABI\((\w+)\)/.exec(ln);
+                    if (m) {
+                        pointersInc += "PXT_FNPTR(::" + m[1] + "),\n";
+                        abiInc += "extern \"C\" void " + m[1] + "();\n";
+                        res.functions.push({
+                            name: m[1],
+                            argsFmt: "",
+                            value: 0
+                        });
+                    }
+                    m = /^#define\s+PXT_COMM_BASE\s+([0-9a-fx]+)/.exec(ln);
+                    if (m)
+                        res.commBase = parseInt(m[1]);
                     // function definition
                     m = /^\s*(\w+)([\*\&]*\s+[\*\&]*)(\w+)\s*\(([^\(\)]*)\)\s*(;\s*$|\{|$)/.exec(ln);
                     if (currAttrs && m) {
@@ -3537,7 +3619,7 @@ var pxt;
                 pxtConfig += "#define PXT_VM 0\n";
             }
             if (!isCSharp) {
-                res.generatedFiles[sourcePath + "pointers.cpp"] = includesInc + protos.finish() + pointersInc + "\nPXT_SHIMS_END\n";
+                res.generatedFiles[sourcePath + "pointers.cpp"] = includesInc + protos.finish() + abiInc + pointersInc + "\nPXT_SHIMS_END\n";
                 res.generatedFiles[sourcePath + "pxtconfig.h"] = pxtConfig;
                 if (isYotta)
                     res.generatedFiles["/config.json"] = JSON.stringify(configJson, null, 4) + "\n";
@@ -3836,13 +3918,7 @@ var pxt;
             });
         }
         function apiAsync(path, data) {
-            return pxt.U.requestAsync({
-                url: "/api/" + path,
-                headers: { "Authorization": pxt.Cloud.localToken },
-                method: data ? "POST" : "GET",
-                data: data || undefined,
-                allowHttpErrors: true
-            }).then(function (r) { return r.json; });
+            return pxt.Cloud.localRequestAsync(path, data).then(function (r) { return r.json; });
         }
         function storeWithLimitAsync(host, idxkey, newkey, newval, maxLen) {
             if (maxLen === void 0) { maxLen = 10; }
@@ -4257,7 +4333,6 @@ var pxt;
     var docs;
     (function (docs) {
         var U = pxtc.Util;
-        var lf = U.lf;
         var markedInstance;
         var stdboxes = {};
         var stdmacros = {};
@@ -4479,13 +4554,15 @@ var pxt;
             }
             if (theme.boardName)
                 params["boardname"] = html2Quote(theme.boardName);
+            if (theme.boardNickname)
+                params["boardnickname"] = html2Quote(theme.boardNickname);
             if (theme.driveDisplayName)
                 params["drivename"] = html2Quote(theme.driveDisplayName);
             if (theme.homeUrl)
                 params["homeurl"] = html2Quote(theme.homeUrl);
             params["targetid"] = theme.id || "???";
             params["targetname"] = theme.name || "Microsoft MakeCode";
-            params["targetlogo"] = theme.docsLogo ? "<img aria-hidden=\"true\" role=\"presentation\" class=\"ui mini image\" src=\"" + U.toDataUri(theme.docsLogo) + "\" />" : "";
+            params["targetlogo"] = theme.docsLogo ? "<img aria-hidden=\"true\" role=\"presentation\" class=\"ui mini image\" src=\"" + theme.docsLogo + "\" />" : "";
             var ghURLs = d.ghEditURLs || [];
             if (ghURLs.length) {
                 var ghText = "<p style=\"margin-top:1em\">\n";
@@ -6526,6 +6603,28 @@ var pxt;
                 return mkStmt(mkText("// " + text));
             }
             Helpers.mkComment = mkComment;
+            function mkMultiComment(text) {
+                var group = [
+                    mkText("/**"),
+                    mkNewLine()
+                ];
+                text.split("\n").forEach(function (c, i, arr) {
+                    if (c) {
+                        group.push(mkText(" * " + c));
+                        group.push(mkNewLine());
+                        // Add an extra line so we can convert it back to new lines
+                        if (i < arr.length - 1) {
+                            group.push(mkText(" * "));
+                            group.push(mkNewLine());
+                        }
+                    }
+                });
+                return mkGroup(group.concat([
+                    mkText(" */"),
+                    mkNewLine()
+                ]));
+            }
+            Helpers.mkMultiComment = mkMultiComment;
             function mkAssign(x, e) {
                 return mkStmt(mkSimpleCall("=", [x, e]));
             }
@@ -6734,7 +6833,6 @@ var pxt;
 /// <reference path="util.ts"/>
 var pxt;
 (function (pxt) {
-    var lf = pxt.U.lf;
     var Package = /** @class */ (function () {
         function Package(id, _verspec, parent, addedBy) {
             this.id = id;
@@ -7436,16 +7534,18 @@ var pxt;
                     var programText_1 = JSON.stringify(files);
                     return pxt.lzmaCompressAsync(headerString_1 + programText_1)
                         .then(function (buf) {
-                        opts.embedMeta = JSON.stringify({
-                            compression: "LZMA",
-                            headerSize: headerString_1.length,
-                            textSize: programText_1.length,
-                            name: _this.config.name,
-                            eURL: pxt.appTarget.appTheme.embedUrl,
-                            eVER: pxt.appTarget.versions ? pxt.appTarget.versions.target : "",
-                            pxtTarget: pxt.appTarget.id,
-                        });
-                        opts.embedBlob = ts.pxtc.encodeBase64(pxt.U.uint8ArrayToString(buf));
+                        if (buf) {
+                            opts.embedMeta = JSON.stringify({
+                                compression: "LZMA",
+                                headerSize: headerString_1.length,
+                                textSize: programText_1.length,
+                                name: _this.config.name,
+                                eURL: pxt.appTarget.appTheme.embedUrl,
+                                eVER: pxt.appTarget.versions ? pxt.appTarget.versions.target : "",
+                                pxtTarget: pxt.appTarget.id,
+                            });
+                            opts.embedBlob = ts.pxtc.encodeBase64(pxt.U.uint8ArrayToString(buf));
+                        }
                     });
                 }
                 else {
@@ -7497,7 +7597,7 @@ var pxt;
                 return pxt.U.sortObjectFields(files);
             });
         };
-        MainPackage.prototype.compressToFileAsync = function (editor) {
+        MainPackage.prototype.saveToJsonAsync = function (editor) {
             var _this = this;
             return this.filesToBePublishedAsync(true)
                 .then(function (files) {
@@ -7510,8 +7610,12 @@ var pxt;
                     },
                     source: JSON.stringify(files, null, 2)
                 };
-                return pxt.lzmaCompressAsync(JSON.stringify(project, null, 2));
+                return project;
             });
+        };
+        MainPackage.prototype.compressToFileAsync = function (editor) {
+            return this.saveToJsonAsync(editor)
+                .then(function (project) { return pxt.lzmaCompressAsync(JSON.stringify(project, null, 2)); });
         };
         MainPackage.prototype.computePartDefinitions = function (parts) {
             if (!parts || !parts.length)
@@ -7688,6 +7792,7 @@ var ts;
         pxtc.ON_START_COMMENT = pxtc.U.lf("on start");
         pxtc.HANDLER_COMMENT = pxtc.U.lf("code goes here");
         pxtc.TS_STATEMENT_TYPE = "typescript_statement";
+        pxtc.TS_DEBUGGER_TYPE = "debugger_keyword";
         pxtc.TS_OUTPUT_TYPE = "typescript_expression";
         pxtc.PAUSE_UNTIL_TYPE = "pxt_pause_until";
         pxtc.BINARY_JS = "binary.js";
@@ -8613,6 +8718,130 @@ var pxt;
         streams.postPayloadAsync = postPayloadAsync;
     })(streams = pxt.streams || (pxt.streams = {}));
 })(pxt || (pxt = {}));
+var pxt;
+(function (pxt) {
+    var toolbox;
+    (function (toolbox) {
+        toolbox.blockColors = {
+            loops: '#107c10',
+            logic: '#006970',
+            math: '#712672',
+            images: '#5C2D91',
+            variables: '#A80000',
+            functions: '#005a9e',
+            text: '#996600',
+            arrays: '#A94400',
+            advanced: '#3c3c3c'
+        };
+        toolbox.blockIcons = {
+            loops: '\uf01e',
+            logic: '\uf074',
+            math: '\uf1ec',
+            variables: '\uf039',
+            functions: '\uf109',
+            text: '\uf035',
+            arrays: '\uf0cb'
+        };
+        var CategoryMode;
+        (function (CategoryMode) {
+            CategoryMode[CategoryMode["All"] = 0] = "All";
+            CategoryMode[CategoryMode["None"] = 1] = "None";
+            CategoryMode[CategoryMode["Basic"] = 2] = "Basic";
+        })(CategoryMode = toolbox.CategoryMode || (toolbox.CategoryMode = {}));
+        var toolboxStyle;
+        var toolboxStyleBuffer = '';
+        function appendToolboxIconCss(className, i) {
+            if (toolboxStyleBuffer.indexOf(className) > -1)
+                return;
+            if (i.length === 1) {
+                var icon = pxt.Util.unicodeToChar(i);
+                toolboxStyleBuffer += "\n                .blocklyTreeIcon." + className + "::before {\n                    content: \"" + icon + "\";\n                }\n            ";
+            }
+            else {
+                toolboxStyleBuffer += "\n                .blocklyTreeIcon." + className + " {\n                    background-image: url(\"" + pxt.Util.pathJoin(pxt.webConfig.commitCdnUrl, encodeURI(i)) + "\")!important;\n                    width: 30px;\n                    height: 100%;\n                    background-size: 20px !important;\n                    background-repeat: no-repeat !important;\n                    background-position: 50% 50% !important;\n                }\n            ";
+            }
+        }
+        toolbox.appendToolboxIconCss = appendToolboxIconCss;
+        function injectToolboxIconCss(extraCss) {
+            if (extraCss)
+                toolboxStyleBuffer += extraCss;
+            if (!toolboxStyle) {
+                toolboxStyle = document.createElement('style');
+                toolboxStyle.id = "blocklyToolboxIcons";
+                toolboxStyle.type = 'text/css';
+                var head = document.head || document.getElementsByTagName('head')[0];
+                head.appendChild(toolboxStyle);
+            }
+            if (toolboxStyle.sheet) {
+                toolboxStyle.textContent = toolboxStyleBuffer + namespaceStyleBuffer;
+            }
+            else {
+                toolboxStyle.appendChild(document.createTextNode(toolboxStyleBuffer + namespaceStyleBuffer));
+            }
+        }
+        toolbox.injectToolboxIconCss = injectToolboxIconCss;
+        var namespaceStyleBuffer = '';
+        function appendNamespaceCss(namespace, color) {
+            var ns = namespace.toLowerCase();
+            color = color || '#dddddd'; // Default toolbox color
+            if (namespaceStyleBuffer.indexOf(ns) > -1)
+                return;
+            namespaceStyleBuffer += "\n            span.docs." + ns + " {\n                background-color: " + color + " !important;\n                border-color: " + fadeColor(color, 0.2, true) + " !important;\n            }\n        ";
+        }
+        toolbox.appendNamespaceCss = appendNamespaceCss;
+        function getNamespaceColor(ns) {
+            if (pxt.appTarget.appTheme.blockColors && pxt.appTarget.appTheme.blockColors[ns])
+                return pxt.appTarget.appTheme.blockColors[ns];
+            if (pxt.toolbox.blockColors[ns])
+                return pxt.toolbox.blockColors[ns];
+            return "";
+        }
+        toolbox.getNamespaceColor = getNamespaceColor;
+        function getNamespaceIcon(ns) {
+            if (pxt.appTarget.appTheme.blockIcons && pxt.appTarget.appTheme.blockIcons[ns]) {
+                return pxt.appTarget.appTheme.blockIcons[ns];
+            }
+            if (pxt.toolbox.blockIcons[ns]) {
+                return pxt.toolbox.blockIcons[ns];
+            }
+            return "";
+        }
+        toolbox.getNamespaceIcon = getNamespaceIcon;
+        function advancedTitle() { return pxt.Util.lf("{id:category}Advanced"); }
+        toolbox.advancedTitle = advancedTitle;
+        function addPackageTitle() { return pxt.Util.lf("{id:category}Extensions"); }
+        toolbox.addPackageTitle = addPackageTitle;
+        /**
+         * Convert blockly hue to rgb
+         */
+        function convertColor(colour) {
+            var hue = parseInt(colour);
+            if (!isNaN(hue)) {
+                console.error('hue style color not supported anymore, use #rrggbb');
+            }
+            // TODO: HSV support
+            return colour;
+        }
+        toolbox.convertColor = convertColor;
+        function fadeColor(hex, luminosity, lighten) {
+            // #ABC => ABC
+            hex = hex.replace(/[^0-9a-f]/gi, '');
+            // ABC => AABBCC
+            if (hex.length < 6)
+                hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+            // tweak
+            var rgb = "#";
+            for (var i = 0; i < 3; i++) {
+                var c = parseInt(hex.substr(i * 2, 2), 16);
+                c = Math.round(Math.min(Math.max(0, lighten ? c + (c * luminosity) : c - (c * luminosity)), 255));
+                var cStr = c.toString(16);
+                rgb += ("00" + cStr).substr(cStr.length);
+            }
+            return rgb;
+        }
+        toolbox.fadeColor = fadeColor;
+    })(toolbox = pxt.toolbox || (pxt.toolbox = {}));
+})(pxt || (pxt = {}));
 /// <reference path='../built/typescriptServices.d.ts' />
 var ts;
 (function (ts) {
@@ -9250,6 +9479,7 @@ var ts;
                     this.labels = {};
                     this.stackpointers = {};
                     this.stack = 0;
+                    this.commPtr = 0;
                     this.peepOps = 0;
                     this.peepDel = 0;
                     this.peepCounts = {};
@@ -9581,6 +9811,15 @@ var ts;
                             else
                                 this.directiveError(lf("expecting number"));
                             break;
+                        case ".p2align":
+                            expectOne();
+                            num0 = this.parseOneInt(words[1]);
+                            if (num0 != null) {
+                                this.align(1 << num0);
+                            }
+                            else
+                                this.directiveError(lf("expecting number"));
+                            break;
                         case ".byte":
                             this.emitBytes(words);
                             break;
@@ -9600,6 +9839,7 @@ var ts;
                             break;
                         case ".word":
                         case ".4bytes":
+                        case ".long":
                             // TODO: a word is machine-dependent (16-bit for AVR, 32-bit for ARM)
                             this.parseNumbers(words).forEach(function (n) {
                                 // we allow negative numbers
@@ -9634,15 +9874,18 @@ var ts;
                             this.stackpointers[words[1]] = this.stack;
                             break;
                         case "@stackempty":
-                            if (this.stackpointers[words[1]] == null)
-                                this.directiveError(lf("no such saved stack"));
-                            else if (this.stackpointers[words[1]] != this.stack)
-                                this.directiveError(lf("stack mismatch"));
+                            if (this.checkStack) {
+                                if (this.stackpointers[words[1]] == null)
+                                    this.directiveError(lf("no such saved stack"));
+                                else if (this.stackpointers[words[1]] != this.stack)
+                                    this.directiveError(lf("stack mismatch"));
+                            }
                             break;
                         case "@scope":
                             this.scope = words[1] || "";
                             this.currLineNo = this.scope ? 0 : this.realCurrLineNo;
                             break;
+                        case ".syntax":
                         case "@nostackcheck":
                             this.checkStack = false;
                             break;
@@ -9656,6 +9899,29 @@ var ts;
                             this.stack = 0;
                             this.scope = "$S" + this.scopeId++;
                             break;
+                        case ".comm": {
+                            words = words.filter(function (x) { return x != ","; });
+                            words.shift();
+                            var sz = this.parseOneInt(words[1]);
+                            var align = 0;
+                            if (words[2])
+                                align = this.parseOneInt(words[2]);
+                            else
+                                align = 4; // not quite what AS does...
+                            var val = this.lookupLabel(words[0]);
+                            if (val == null) {
+                                if (!this.commPtr) {
+                                    this.commPtr = this.lookupExternalLabel("_pxt_comm_base") || 0;
+                                    if (!this.commPtr)
+                                        this.directiveError(lf("PXT_COMM_BASE not defined"));
+                                }
+                                while (this.commPtr & (align - 1))
+                                    this.commPtr++;
+                                this.labels[this.scopedName(words[0])] = this.commPtr - this.baseOffset;
+                                this.commPtr += sz;
+                            }
+                            break;
+                        }
                         case ".file":
                         case ".text":
                         case ".cpu":
@@ -9664,6 +9930,13 @@ var ts;
                         case ".code":
                         case ".thumb_func":
                         case ".type":
+                        case ".fnstart":
+                        case ".save":
+                        case ".size":
+                        case ".fnend":
+                        case ".pad":
+                        case ".globl": // TODO might need this one
+                        case ".local":
                             break;
                         case "@":
                             // @ sp needed
@@ -9893,6 +10166,10 @@ var ts;
                         }
                     }
                 };
+                File.prototype.clearLabels = function () {
+                    this.labels = {};
+                    this.commPtr = 0;
+                };
                 File.prototype.peepPass = function (reallyFinal) {
                     if (this.disablePeepHole)
                         return;
@@ -9902,7 +10179,7 @@ var ts;
                     this.peepHole();
                     this.throwOnError = true;
                     this.finalEmit = false;
-                    this.labels = {};
+                    this.clearLabels();
                     this.iterLines();
                     pxtc.assert(!this.checkStack || this.stack == 0);
                     this.finalEmit = true;
@@ -9921,7 +10198,7 @@ var ts;
                     this.prepLines(text);
                     if (this.errors.length > 0)
                         return;
-                    this.labels = {};
+                    this.clearLabels();
                     this.iterLines();
                     if (this.checkStack && this.stack != 0)
                         this.directiveError(lf("stack misaligned at the end of the file"));
@@ -9929,7 +10206,7 @@ var ts;
                         return;
                     this.ei.expandLdlit(this);
                     this.ei.commonalize(this);
-                    this.labels = {};
+                    this.clearLabels();
                     this.iterLines();
                     this.finalEmit = true;
                     this.reallyFinalEmit = this.disablePeepHole;
@@ -10228,6 +10505,16 @@ var pxt;
             }
         }
         Cloud.isLocalHost = isLocalHost;
+        function localRequestAsync(path, data) {
+            return pxt.U.requestAsync({
+                url: "/api/" + path,
+                headers: { "Authorization": Cloud.localToken },
+                method: data ? "POST" : "GET",
+                data: data || undefined,
+                allowHttpErrors: true
+            });
+        }
+        Cloud.localRequestAsync = localRequestAsync;
         function privateRequestAsync(options) {
             options.url = pxt.webConfig && pxt.webConfig.isStatic ? pxt.webConfig.relprefix + options.url : Cloud.apiRoot + options.url;
             options.allowGzipPost = true;
@@ -10267,12 +10554,7 @@ var pxt;
                 return Promise.resolve(undefined);
             var url = pxt.webConfig && pxt.webConfig.isStatic ? "targetconfig.json" : "config/" + pxt.appTarget.id + "/targetconfig";
             if (Cloud.isLocalHost())
-                return Util.requestAsync({
-                    url: "/api/" + url,
-                    headers: { "Authorization": Cloud.localToken },
-                    method: "GET",
-                    allowHttpErrors: true
-                }).then(function (resp) { return resp.json; });
+                return localRequestAsync(url).then(function (r) { return r.json; });
             else
                 return Cloud.privateGetAsync(url);
         }
@@ -10294,12 +10576,7 @@ var pxt;
                     url += "&live=1";
             }
             if (Cloud.isLocalHost() && !live)
-                return Util.requestAsync({
-                    url: "/api/" + url,
-                    headers: { "Authorization": Cloud.localToken },
-                    method: "GET",
-                    allowHttpErrors: true
-                }).then(function (resp) {
+                return localRequestAsync(url).then(function (resp) {
                     if (resp.statusCode == 404)
                         return privateGetTextAsync(url);
                     else

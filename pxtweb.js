@@ -64,7 +64,14 @@ var pxt;
                 info.Css.forEach(injectStylesheet);
             }
             all(info.Js || [], injectScriptAsync, function (msccError) {
-                initializeAppInsights(!msccError && typeof mscc !== "undefined" && mscc.hasConsent());
+                if (!msccError && typeof mscc !== "undefined") {
+                    if (mscc.hasConsent()) {
+                        initializeAppInsights(true);
+                    }
+                    else {
+                        mscc.on("consent", function () { return initializeAppInsights(true); });
+                    }
+                }
             });
         });
     }

@@ -411,14 +411,14 @@ var pxt;
                 var nsStyleBuffer = '';
                 Object.keys(res).forEach(function (ns) {
                     var color = res[ns] || '#dddddd';
-                    nsStyleBuffer += "\n                        span.docs." + ns.toLowerCase() + " {\n                            background-color: " + color + " !important;\n                            border-color: " + Blockly.PXTUtils.fadeColour(color, 0.2, true) + " !important;\n                        }\n                    ";
+                    nsStyleBuffer += "\n                        span.docs." + ns.toLowerCase() + " {\n                            background-color: " + color + " !important;\n                            border-color: " + pxt.toolbox.fadeColor(color, 0.2, true) + " !important;\n                        }\n                    ";
                 });
                 return nsStyleBuffer;
             })
                 .then(function (nsStyleBuffer) {
-                Object.keys(pxt.blocks.blockColors).forEach(function (ns) {
-                    var color = pxt.blocks.blockColors[ns];
-                    nsStyleBuffer += "\n                        span.docs." + ns.toLowerCase() + " {\n                            background-color: " + color + " !important;\n                            border-color: " + Blockly.PXTUtils.fadeColour(color, 0.2, true) + " !important;\n                        }\n                    ";
+                Object.keys(pxt.toolbox.blockColors).forEach(function (ns) {
+                    var color = pxt.toolbox.blockColors[ns];
+                    nsStyleBuffer += "\n                        span.docs." + ns.toLowerCase() + " {\n                            background-color: " + color + " !important;\n                            border-color: " + pxt.toolbox.fadeColor(color, 0.2, true) + " !important;\n                        }\n                    ";
                 });
                 return nsStyleBuffer;
             })
@@ -725,19 +725,24 @@ var pxt;
                 showEdit: !!options.showEdit,
                 run: !!options.simulator
             };
-            function render(e) {
+            function render(e, ignored) {
                 if (typeof hljs !== "undefined") {
                     $(e).text($(e).text().replace(/^\s*\r?\n/, ''));
                     hljs.highlightBlock(e);
                 }
-                fillWithWidget(options, $(e).parent(), $(e), undefined, undefined, woptions);
+                var opts = pxt.U.clone(woptions);
+                if (ignored) {
+                    opts.run = false;
+                    opts.showEdit = false;
+                }
+                fillWithWidget(options, $(e).parent(), $(e), undefined, undefined, opts);
             }
             $('code.lang-typescript').each(function (i, e) {
-                render(e);
+                render(e, false);
                 $(e).removeClass('lang-typescript');
             });
             $('code.lang-typescript-ignore').each(function (i, e) {
-                render(e);
+                render(e, true);
                 $(e).removeClass('lang-typescript-ignore');
             });
         }
@@ -746,7 +751,8 @@ var pxt;
                 options = {};
             if (options.pxtUrl)
                 options.pxtUrl = options.pxtUrl.replace(/\/$/, '');
-            options.showEdit = !pxt.BrowserUtils.isIFrame();
+            if (options.showEdit)
+                options.showEdit = !pxt.BrowserUtils.isIFrame();
             mergeConfig(options);
             if (options.simulatorClass) {
                 // simulators
@@ -1089,10 +1095,12 @@ var pxt;
         }
         function initEditorExtensionsAsync() {
             var promise = Promise.resolve();
-            if (pxt.appTarget.appTheme && pxt.appTarget.appTheme.extendEditor) {
+            if (pxt.appTarget.appTheme && pxt.appTarget.appTheme.extendFieldEditors) {
                 var opts_1 = {};
-                promise = promise.then(function () { return pxt.BrowserUtils.loadScriptAsync(pxt.webConfig.commitCdnUrl + "editor.js"); })
-                    .then(function () { return pxt.editor.initExtensionsAsync(opts_1); })
+                promise = promise
+                    .then(function () { return pxt.BrowserUtils.loadBlocklyAsync(); })
+                    .then(function () { return pxt.BrowserUtils.loadScriptAsync("fieldeditors.js"); })
+                    .then(function () { return pxt.editor.initFieldExtensionsAsync(opts_1); })
                     .then(function (res) {
                     if (res.fieldEditors)
                         res.fieldEditors.forEach(function (fi) {
@@ -1157,9 +1165,11 @@ var pxt;
                     .then(function () {
                     switch (doctype) {
                         case "project":
-                            return renderProjectFilesAsync(content, JSON.parse(src));
+                            return renderProjectFilesAsync(content, JSON.parse(src))
+                                .then(function () { return pxsim.print(1000); });
                         case "projectid":
-                            return renderProjectAsync(content, JSON.parse(src));
+                            return renderProjectAsync(content, JSON.parse(src))
+                                .then(function () { return pxsim.print(1000); });
                         case "doc":
                             return renderDocAsync(content, src);
                         case "tutorial":
@@ -1246,7 +1256,10 @@ var pxt;
             if (cfg && cfg.dependencies) {
                 md += "\n## Packages\n\n" + Object.keys(cfg.dependencies).map(function (k) { return "* " + k + ", " + cfg.dependencies[k]; }).join('\n') + "\n\n```package\n" + Object.keys(cfg.dependencies).map(function (k) { return k + "=" + cfg.dependencies[k]; }).join('\n') + "\n```\n";
             }
-            return renderMarkdownAsync(content, md);
+            var options = {
+                print: true
+            };
+            return renderMarkdownAsync(content, md, options);
         }
         runner.renderProjectFilesAsync = renderProjectFilesAsync;
         function renderDocAsync(content, docid) {
@@ -1304,7 +1317,7 @@ var pxt;
                 || window.innerHeight < window.innerWidth ? 1.62 : 1 / 1.62;
             $(content).html(html);
             $(content).find('a').attr('target', '_blank');
-            return pxt.runner.renderAsync({
+            var renderOptions = {
                 blocksAspectRatio: blocksAspectRatio,
                 snippetClass: 'lang-blocks',
                 signatureClass: 'lang-sig',
@@ -1322,7 +1335,12 @@ var pxt;
                 tutorial: !!options.tutorial,
                 showJavaScript: runner.languageMode == LanguageMode.TypeScript,
                 hexName: pxt.appTarget.id
-            }).then(function () {
+            };
+            if (options.print) {
+                renderOptions.showEdit = false;
+                renderOptions.simulator = false;
+            }
+            return pxt.runner.renderAsync(renderOptions).then(function () {
                 // patch a elements
                 $(content).find('a[href^="/"]').removeAttr('target').each(function (i, a) {
                     $(a).attr('href', '#doc:' + $(a).attr('href').replace(/^\//, ''));

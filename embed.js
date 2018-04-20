@@ -7,7 +7,7 @@
     "workerjs": "/pxt-Impetus/worker.js",
     "tdworkerjs": "/pxt-Impetus/tdworker.js",
     "monacoworkerjs": "/pxt-Impetus/monacoworker.js",
-    "pxtVersion": "3.8.8",
+    "pxtVersion": "3.10.11",
     "pxtRelId": "",
     "pxtCdnUrl": "/pxt-Impetus/",
     "commitCdnUrl": "/pxt-Impetus/",
@@ -27,20 +27,10 @@
     var scripts = [
         "/pxt-Impetus/highlight.js/highlight.pack.js",
         "/pxt-Impetus/bluebird.min.js",
-        "/pxt-Impetus/typescript.js",
         "/pxt-Impetus/semantic.js",
         "/pxt-Impetus/marked/marked.min.js",
-        "/pxt-Impetus/lzma/lzma_worker-min.js",
-        "/pxt-Impetus/blockly/blockly_compressed.js",
-        "/pxt-Impetus/blockly/blocks_compressed.js",
-        "/pxt-Impetus/blockly/msg/js/en.js",
-        "/pxt-Impetus/pxtlib.js",
-        "/pxt-Impetus/pxtcompiler.js",
-        "/pxt-Impetus/pxtblocks.js",
-        "/pxt-Impetus/pxteditor.js",
-        "/pxt-Impetus/pxtsim.js",
         "/pxt-Impetus/target.js",
-        "/pxt-Impetus/pxtrunner.js"
+        "/pxt-Impetus/pxtembed.js"
     ]
 
     if (typeof jQuery == "undefined")
