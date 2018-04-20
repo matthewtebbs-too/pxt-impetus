@@ -110,6 +110,9 @@ declare class Object3d {
 
 //%
 declare class Color {
+    //% group="Color"
+    //% shim=color::colorToString
+    toString(): string;
 }
 
 //%

@@ -14,6 +14,10 @@ namespace pxsim {
 }
 
 namespace pxsim.color {
+    export function colorToString(color: Color): string {
+        return `(${color.r * 255}, ${color.g * 255}, ${color.b * 255})`;
+    }
+
     export function standardColor(rgb: number): Color {
         return new ColorConstructor(rgb);
     }

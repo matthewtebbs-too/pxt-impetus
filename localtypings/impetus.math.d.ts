@@ -7,14 +7,14 @@
 //% blockNamespace=Math
 declare class Vector {
     //% group="Vector"
-    //% shim=.vectorToString
+    //% shim=math3d::vectorToString
     toString(): string;
 }
 
 //% blockNamespace=Math
 declare class Quaternion {
     //% group="Quaternion"
-    //% shim=.quaternionToString
+    //% shim=math3d::quaternionToString
     toString(): string;
 }
 
