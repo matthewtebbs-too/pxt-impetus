@@ -10,7 +10,6 @@
 namespace pxsim {
     // tslint:disable-next-line:interface-name
     export interface MaterialParameters extends THREE.MeshStandardMaterialParameters {
-        density?: number;
     }
 
     export function MaterialMixin<T extends rt.ObjectConstructor<THREE.MeshStandardMaterial>>(base: T) {
@@ -27,13 +26,6 @@ namespace pxsim {
 
             constructor(...args: any[]) {
                 super(...args);
-
-                if (args.length) {
-                    const parameters = args[0] as MaterialParameters;
-                    if (parameters.density) {
-                        this.density = parameters.density;
-                    }
-                }
             }
 
             public copy(source: this): this {
@@ -52,7 +44,6 @@ namespace pxsim {
             return SolidMaterial._factory.instantiate(
                 {
                     color: (solidColor ? solidColor.getHex() : undefined) || Palette.White,
-                    density: 1,
                     emissive: 0.,
                     metalness: 0.,
                     roughness: .5,
