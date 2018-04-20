@@ -228,6 +228,7 @@
   "{id:category}Array": "Array",
   "{id:category}Arrays": "Arrays",
   "{id:category}Boolean": "Boolean",
+  "{id:category}Color": "Color",
   "{id:category}Console": "Console",
   "{id:category}Design": "Design",
   "{id:category}Fieldeditors": "Fieldeditors",
