@@ -174,10 +174,10 @@ var pxsim;
                 this.lookAt(position);
             };
             class_2.prototype.animate = function (timeStep) {
-                this.children.forEach(function (child) { return child.animate(timeStep); });
                 if (this._rigidbody) {
                     this._rigidbody.syncMotionStateToObject3d();
                 }
+                this.children.forEach(function (child) { return child.animate(timeStep); });
             };
             class_2.prototype.onAdded = function (scene3d) {
                 if (this._rigidbody) {
