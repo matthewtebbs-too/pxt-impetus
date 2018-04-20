@@ -7,10 +7,12 @@ Hover over a floating cube.
     let intersected: Object3d = null
     let boxshape: Shape3d = null
     let mouseY = 0
+    let mouseIn = false
     let mouseX = 0
     let theta = 0
     theta = 0
     world.scene().backgroundColor = design.standardColor(Palette.LightCyan)
+
     world.scene().addAt(design.directionalLight(design.colorPicker(0xffffff), 1), Math.vector(5, 20, 0))
     boxshape = design.boxShape(20, 20, 20)
     for (let i = 0; i < 2000; i++) {
@@ -24,14 +26,22 @@ Hover over a floating cube.
         if (intersected) {
             object.materialOf(intersected).emissive = design.standardColor(Palette.Black)
         }
-        intersected = scene.intersectedObjectAt(mouseX, mouseY)
-        if (intersected) {
-            object.materialOf(intersected).emissive = design.standardColor(Palette.Red)
+        if (mouseIn) {
+            intersected = scene.intersectedObjectAt(mouseX, mouseY)
+            if (intersected) {
+                object.materialOf(intersected).emissive = design.standardColor(Palette.Red)
+            }
         }
     })
     input.onMouseMove(function (x, y) {
         mouseX = x
         mouseY = y
+    })
+    input.onMouseEnter(function () {
+        mouseIn = true
+    })
+    input.onMouseLeave(function () {
+        mouseIn = false
     })
 ```
 

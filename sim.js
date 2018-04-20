@@ -19,26 +19,6 @@ var rt;
         object.userData[key] = data;
     }
     rt.setUserData = setUserData;
-    function DisposableObjectMixin(base) {
-        return (function (_super) {
-            __extends(class_1, _super);
-            function class_1() {
-                var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this._isDisposed = false;
-                return _this;
-            }
-            class_1.prototype.dispose = function () {
-                if (!this._isDisposed) {
-                    this._onDispose();
-                    this._isDisposed = true;
-                }
-            };
-            class_1.prototype._onDispose = function () {
-            };
-            return class_1;
-        }(base));
-    }
-    rt.DisposableObjectMixin = DisposableObjectMixin;
     var DisposableObject = (function () {
         function DisposableObject() {
             this._isDisposed = false;
@@ -98,15 +78,16 @@ var rt;
 var pxsim;
 (function (pxsim) {
     function Object3dMixin(base) {
-        return rt.DisposableObjectMixin((function (_super) {
-            __extends(class_2, _super);
-            function class_2() {
+        return (function (_super) {
+            __extends(class_1, _super);
+            function class_1() {
                 var args = [];
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i] = arguments[_i];
                 }
                 var _this = _super.apply(this, args) || this;
                 _this._rigidbody = null;
+                _this._isDisposed = false;
                 if (undefined !== _this.castShadow) {
                     _this.castShadow = true;
                 }
@@ -115,7 +96,7 @@ var pxsim;
                 }
                 return _this;
             }
-            Object.defineProperty(class_2.prototype, "position_", {
+            Object.defineProperty(class_1.prototype, "position_", {
                 get: function () {
                     return this.position;
                 },
@@ -125,7 +106,7 @@ var pxsim;
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(class_2.prototype, "rotation_", {
+            Object.defineProperty(class_1.prototype, "rotation_", {
                 get: function () {
                     var rotation = this.rotation.toVector3();
                     return new pxsim.VectorConstructor(THREE.Math.radToDeg(rotation.x), THREE.Math.radToDeg(rotation.y), THREE.Math.radToDeg(rotation.z));
@@ -136,7 +117,7 @@ var pxsim;
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(class_2.prototype, "quaternion_", {
+            Object.defineProperty(class_1.prototype, "quaternion_", {
                 get: function () {
                     return this.quaternion;
                 },
@@ -146,7 +127,7 @@ var pxsim;
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(class_2.prototype, "scale_", {
+            Object.defineProperty(class_1.prototype, "scale_", {
                 get: function () {
                     return this.scale;
                 },
@@ -156,51 +137,57 @@ var pxsim;
                 enumerable: true,
                 configurable: true
             });
-            class_2.prototype.setRotationFromAxisAngle = function (axis, angle) {
+            class_1.prototype.setRotationFromAxisAngle = function (axis, angle) {
                 if (!axis) {
                     return;
                 }
                 this.setRotationFromAxisAngle(axis, THREE.Math.degToRad(angle));
             };
-            class_2.prototype.setPhysicsEnabled = function (enable) {
+            class_1.prototype.setPhysicsEnabled = function (enable) {
                 if (this._rigidbody) {
                     this._rigidbody.isKinematic = !enable;
                 }
             };
-            class_2.prototype.lookAtPosition = function (position) {
+            class_1.prototype.lookAtPosition = function (position) {
                 if (!position) {
                     return;
                 }
                 this.lookAt(position);
             };
-            class_2.prototype.animate = function (timeStep) {
+            class_1.prototype.animate = function (timeStep) {
                 if (this._rigidbody) {
                     this._rigidbody.syncMotionStateToObject3d();
                 }
                 this.children.forEach(function (child) { return child.animate(timeStep); });
             };
-            class_2.prototype.onAdded = function (scene3d) {
+            class_1.prototype.onAdded = function (scene3d) {
                 if (this._rigidbody) {
                     this._rigidbody.addRigidBody(scene3d.physicsWorld);
                 }
                 this.children.forEach(function (child) { return child.onAdded(scene3d); });
             };
-            class_2.prototype.onRemoved = function (scene3d) {
+            class_1.prototype.onRemoved = function (scene3d) {
                 this.children.forEach(function (child) { return child.onRemoved(scene3d); });
                 if (this._rigidbody) {
                     this._rigidbody.removeRigidBody(scene3d.physicsWorld);
                 }
             };
-            class_2.prototype.copy = function (source, recursive) {
+            class_1.prototype.copy = function (source, recursive) {
                 _super.prototype.copy.call(this, source, recursive);
                 throw Error();
             };
-            class_2.prototype._onDispose = function () {
+            class_1.prototype.dispose = function () {
+                if (!this._isDisposed) {
+                    this._onDispose();
+                    this._isDisposed = true;
+                }
+            };
+            class_1.prototype._onDispose = function () {
                 this.children.forEach(function (child) { return child.dispose(); });
                 pxsim.Helper.safeObjectDispose(this._rigidbody);
             };
-            return class_2;
-        }(base)));
+            return class_1;
+        }(base));
     }
     pxsim.Object3dMixin = Object3dMixin;
     var Object3d = (function (_super) {
@@ -216,13 +203,13 @@ var pxsim;
 (function (pxsim) {
     function CameraMixin(base) {
         return (function (_super) {
-            __extends(class_3, _super);
-            function class_3() {
+            __extends(class_2, _super);
+            function class_2() {
                 return _super !== null && _super.apply(this, arguments) || this;
             }
-            class_3.prototype.setSize = function (width, height) {
+            class_2.prototype.setSize = function (width, height) {
             };
-            return class_3;
+            return class_2;
         }(base));
     }
     pxsim.CameraMixin = CameraMixin;
@@ -327,10 +314,18 @@ var pxsim;
 (function (pxsim) {
     var input;
     (function (input) {
-        function onMouseMove(handler) {
+        function onMouseEnter(handler) {
             pxsim.singletonWorldBoard().events.listen(2, 1, handler);
         }
+        input.onMouseEnter = onMouseEnter;
+        function onMouseMove(handler) {
+            pxsim.singletonWorldBoard().events.listen(2, 2, handler);
+        }
         input.onMouseMove = onMouseMove;
+        function onMouseLeave(handler) {
+            pxsim.singletonWorldBoard().events.listen(2, 3, handler);
+        }
+        input.onMouseLeave = onMouseLeave;
         function onMouseClick(button, handler) {
             var sid;
             switch (button) {
@@ -346,7 +341,7 @@ var pxsim;
                 default:
                     return;
             }
-            pxsim.singletonWorldBoard().events.listen(sid, 2, handler);
+            pxsim.singletonWorldBoard().events.listen(sid, 4, handler);
         }
         input.onMouseClick = onMouseClick;
     })(input = pxsim.input || (pxsim.input = {}));
@@ -355,11 +350,11 @@ var pxsim;
 (function (pxsim) {
     function LightMixin(base) {
         return _a = (function (_super) {
-                __extends(class_4, _super);
-                function class_4() {
+                __extends(class_3, _super);
+                function class_3() {
                     return _super !== null && _super.apply(this, arguments) || this;
                 }
-                class_4.prototype._configureShadow = function () {
+                class_3.prototype._configureShadow = function () {
                     if (this.shadow.camera instanceof THREE.OrthographicCamera) {
                         this.shadow.camera.left = -Light.distFrustum;
                         this.shadow.camera.right = Light.distFrustum;
@@ -370,7 +365,7 @@ var pxsim;
                     this.shadow.mapSize.width = 2048;
                     this.shadow.mapSize.height = 2048;
                 };
-                return class_4;
+                return class_3;
             }(base)),
             _a.distFrustum = 100,
             _a;
@@ -466,9 +461,9 @@ var pxsim;
 var pxsim;
 (function (pxsim) {
     function MaterialMixin(base) {
-        return rt.DisposableObjectMixin((function (_super) {
-            __extends(class_5, _super);
-            function class_5() {
+        return (function (_super) {
+            __extends(class_4, _super);
+            function class_4() {
                 var args = [];
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i] = arguments[_i];
@@ -477,7 +472,7 @@ var pxsim;
                 _this._density = 1;
                 return _this;
             }
-            Object.defineProperty(class_5.prototype, "density", {
+            Object.defineProperty(class_4.prototype, "density", {
                 get: function () {
                     return this._density;
                 },
@@ -487,13 +482,13 @@ var pxsim;
                 enumerable: true,
                 configurable: true
             });
-            class_5.prototype.copy = function (source) {
+            class_4.prototype.copy = function (source) {
                 _super.prototype.copy.call(this, source);
                 this.density = source.density;
                 return this;
             };
-            return class_5;
-        }(base)));
+            return class_4;
+        }(base));
     }
     pxsim.MaterialMixin = MaterialMixin;
     var Material = (function (_super) {
@@ -748,8 +743,8 @@ var pxsim;
             throw Error();
         };
         Scene3d.prototype._onDispose = function () {
-            this._physicsworld.dispose();
             _super.prototype._onDispose.call(this);
+            this._physicsworld.dispose();
         };
         return Scene3d;
     }(pxsim.Object3dMixin(THREE.Scene)));
@@ -773,50 +768,50 @@ var pxsim;
 var pxsim;
 (function (pxsim) {
     function ShapeMixin(base) {
-        return rt.DisposableObjectMixin((_a = (function (_super) {
-                __extends(class_6, _super);
-                function class_6() {
+        return _a = (function (_super) {
+                __extends(class_5, _super);
+                function class_5() {
                     var _this = _super !== null && _super.apply(this, arguments) || this;
                     _this._volume = 0;
                     _this._ctorCollisionShape = null;
                     return _this;
                 }
-                Object.defineProperty(class_6.prototype, "volume", {
+                Object.defineProperty(class_5.prototype, "volume", {
                     get: function () {
                         return this._volume;
                     },
                     enumerable: true,
                     configurable: true
                 });
-                class_6.prototype.createCollisionShape = function () {
+                class_5.prototype.createCollisionShape = function () {
                     return this._ctorCollisionShape ? this._ctorCollisionShape() : null;
                 };
-                class_6.prototype.copy = function (source) {
+                class_5.prototype.copy = function (source) {
                     _super.prototype.copy.call(this, source);
                     throw new Error();
                 };
-                class_6.prototype._setShapeVolume = function (volume) {
+                class_5.prototype._setShapeVolume = function (volume) {
                     this._volume = volume;
                 };
-                class_6.prototype._setCtorCollisionShape = function (ctor) {
+                class_5.prototype._setCtorCollisionShape = function (ctor) {
                     this._ctorCollisionShape = ctor;
                 };
-                class_6.prototype._getBounds = function (target) {
+                class_5.prototype._getBounds = function (target) {
                     this.computeBoundingBox();
                     return this.boundingBox.getSize(target);
                 };
-                class_6.prototype._createCollisionShapeFromHalfExtents = function (ctor) {
+                class_5.prototype._createCollisionShapeFromHalfExtents = function (ctor) {
                     var bthalfextents = pxsim.Helper.btVector3FromThree(this._getBounds(new THREE.Vector3()).divideScalar(2));
                     var btshape = ctor(bthalfextents);
                     btshape.setMargin(Shape3d._collisionMargin);
                     pxsim.Helper.safeAmmoObjectDestroy(bthalfextents);
                     return btshape;
                 };
-                return class_6;
+                return class_5;
             }(base)),
             _a._radialSegments = 32,
             _a._collisionMargin = 0.05,
-            _a));
+            _a;
         var _a;
     }
     pxsim.ShapeMixin = ShapeMixin;
@@ -934,16 +929,21 @@ var pxsim;
             _this._onWindowResize = function () {
                 _this._renderer.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio);
             };
-            _this._onDocumentMouseMove = function (event) { return _this._onDocumentMouseEvent(2, 1, event); };
-            _this._onDocumentMouseClick = function (event) { return _this._onDocumentMouseEvent(World3d._sidFromMouseButtonEvent(event), 2, event); };
-            _this._onDocumentMouseEvent = function (sid, evid, event) {
+            _this._onDocumentMouseEnter = function (event) { return _this._onDocumentEvent(2, 1, event); };
+            _this._onDocumentMouseMove = function (event) { return _this._onDocumentMouseEvent(2, 2, event); };
+            _this._onDocumentMouseLeave = function (event) { return _this._onDocumentEvent(2, 3, event); };
+            _this._onDocumentMouseClick = function (event) { return _this._onDocumentMouseEvent(World3d._sidFromMouseButtonEvent(event), 4, event); };
+            _this._onDocumentEvent = function (sid, evid, event, value) {
                 event.preventDefault();
                 if (!sid) {
                     return;
                 }
+                pxsim.singletonWorldBoard().events.queue(sid, evid, value);
+            };
+            _this._onDocumentMouseEvent = function (sid, evid, event) {
                 var x = (event.clientX / window.innerWidth) * 2 - 1;
                 var y = -(event.clientY / window.innerHeight) * 2 + 1;
-                pxsim.singletonWorldBoard().events.queue(sid, evid, new pxsim.EventCoordValue(x, y));
+                _this._onDocumentEvent(sid, evid, event, new pxsim.EventCoordValue(x, y));
             };
             _this._renderer = new pxsim.Renderer(id);
             _this._scene = new pxsim.Scene3d();
@@ -960,7 +960,9 @@ var pxsim;
             }
             _this._onWindowResize();
             window.addEventListener('resize', _this._onWindowResize, false);
+            document.addEventListener('mouseenter', _this._onDocumentMouseEnter, false);
             document.addEventListener('mousemove', _this._onDocumentMouseMove, false);
+            document.addEventListener('mouseleave', _this._onDocumentMouseLeave, false);
             document.addEventListener('click', _this._onDocumentMouseClick, false);
             return _this;
         }
@@ -996,7 +998,9 @@ var pxsim;
         });
         World3d.prototype._onDispose = function () {
             document.removeEventListener('click', this._onDocumentMouseClick, false);
+            document.removeEventListener('mouseleave', this._onDocumentMouseLeave, false);
             document.removeEventListener('mousemove', this._onDocumentMouseMove, false);
+            document.removeEventListener('mouseenter', this._onDocumentMouseEnter, false);
             window.removeEventListener('resize', this._onWindowResize, false);
             var container = document.getElementById(this._renderer.id);
             if (container) {
@@ -1116,7 +1120,7 @@ var pxsim;
     var WorldEventBus = (function (_super) {
         __extends(WorldEventBus, _super);
         function WorldEventBus(runtime) {
-            return _super.call(this, runtime, function (value) { return typeof value === 'object' ? value.toActionArgs() : [value]; }) || this;
+            return _super.call(this, runtime, function (value) { return value ? (typeof value === 'object' ? value.toActionArgs() : [value]) : []; }) || this;
         }
         return WorldEventBus;
     }(pxsim.EventBusGeneric));

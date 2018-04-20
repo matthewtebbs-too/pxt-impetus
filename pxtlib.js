@@ -2521,6 +2521,9 @@ var pxt;
         }
         BrowserUtils.loadImageAsync = loadImageAsync;
         function resolveCdnUrl(path) {
+            // don't expand full urls
+            if (/^https?:\/\//i.test(path))
+                return path;
             var monacoPaths = window.MonacoPaths || {};
             var url = monacoPaths[path] || (pxt.webConfig.commitCdnUrl + path);
             return url;

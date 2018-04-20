@@ -2524,6 +2524,9 @@ var pxt;
         }
         BrowserUtils.loadImageAsync = loadImageAsync;
         function resolveCdnUrl(path) {
+            // don't expand full urls
+            if (/^https?:\/\//i.test(path))
+                return path;
             var monacoPaths = window.MonacoPaths || {};
             var url = monacoPaths[path] || (pxt.webConfig.commitCdnUrl + path);
             return url;
@@ -13706,6 +13709,16 @@ var pxsim;
             return result;
         }
         util.pathJoin = pathJoin;
+        function toArray(a) {
+            if (Array.isArray(a)) {
+                return a;
+            }
+            var r = [];
+            for (var i = 0; i < a.length; ++i)
+                r.push(a[i]);
+            return r;
+        }
+        util.toArray = toArray;
     })(util = pxsim.util || (pxsim.util = {}));
 })(pxsim || (pxsim = {}));
 /// <reference path="./debugProtocol.ts" />
@@ -16814,11 +16827,11 @@ var pxsim;
         SimulatorDriver.prototype.freeze = function (value) {
             var cls = "pause-overlay";
             if (!value) {
-                this.container.querySelectorAll("div.simframe div." + cls)
+                pxsim.util.toArray(this.container.querySelectorAll("div.simframe div." + cls))
                     .forEach(function (overlay) { return overlay.parentElement.removeChild(overlay); });
             }
             else {
-                this.container.querySelectorAll("div.simframe")
+                pxsim.util.toArray(this.container.querySelectorAll("div.simframe"))
                     .forEach(function (frame) {
                     if (frame.querySelector("div." + cls))
                         return;
