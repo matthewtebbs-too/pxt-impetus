@@ -46,7 +46,7 @@
     "@types/node": "9.6.6",
     "@types/object-hash": "1.2.0",
     "@types/stats": "0.16.30",
-    "@types/three": "0.91.8",
+    "@types/three": "0.91.9",
     "less": "2.7.3",
     "semantic-ui-less": "2.2.14",
     "tslint": "5.9.1",
