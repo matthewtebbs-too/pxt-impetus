@@ -211,6 +211,8 @@
   "fieldeditors.onOff|block": "%on",
   "fieldeditors|block": "fieldeditors",
   "input.onMouseClick|block": "on mouse %button click",
+  "input.onMouseEnter|block": "on mouse enter",
+  "input.onMouseLeave|block": "on mouse leave",
   "input.onMouseMove|block": "on mouse move",
   "input|block": "Input",
   "loops.forever|block": "forever",

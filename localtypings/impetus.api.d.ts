@@ -427,6 +427,15 @@ declare namespace world { /* globe icon */
 //% color="#B4009E" icon="\uf192" block="Input" weight=93
 declare namespace input { /* dot-circle icon */
     /**
+     * Code to run when a mouse enter occurs.
+     */
+    //% blockId=input_on_mouseenter
+    //% block="on mouse enter"
+    //% afterOnStart=true
+    //% shim=input::onMouseEnter
+    function onMouseEnter(cb: () => void): void;
+
+    /**
      * Code to run when a mouse move occurs.
      */
     //% blockId=input_on_mousemove
@@ -443,4 +452,13 @@ declare namespace input { /* dot-circle icon */
     //% afterOnStart=true
     //% shim=input::onMouseClick
     function onMouseClick(button: MouseButton, cb: (x: number, y: number) => void): void;
+
+    /**
+     * Code to run when a mouse leave occurs.
+     */
+    //% blockId=input_on_mouseleave
+    //% block="on mouse leave"
+    //% afterOnStart=true
+    //% shim=input::onMouseLeave
+    function onMouseLeave(cb: () => void): void;
 }

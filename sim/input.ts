@@ -5,8 +5,16 @@
 */
 
 namespace pxsim.input {
+    export function onMouseEnter(handler: RefAction) {
+        singletonWorldBoard().events!.listen(ScopeId.MouseDevice, EventId.Enter, handler);
+    }
+
     export function onMouseMove(handler: RefAction) {
         singletonWorldBoard().events!.listen(ScopeId.MouseDevice, EventId.Move, handler);
+    }
+
+    export function onMouseLeave(handler: RefAction) {
+        singletonWorldBoard().events!.listen(ScopeId.MouseDevice, EventId.Leave, handler);
     }
 
     export function onMouseClick(button: MouseButton, handler: RefAction) {

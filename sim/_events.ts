@@ -19,7 +19,9 @@ namespace pxsim {
     export const enum EventId {
         Animate,
 
+        Enter,
         Move,
+        Leave,
 
         Click,
         DoubleClick,
@@ -41,7 +43,7 @@ namespace pxsim {
 
     export class WorldEventBus extends EventBusGeneric<EventValue | string | number> {
         constructor(runtime: Runtime) {
-            super(runtime, value => typeof value === 'object' ? value.toActionArgs() : [value]);
+            super(runtime, value => value ? (typeof value === 'object' ? value.toActionArgs() : [value]) : []);
         }
     }
 }

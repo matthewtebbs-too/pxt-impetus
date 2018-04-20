@@ -60,13 +60,17 @@ namespace pxsim {
             this._onWindowResize();
 
             window.addEventListener('resize', this._onWindowResize, false);
+            document.addEventListener('mouseenter', this._onDocumentMouseEnter, false);
             document.addEventListener('mousemove', this._onDocumentMouseMove, false);
+            document.addEventListener('mouseleave', this._onDocumentMouseLeave, false);
             document.addEventListener('click', this._onDocumentMouseClick, false);
         }
 
         protected _onDispose() {
             document.removeEventListener('click', this._onDocumentMouseClick, false);
+            document.removeEventListener('mouseleave', this._onDocumentMouseLeave, false);
             document.removeEventListener('mousemove', this._onDocumentMouseMove, false);
+            document.removeEventListener('mouseenter', this._onDocumentMouseEnter, false);
             window.removeEventListener('resize', this._onWindowResize, false);
 
             const container = document.getElementById(this._renderer.id as string);
@@ -87,20 +91,26 @@ namespace pxsim {
             this._renderer.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio);
         }
 
+        protected _onDocumentMouseEnter = (event: Event) => this._onDocumentEvent(ScopeId.MouseDevice, EventId.Enter, event);
         protected _onDocumentMouseMove = (event: MouseEvent) => this._onDocumentMouseEvent(ScopeId.MouseDevice, EventId.Move, event);
+        protected _onDocumentMouseLeave = (event: Event) => this._onDocumentEvent(ScopeId.MouseDevice, EventId.Leave, event);
         protected _onDocumentMouseClick = (event: MouseEvent) => this._onDocumentMouseEvent(World3d._sidFromMouseButtonEvent(event), EventId.Click, event);
 
-        protected _onDocumentMouseEvent = (sid: ScopeId | undefined, evid: EventId, event: MouseEvent) => {
+        protected _onDocumentEvent = (sid: ScopeId | undefined, evid: EventId, event: Event, value?: EventValue) => {
             event.preventDefault();
 
             if (!sid) {
                 return;
             }
 
+            singletonWorldBoard().events!.queue(sid, evid, value);
+        }
+
+        protected _onDocumentMouseEvent = (sid: ScopeId | undefined, evid: EventId, event: MouseEvent) => {
             const x = (event.clientX / window.innerWidth) * 2 - 1;
             const y = - (event.clientY / window.innerHeight) * 2 + 1;
 
-            singletonWorldBoard().events!.queue(sid, evid, new EventCoordValue(x, y));
+            this._onDocumentEvent(sid, evid, event, new EventCoordValue(x, y));
         }
     }
 }
