@@ -10,7 +10,6 @@
     "../localtypings/detector.d.ts",
 
     "../localtypings/impetus.enums.d.ts",
-    "../localtypings/impetus.api.d.ts",
 
     "./**/*"
   ]

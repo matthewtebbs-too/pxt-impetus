@@ -5,14 +5,15 @@
 */
 
 /// <reference path="_physics.ts"/>
+/// <reference path="object.ts"/>
 
 namespace pxsim {
-    export function btMotionStateFromObject3d(btmotionstate: Ammo.btMotionState, object3d: Object3dImpl<THREE.Object3D>) {
+    export function btMotionStateFromObject3d(btmotionstate: Ammo.btMotionState, object3d: Object3d) {
         const bttransform = new Ammo.btTransform();
         let btorigin, btquarternion;
 
-        bttransform.setOrigin(btorigin = Helper.btVector3FromThree(object3d.reference.position));
-        bttransform.setRotation(btquarternion = Helper.btQuaternionFromThree(object3d.reference.quaternion));
+        bttransform.setOrigin(btorigin = Helper.btVector3FromThree(object3d.position as THREE.Vector3));
+        bttransform.setRotation(btquarternion = Helper.btQuaternionFromThree(object3d.quaternion as THREE.Quaternion));
 
         btmotionstate.setWorldTransform(bttransform);
 
@@ -23,7 +24,7 @@ namespace pxsim {
         return btmotionstate;
     }
 
-    export function btMotionStateToObject3d(btmotionstate: Ammo.btMotionState, object3d: Object3dImpl<THREE.Object3D>): void {
+    export function btMotionStateToObject3d(btmotionstate: Ammo.btMotionState, object3d: Object3d): void {
         const bttransform = new Ammo.btTransform();
 
         btmotionstate.getWorldTransform(bttransform);
@@ -31,8 +32,8 @@ namespace pxsim {
         const btorigin = bttransform.getOrigin();
         const btrotation = bttransform.getRotation();
 
-        object3d.reference.position.set(btorigin.x(), btorigin.y(), btorigin.z());
-        object3d.reference.quaternion.set(btrotation.x(), btrotation.y(), btrotation.z(), btrotation.w());
+        object3d.position.set(btorigin.x(), btorigin.y(), btorigin.z());
+        object3d.quaternion.set(btrotation.x(), btrotation.y(), btrotation.z(), btrotation.w());
 
         Helper.safeAmmoObjectDestroy(bttransform);
     }
@@ -44,7 +45,7 @@ namespace pxsim {
 
         private _world: PhysicsWorld | null = null;
 
-        private _object3d: Object3dImpl<THREE.Object3D>;
+        private _object3d: Object3d;
 
         private _btbody: Ammo.btRigidBody;
         private _btshape: Ammo.btCollisionShape;
@@ -78,8 +79,8 @@ namespace pxsim {
         }
 
         constructor(
-            object3d: Object3dImpl<THREE.Object3D>,
-            shape3d: Shape3dImpl<THREE.Geometry | THREE.BufferGeometry>,
+            object3d: Object3d,
+            shape3d: Shape3d,
             mass: number,
         ) {
             super();

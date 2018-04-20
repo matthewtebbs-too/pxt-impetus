@@ -1,6 +1,6 @@
 # Falling Spheres
 
-Watch the spheres fall!
+Watch the spheres fall.
 
 ```blocks
     let sphereshape: Shape3d = null
@@ -9,14 +9,14 @@ Watch the spheres fall!
     loops.forever(function () {
         if (count > 0) {
             sphereobject = object.fromShapeAndMaterial(sphereshape, design.materialOfColor(design.randomColor()))
-            world.scene().add(sphereobject, Math.vector(0, 40, 0))
+            world.scene().addAt(sphereobject, Math.vector(0, 40, 0))
             sphereobject.setPhysicsEnabled(true)
             count += -1
         }
     })
     count = 200
-    world.scene().add(design.directionalLight(design.colorPicker(0xffffff), 1), Math.vector(0, 10, 0))
-    world.scene().add(object.fromShapeAndMaterial(design.planeShape(100, 100), design.materialOfColor(design.colorPicker(0xffffff))), scene.origin())
+    world.scene().addAt(design.directionalLight(design.colorPicker(0xffffff), 1), Math.vector(0, 10, 0))
+    world.scene().addAt(object.fromShapeAndMaterial(design.planeShape(100, 100), design.materialOfColor(design.colorPicker(0xffffff))), world.scene().origin)
     sphereshape = design.sphereShape(2)
 ```
 

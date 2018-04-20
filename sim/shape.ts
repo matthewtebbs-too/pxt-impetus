@@ -7,67 +7,70 @@
 /// <reference path="_runtime.ts"/>
 
 namespace pxsim {
-    export class Shape3dImpl<T extends THREE.Geometry | THREE.BufferGeometry> extends rt.ProxyObjectWithId<T> implements Shape3d {
-        public static instantiate(reference: THREE.Geometry | THREE.BufferGeometry) {
-            return new Shape3dImpl(reference);
-        }
+    export function ShapeMixin<T extends rt.ObjectConstructor<THREE.BufferGeometry>>(base: T) {
+        return rt.DisposableObjectMixin(class extends base implements rt.ICloneableObject {
+            protected static _radialSegments = 32;
+            protected static _collisionMargin = 0.05;
 
-        protected static _radialSegments = 32;
-        protected static _collisionMargin = 0.05;
+            private _volume = 0;
+            private _ctorCollisionShape: (() => Ammo.btCollisionShape) | null = null;
 
-        private _volume = 0;
-        private _ctorCollisionShape: (() => Ammo.btCollisionShape) | null = null;
+            public get volume(): number {
+                return this._volume;
+            }
 
-        public get volume(): number {
-            return this._volume;
-        }
+            public createCollisionShape(): Ammo.btCollisionShape | null {
+                return this._ctorCollisionShape ? this._ctorCollisionShape() : null;
+            }
 
-        public createCollisionShape(): Ammo.btCollisionShape | null {
-            return this._ctorCollisionShape ? this._ctorCollisionShape() : null;
-        }
+            public copy(source: this): this {
+                super.copy(source);
 
-        public _onDispose() {
-            /* do nothing */
-        }
+                throw new Error();
+            }
 
-        protected _setShapeVolume(volume: number) {
-            this._volume = volume;
-        }
+            protected _setShapeVolume(volume: number) {
+                this._volume = volume;
+            }
 
-        protected _setCtorCollisionShape(ctor: () => Ammo.btCollisionShape) {
-            this._ctorCollisionShape = ctor;
-        }
+            protected _setCtorCollisionShape(ctor: () => Ammo.btCollisionShape) {
+                this._ctorCollisionShape = ctor;
+            }
 
-        protected _getBounds(target: THREE.Vector3): THREE.Vector3 {
-            this.reference.computeBoundingBox();
+            protected _getBounds(target: THREE.Vector3): THREE.Vector3 {
+                this.computeBoundingBox();
 
-            return this.reference.boundingBox.getSize(target);
-        }
+                return this.boundingBox.getSize(target);
+            }
 
-        protected _createCollisionShapeFromHalfExtents(ctor: (bthalfextents: Ammo.btVector3) => Ammo.btCollisionShape): Ammo.btCollisionShape {
-            const bthalfextents = Helper.btVector3FromThree(this._getBounds(new THREE.Vector3()).divideScalar(2));
+            protected _createCollisionShapeFromHalfExtents(ctor: (bthalfextents: Ammo.btVector3) => Ammo.btCollisionShape): Ammo.btCollisionShape {
+                const bthalfextents = Helper.btVector3FromThree(this._getBounds(new THREE.Vector3()).divideScalar(2));
 
-            const btshape = ctor(bthalfextents);
-            btshape.setMargin(Shape3dImpl._collisionMargin);
+                const btshape = ctor(bthalfextents);
+                btshape.setMargin(Shape3d._collisionMargin);
 
-            Helper.safeAmmoObjectDestroy(bthalfextents);
+                Helper.safeAmmoObjectDestroy(bthalfextents);
 
-            return btshape;
-        }
+                return btshape;
+            }
+        });
     }
 
-    export class PlaneShape3d extends Shape3dImpl<THREE.PlaneBufferGeometry> {
+    export class Shape3d extends ShapeMixin(THREE.BufferGeometry) { }
+
+    export class PlaneShape3d extends ShapeMixin(THREE.PlaneBufferGeometry) {
         constructor(width?: number, height?: number) {
             width = width || 100;
             height = height || 100;
 
-            super(new THREE.PlaneBufferGeometry(width, height).rotateX(-Math.PI / 2) as THREE.PlaneBufferGeometry);
+            super(width, height);
 
+            this.rotateX(-Math.PI / 2);
             this._setCtorCollisionShape(() => this._createCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btBoxShape(bthalfextents)));
         }
     }
 
-    export class BoxShape3d extends Shape3dImpl<THREE.BoxBufferGeometry> {
+    export class BoxShape3d extends ShapeMixin(THREE.BoxBufferGeometry) {
         constructor(
             width?: number,
             height?: number,
@@ -78,14 +81,14 @@ namespace pxsim {
             height = height || 1;
             depth = depth || 1;
 
-            super(new THREE.BoxBufferGeometry(width, height, depth));
+            super(width, height, depth);
 
             this._setShapeVolume(width * height * depth);
             this._setCtorCollisionShape(() => this._createCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btBoxShape(bthalfextents)));
         }
     }
 
-    export class CylinderShape3d extends Shape3dImpl<THREE.CylinderBufferGeometry> {
+    export class CylinderShape3d extends ShapeMixin(THREE.CylinderBufferGeometry) {
         constructor(
             radius?: number,
             height?: number,
@@ -94,34 +97,33 @@ namespace pxsim {
             radius = radius || .5;
             height = height || 1;
 
-            super(new THREE.CylinderBufferGeometry(radius, radius, height, Shape3dImpl._radialSegments, 1, openEnded || false));
+            super(radius, radius, height, Shape3d._radialSegments, 1, openEnded || false);
 
             this._setShapeVolume(Math.PI * Math.pow(radius, 2) * height);
             this._setCtorCollisionShape(() => this._createCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btCylinderShape(bthalfextents)));
         }
     }
 
-    export class SphereShape3d extends Shape3dImpl<THREE.SphereBufferGeometry> {
+    export class SphereShape3d extends ShapeMixin(THREE.SphereBufferGeometry) {
         constructor(radius?: number) {
             radius = radius || .5;
 
-            super(new THREE.SphereBufferGeometry(radius, Shape3dImpl._radialSegments, Shape3dImpl._radialSegments));
+            super(radius, Shape3d._radialSegments, Shape3d._radialSegments);
 
             this._setShapeVolume(4 / 3 * Math.PI * Math.pow(radius, 3));
             this._setCtorCollisionShape(() => new Ammo.btSphereShape(radius!));
         }
     }
 
-    export class ConeShape3d extends Shape3dImpl<THREE.ConeBufferGeometry> {
+    export class ConeShape3d extends ShapeMixin(THREE.ConeBufferGeometry) {
         constructor(radius?: number, height?: number) {
             radius = radius || .5;
             height = height || 1;
 
-            super(new THREE.ConeBufferGeometry(radius, height, Shape3dImpl._radialSegments));
+            super(radius, height, Shape3d._radialSegments);
 
             this._setShapeVolume(Math.PI * Math.pow(radius, 2) * height / 3);
             this._setCtorCollisionShape(() => new Ammo.btConeShape(radius!, height!));
-
         }
     }
 }

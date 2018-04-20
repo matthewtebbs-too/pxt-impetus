@@ -7,131 +7,116 @@
 /// <reference path="_runtime.ts"/>
 
 namespace pxsim {
-    interface IUserDataObject3d {
-        _rigidbody: RigidBody | null;
+    export function Object3dMixin<T extends rt.ObjectConstructor<THREE.Object3D>>(base: T) {
+        return rt.DisposableObjectMixin(class extends base implements rt.ICloneableObject {
+            protected _rigidbody: RigidBody | null = null;
+
+            constructor(...args: any[]) {
+                super(...args);
+
+                if (undefined !== this.castShadow) {
+                    this.castShadow = true;
+                }
+
+                if (undefined !== this.receiveShadow) {
+                    this.receiveShadow = true;
+                }
+            }
+
+            public get position_(): Vector {
+                return this.position;
+            }
+
+            public set position_(position: Vector) {
+                this.position.copy(position);
+            }
+
+            public get rotation_(): Vector {
+                const rotation = this.rotation.toVector3();
+                return new VectorConstructor(THREE.Math.radToDeg(rotation.x), THREE.Math.radToDeg(rotation.y), THREE.Math.radToDeg(rotation.z));
+            }
+
+            public set rotation_(rotation: Vector) {
+                this.rotation.setFromVector3(new VectorConstructor(THREE.Math.degToRad(rotation.x), THREE.Math.degToRad(rotation.y), THREE.Math.degToRad(rotation.z)));
+            }
+
+            public get quaternion_(): Quaternion {
+                return this.quaternion;
+            }
+
+            public set quaternion_(quaternion: Quaternion) {
+                this.quaternion.copy(quaternion);
+            }
+
+            public get scale_(): Vector {
+                return this.scale;
+            }
+
+            public set scale_(scale: Vector) {
+                this.scale.copy(scale);
+            }
+
+            public setRotationFromAxisAngle(axis: Vector, angle: number) {
+                if (!axis) {
+                    return;
+                }
+
+                this.setRotationFromAxisAngle(axis, THREE.Math.degToRad(angle));
+            }
+
+            public setPhysicsEnabled(enable: boolean) {
+                if (this._rigidbody) {
+                    this._rigidbody.isKinematic = !enable;
+                }
+            }
+
+            public lookAtPosition(position: Vector) {
+                if (!position) {
+                    return;
+                }
+
+                this.lookAt(position);
+            }
+
+            public animate(timeStep: number) {
+                this.children.forEach(child => (child as Object3d).animate(timeStep));
+
+                if (this._rigidbody) {
+                    this._rigidbody.syncMotionStateToObject3d();
+                }
+            }
+
+            public onAdded(scene3d: Scene3d) {
+                if (this._rigidbody) {
+                    this._rigidbody.addRigidBody(scene3d.physicsWorld);
+                }
+
+                this.children.forEach(child => (child as Object3d).onAdded(scene3d));
+            }
+
+            public onRemoved(scene3d: Scene3d) {
+                this.children.forEach(child => (child as Object3d).onRemoved(scene3d));
+
+                if (this._rigidbody) {
+                    this._rigidbody.removeRigidBody(scene3d.physicsWorld);
+                }
+            }
+
+            public copy(source: this, recursive?: boolean): this {
+                super.copy(source, recursive);
+
+                throw Error();
+            }
+
+            protected _onDispose() {
+                this.children.forEach(child => (child as Object3d).dispose());
+
+                Helper.safeObjectDispose(this._rigidbody);
+            }
+        });
     }
 
-    export class Object3dImpl<T extends THREE.Object3D> extends rt.ProxyObjectWithId<T> implements Object3d {
-        public static instantiate(reference: THREE.Object3D) {
-            return new Object3dImpl(reference);
-        }
-
-        protected static _applyFnToUserData(reference: THREE.Object3D, fn: (udo3d: IUserDataObject3d) => void) {
-            reference.children.forEach(childreference => Object3dImpl._applyFnToUserData(childreference, fn));
-
-            const udo3d = Helper.getUserData<IUserDataObject3d>(reference, Object3dImpl._propertyUserData);
-            if (udo3d) {
-                fn(udo3d);
-            }
-        }
-
-        private static _propertyUserData = 'udo3d';
-
-        protected get _rigidbody(): RigidBody | null {
-            const udo3d = Helper.getUserData<IUserDataObject3d>(this.reference, Object3dImpl._propertyUserData);
-            return udo3d ? udo3d._rigidbody : null;
-        }
-
-        protected set _rigidbody(rigidbody: RigidBody | null) {
-            const udo3d = Helper.getUserData<IUserDataObject3d>(this.reference, Object3dImpl._propertyUserData);
-            if (udo3d) {
-                udo3d._rigidbody = rigidbody;
-            }
-        }
-
-        constructor(reference: T) {
-            super(reference);
-
-            // tslint:disable-next-line:no-string-literal
-            this.reference.userData[Object3dImpl._propertyUserData] = {
-                rigidbody: null,
-            };
-
-            if (undefined !== this.reference.castShadow) {
-                this.reference.castShadow = true;
-            }
-
-            if (undefined !== this.reference.receiveShadow) {
-                this.reference.receiveShadow = true;
-            }
-        }
-
-        public lookAt(position: Vector)  {
-            if (!position) {
-                return;
-            }
-
-            this.reference.lookAt(position);
-        }
-
-        public setPosition(position: Vector) {
-            if (!position) {
-                return;
-            }
-
-            this.reference.position.set(position.x, position.y, position.z);
-        }
-
-        public setRotation(rotation: Vector) {
-            if (!rotation) {
-                return;
-            }
-
-            this.reference.rotation.set(THREE.Math.degToRad(rotation.x), THREE.Math.degToRad(rotation.y), THREE.Math.degToRad(rotation.z));
-        }
-
-        public setScale(scale: Vector) {
-            this.reference.scale.set(scale.x, scale.y, scale.z);
-        }
-
-        public setRotationFromAxisAngle(axis: Vector, angle: number) {
-            if (!axis) {
-                return;
-            }
-
-            this.reference.setRotationFromAxisAngle(axis, THREE.Math.degToRad(angle));
-        }
-
-        public setPhysicsEnabled(enable: boolean) {
-            if (this._rigidbody) {
-                this._rigidbody.isKinematic = !enable;
-            }
-        }
-
-        public animate(timeStep: number) {
-            Object3dImpl._applyFnToUserData(this.reference, udo3d => {
-                if (udo3d._rigidbody) {
-                    udo3d._rigidbody.syncMotionStateToObject3d();
-                }
-            });
-        }
-
-        public onAdded(scene3d: Scene3dImpl) {
-            if (this._rigidbody) {
-                this._rigidbody.addRigidBody(scene3d.physicsWorld);
-            }
-        }
-
-        public onRemoved(scene3d: Scene3dImpl) {
-            if (this._rigidbody) {
-                this._rigidbody.removeRigidBody(scene3d.physicsWorld);
-            }
-        }
-
-        protected _constructRigidBody(): RigidBody | null {
-            return null;
-        }
-
-        protected _onDispose() {
-            Object3dImpl._applyFnToUserData(this.reference, udo3d => {
-                if (udo3d._rigidbody) {
-                    udo3d._rigidbody.dispose();
-                }
-            });
-
-            delete this.reference.userData.udo3d;
-        }
-    }
+    export class Object3d extends Object3dMixin(THREE.Object3D) { }
 }
 
 namespace pxsim.object {

@@ -5,6 +5,7 @@
 */
 
 /// <reference path='impetus.enums.d.ts'/>
+/// <reference path='impetus.math.d.ts'/>
 
 declare namespace fieldeditors {
     /**
@@ -43,54 +44,40 @@ declare namespace loops {
 declare namespace logic {
 }
 
-//% blockNamespace=vector
-declare class Vector {
-    //% blockId=vector_x
-    //% block="vector% x"
-    //% shim=.x property
-    readonly x: number;
-
-    //% shim=.toString
-    toString(): string;
-}
-
 //% blockNamespace=object
-declare interface Object3d {
+declare class Object3d {
     /**
-     * Look at.
-     * @param position Vector
+     * Object position.
      */
-    //% blockId=object3d_look_at
-    //% block="%object3d|look at %position=math_vector"
-    //% shim=.lookAt
-    lookAt(position: Vector): void;
-    
-    /**
-     * Set object position.
-     * @param position Vector
-     */
-    //% blockId=object3d_set_position
-    //% block="set %object3d position|at %position=math_vector"
-    //% shim=.setPosition
-    setPosition(position: Vector): void;
+    //% blockCombine
+    //% blockCombineShadow=math_zero_vector
+    //% shim=.position_ property
+    position: Vector;
 
     /**
-     * Set object rotation.
-     * @param rotation Vector
+     * Object rotation.
      */
-    //% blockId=object3d_set_rotation
-    //% block="set %object3d rotation|to %rotation=math_unit_vector"
-    //% shim=.setRotation
-    setRotation(rotation: Vector): void;
+    //% blockCombine
+    //% blockCombineShadow=math_zero_vector
+    //% shim=.rotation_ property
+    rotation: Vector;
 
     /**
-     * Set object scale.
-     * @param scale Vector
+     * Object quarternion.
      */
-    //% blockId=object3d_set_scale
-    //% block="set %object3d scale|to %scale=math_unit_vector"
-    //% shim=.setScale
-    setScale(scale: Vector): void;
+    //% blockCombine
+    //% blockCombineShadow=math_zero_quaternion
+    //% shim=.quaternion_ property
+    //% advanced=true
+    quaternion: Quaternion;
+
+    /**
+     * Object scale.
+     */
+    //% blockCombine
+    //% blockCombineShadow=math_unit_vector
+    //% shim=.scale_ property
+    scale: Vector;
 
     /**
      * Rotate object by angle around axis.
@@ -110,6 +97,15 @@ declare interface Object3d {
     //% block="set %object3d physics %enabled=fieldeditors_toggleOnOff"
     //% shim=.setPhysicsEnabled
     setPhysicsEnabled(enabled: boolean): void;
+
+    /**
+     * Look at.
+     * @param position Vector
+     */
+    //% blockId=object3d_look_at
+    //% block="%object3d|look at %position=math_vector"
+    //% shim=.lookAtPosition
+    lookAtPosition(position: Vector): void;
 }
 
 //%
@@ -117,7 +113,7 @@ declare class Color {
 }
 
 //%
-declare interface Shape3d {
+declare class Shape3d {
 }
 
 //% color="#2680d9" icon="\uf1fc" block="Design" weight=100
@@ -267,32 +263,32 @@ declare namespace design {
 }
 
 //% blockNamespace=design
-declare interface Material {
+declare class Material {
     //% blockCombine
     //% blockCombineShadow=color_picker
     //% group="Material"
-    //% shim=material::color property
+    //% shim=.color property
     color: Color;
 
     //% blockCombine
     //% blockCombineShadow=color_picker
     //% group="Material"
-    //% shim=material::emissive property
+    //% shim=.emissive property
     emissive: Color;
 
     //% blockCombine
     //% group="Material"
-    //% shim=material::roughness property
+    //% shim=.roughness property
     roughness: number;
 
     //% blockCombine
     //% group="Material"
-    //% shim=material::metalness property
+    //% shim=.metalness property
     metalness: number;
 
     //% blockCombine
     //% group="Material"
-    //% shim=material::density property
+    //% shim=.density property
     density: number;
 }
 
@@ -329,11 +325,11 @@ declare namespace object { /* cube icon */
 }
 
 //%
-declare interface Light extends Object3d {
+declare class Light extends Object3d {
 }
 
 //%
-declare interface Camera extends Object3d {
+declare class Camera extends Object3d {
 }
 
 //% color="#ffffff" icon="\uf030" block="Camera" weight=96
@@ -341,51 +337,49 @@ declare namespace camera { /* camera icon */
 }
 
 //%
-declare interface Mesh3d extends Object3d {
+declare class Mesh3d extends Object3d {
 }
 
 //% blockNamespace=scene
-declare interface Scene3d extends Object3d {
+declare class Scene3d extends Object3d {
     /**
      * Active camera.
      */
     //% blockCombine
     //% blockCombineShadow=world_scene
-    //% shim=scene::camera
+    //% shim=.camera property
     camera: Camera;
 
     /**
      * Origin.
      */
     //% blockCombine
-    //% shim=scene::origin
+    //% shim=.origin property
     readonly origin: Vector;
 
     /**
-     * Set background color.
-     * @param color Color
+     * Background color.
      */
-    //% blockId=set_background_color
-    //% block="set %scene=world_scene|background %color=color_picker"
-    //% shim=.setBackgroundColor
-    setBackgroundColor(color: Color): void;
+    //% blockCombine
+    //% blockCombineShadow=color_picker
+    //% shim=.backgroundColor property
+    backgroundColor: Color;
 
     /**
-     * Set ambient light color.
-     * @param color Color
+     * Ambient light color.
      */
-    //% blockId=set_ambientlight_color
-    //% block="set %scene=world_scene|ambient light %color=color_picker"
-    //% shim=.setAmbientLight
-    setAmbientLight(color: Color): void;
+    //% blockCombine
+    //% blockCombineShadow=color_picker
+    //% shim=.ambientColor property
+    ambientColor: Color;
 
     /**
      * Add object to scene.
      */
     //% blockId=add_object
     //% block="add to %scene=world_scene %object3d|at %position=world_origin"
-    //% shim=.add
-    add(object3d: Object3d, position: Vector): void;
+    //% shim=.addAt
+    addAt(object3d: Object3d, position: Vector): void;
 
     /**
      * Remove object from scene.

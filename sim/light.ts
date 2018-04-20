@@ -7,66 +7,69 @@
 /// <reference path="object.ts"/>
 
 namespace pxsim {
-    export class LightImpl<T extends THREE.Light> extends Object3dImpl<T> implements Light {
-        public static distFrustum = 100;
+    export function LightMixin<T extends rt.ObjectConstructor<THREE.Light>>(base: T) {
+        return class extends base {
+            public static distFrustum = 100;
 
-        protected _configureShadow() {
-            (this.reference.shadow.camera as THREE.OrthographicCamera).left = -LightImpl.distFrustum;
-            (this.reference.shadow.camera as THREE.OrthographicCamera).right = LightImpl.distFrustum;
-            (this.reference.shadow.camera as THREE.OrthographicCamera).top = LightImpl.distFrustum;
-            (this.reference.shadow.camera as THREE.OrthographicCamera).bottom = -LightImpl.distFrustum;
+            protected _configureShadow() {
+                if (this.shadow.camera instanceof THREE.OrthographicCamera) {
+                    (this.shadow.camera as THREE.OrthographicCamera).left = -Light.distFrustum;
+                    (this.shadow.camera as THREE.OrthographicCamera).right = Light.distFrustum;
+                    (this.shadow.camera as THREE.OrthographicCamera).top = Light.distFrustum;
+                    (this.shadow.camera as THREE.OrthographicCamera).bottom = -Light.distFrustum;
+                }
 
-            this.reference.shadow.bias = 0.0001;
-            this.reference.shadow.mapSize.width = 2048;
-            this.reference.shadow.mapSize.height = 2048;
+                this.shadow.bias = 0.0001;
+                this.shadow.mapSize.width = 2048;
+                this.shadow.mapSize.height = 2048;
+            }
+        };
+    }
+
+    export class Light extends LightMixin(Object3dMixin(THREE.Light)) { }
+
+    export class AmbientLight extends LightMixin(Object3dMixin(THREE.AmbientLight)) {
+        constructor(color?: Color, intensity?: number) {
+            super(color || Palette.SoftWhite, intensity || 1);
         }
     }
 
-    export class AmbientLight extends LightImpl<THREE.AmbientLight> {
+    export class DirectionalLight extends LightMixin(Object3dMixin(THREE.DirectionalLight)) {
         constructor(color?: Color, intensity?: number) {
-            super(new THREE.AmbientLight(color || Palette.SoftWhite, intensity || 1));
-        }
-    }
-
-    export class DirectionalLight extends LightImpl<THREE.DirectionalLight> {
-        constructor(color?: Color, intensity?: number) {
-            super(new THREE.DirectionalLight(color || Palette.White, intensity || 1));
+            super(color || Palette.White, intensity || 1);
 
             this._configureShadow();
         }
     }
 
-    export class HemisphereLight extends LightImpl<THREE.HemisphereLight> {
+    export class HemisphereLight extends LightMixin(Object3dMixin(THREE.HemisphereLight)) {
         constructor(colorSky?: Color, colorGround?: Color, intensity?: number) {
-            super(new THREE.HemisphereLight(colorSky || NaturePalette.Sky, colorGround || NaturePalette.Ground, intensity || 0.6));
+            super(colorSky || NaturePalette.Sky, colorGround || NaturePalette.Ground, intensity || 0.6);
         }
     }
 
-    export class PointLight extends LightImpl<THREE.PointLight> {
+    export class PointLight extends LightMixin(Object3dMixin(THREE.PointLight)) {
         constructor(
             color?: Color, intensity?: number,
             distance?: number,
             decay?: number,
         ) {
-            super(new THREE.PointLight(color || Palette.White, intensity || 1, distance || 0, decay || 2));
+            super(color || Palette.White, intensity || 1, distance || 0, decay || 2);
 
             this._configureShadow();
         }
     }
 
-    export class SpotLight extends LightImpl<THREE.SpotLight> {
+    export class SpotLight extends LightMixin(Object3dMixin(THREE.SpotLight)) {
         constructor(
             color?: Color, intensity?: number,
             distance?: number, angle?: number,
             penumbra?: number, decay?: number,
         ) {
             super(
-                new THREE.SpotLight
-                (
-                    color || Palette.White, intensity || 1,
-                    distance || 0, angle || Math.PI / 3,
-                    penumbra || 0, decay || 2,
-                ),
+                color || Palette.White, intensity || 1,
+                distance || 0, angle || Math.PI / 3,
+                penumbra || 0, decay || 2,
             );
 
             this._configureShadow();

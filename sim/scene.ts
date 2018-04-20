@@ -7,37 +7,33 @@
 /// <reference path='object.ts'/>
 
 namespace pxsim {
-    export class Scene3dImpl extends Object3dImpl<THREE.Scene> implements Scene3d {
+    export class Scene3d extends Object3dMixin(THREE.Scene) {
         private _ambientlight: AmbientLight;
-        private _camera: CameraImpl<THREE.Camera>;
+        private _camera: Camera;
 
         private _physicsworld: PhysicsWorld = new PhysicsWorld();
 
         private _raycaster: THREE.Raycaster;
-        private _controls: THREE.OrbitControls | null = null;
-
-        public get ambientLight(): AmbientLight {
-            return this._ambientlight;
-        }
+        private _controls: THREE.OrbitControls;
 
         public get physicsWorld(): PhysicsWorld {
             return this._physicsworld;
         }
 
         constructor() {
-            super(new THREE.Scene());
+            super();
 
-            this.reference.background = new THREE.Color(Palette.LightGray);
+            this.background = new ColorConstructor(Palette.LightGray);
 
             this._ambientlight = new AmbientLight();
-            this.add(this._ambientlight, math3d.zeroVector());
+            this.addAt(this._ambientlight, math3d.zeroVector());
 
             this._camera = new PerspectiveCamera();
-            this.add(this._camera, new Vector(-40, 20, 15));
+            this.addAt(this._camera, new VectorConstructor(-40, 20, 15));
 
             this._raycaster = new THREE.Raycaster();
 
-            this._controls = new THREE.OrbitControls(this._camera.reference);
+            this._controls = new THREE.OrbitControls(this._camera);
             this._controls.target.set(0, 2, 0);
             this._controls.update();
         }
@@ -46,48 +42,51 @@ namespace pxsim {
             return math3d.zeroVector();
         }
 
-        public get camera(): CameraImpl<THREE.Camera> {
+        public get camera(): Camera {
             return this._camera;
         }
 
-        public set camera(camera: CameraImpl<THREE.Camera>) {
+        public set camera(camera: Camera) {
             this._camera = camera;
         }
 
-        public setBackgroundColor(value: Color)  {
-            if (!value) {
-                return;
-            }
-
-            this.reference.background = value;
+        public get backgroundColor(): Color {
+            return this.background;
         }
 
-        public setAmbientLight(value: Color)  {
-            if (!value) {
-                return;
-            }
-
-            this.ambientLight.reference.color = value;
+        public set backgroundColor(color: Color) {
+            this.background = color;
         }
 
-        public add(object3d: Object3dImpl<THREE.Object3D>, position: Vector) {
+        public get ambientColor(): Color {
+            return this._ambientlight.color;
+        }
+
+        public set ambientColor(color: Color) {
+            this._ambientlight.color = color;
+        }
+
+        public addAt(object3d: Object3d, position: Vector) {
             if (!object3d) {
                 return;
             }
 
-            object3d.setPosition(position);
-
-            this.reference.add(object3d.reference);
-            object3d.onAdded(this);
+            object3d.position.copy(position);
+            this.add(object3d);
         }
 
-        public remove(object3d: Object3dImpl<THREE.Object3D>) {
-            if (!object3d) {
-                return;
+        public add(...objects3d: Object3d[]) {
+            if (objects3d) {
+                super.add(...objects3d);
+                objects3d.forEach(object3d => object3d.onAdded(this));
             }
+        }
 
-            object3d.onRemoved(this);
-            this.reference.remove(object3d.reference);
+        public remove(object3d: Object3d) {
+            if (object3d) {
+                object3d.onRemoved(this);
+                super.remove(object3d);
+            }
         }
 
         public animate(timeStep: number) {
@@ -103,14 +102,20 @@ namespace pxsim {
                 return null;
             }
 
-            this._raycaster.setFromCamera(new THREE.Vector2(x, y), this._camera.reference);
-            const intersections = this._raycaster.intersectObjects(this.reference.children);
+            this._raycaster.setFromCamera(new THREE.Vector2(x, y), this._camera);
+            const intersections = this._raycaster.intersectObjects(this.children);
 
-            return intersections.length > 0 ? intersections.map(intersection => Object3dImpl.instantiate(intersection.object)) : null;
+            return intersections ? intersections.map(intersection => intersection.object as any) : null;
         }
 
         public setPhysicsEnabled(enable: boolean) {
             /* TODO$: */
+        }
+
+        public copy(source: this, recursive?: boolean): this {
+            super.copy(source, recursive);
+
+            throw Error();
         }
 
         protected _onDispose() {
@@ -122,18 +127,6 @@ namespace pxsim {
 }
 
 namespace pxsim.scene {
-    export function camera(scene3d: Scene3d, value?: Camera): Camera {
-        if (value) {
-            scene3d.camera = value;
-        }
-
-        return scene3d.camera;
-    }
-
-    export function origin(): Vector  {
-        return pxsim.math3d.zeroVector();
-    }
-
     export function intersectedObjectAt(x: number, y: number): Object3d | null {
         const scene3d = pxsim.world.scene();
         const objects = scene3d ? scene3d.intersectedObjects(x, y) : null;

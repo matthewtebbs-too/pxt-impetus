@@ -30,7 +30,41 @@ namespace rt {
         copy(source: this, recursive?: boolean): this;
     }
 
-    export abstract class DisposableObject implements IDisposableObject {
+    export interface INameableObjectWithId extends IObjectWithId, INameableObject {
+    }
+
+    export function getUserData<T>(object: rt.IObjectWithUserData, key: string): T | undefined {
+        // tslint:disable-next-line:no-string-literal
+        return object.userData[key] as T;
+    }
+
+    export function setUserData<T>(object: rt.IObjectWithUserData, key: string, data?: T) {
+        // tslint:disable-next-line:no-string-literal
+        object.userData[key] = data;
+    }
+
+    export type ObjectConstructor<T = {}> = new (...args: any[]) => T;
+
+    export type ObjectCreator<T> = (parameters?: any) => T;
+
+    export function DisposableObjectMixin<T extends rt.ObjectConstructor>(base: T) {
+        return class extends base {
+            private _isDisposed = false;
+
+            public dispose() {
+                if (!this._isDisposed) {
+                    this._onDispose();
+                    this._isDisposed = true;
+                }
+            }
+
+            protected _onDispose(): void {
+                /* do nothing */
+            }
+        };
+    }
+
+    export abstract class DisposableObject {
         private _isDisposed = false;
 
         public dispose() {
@@ -54,27 +88,6 @@ namespace rt {
             this._reference = reference;
         }
     }
-
-    export interface INameableObjectWithId extends IObjectWithId, INameableObject {
-    }
-
-    export abstract class ProxyObjectWithId<T extends IObjectWithId> extends ProxyObject<T> {
-        public get id() {
-            return this.reference.id;
-        }
-    }
-
-    export abstract class ProxyNameableObjectWithId<T extends INameableObjectWithId> extends ProxyObjectWithId<T> {
-        public get name() {
-            return this.reference.name;
-        }
-
-        public set name(name: string) {
-            this.reference.name = name;
-        }
-    }
-
-    export type ObjectCreator<T> = (parameters?: any) => T;
 
     export class ObjectFactory<T> {
         public static forgetAllInstances() {

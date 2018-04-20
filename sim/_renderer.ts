@@ -26,8 +26,8 @@ namespace pxsim {
 
         private _domElement: HTMLElement = document.createElement('div');
 
-        private _scene3d: Scene3dImpl | null = null;
-        private _camera: CameraImpl<THREE.Camera> | null = null;
+        private _scene3d: Scene3d | null = null;
+        private _camera: Camera | null = null;
         private _stats: Stats = new Stats();
 
         private _clock: THREE.Clock = new THREE.Clock();
@@ -44,11 +44,11 @@ namespace pxsim {
             return this._domElement;
         }
 
-        public get scene(): Scene3dImpl | null {
+        public get scene(): Scene3d | null {
             return this._scene3d;
         }
 
-        public set scene(value: Scene3dImpl | null) {
+        public set scene(value: Scene3d | null) {
             this._scene3d = value;
             this._updateSceneCameraSize();
         }
@@ -73,25 +73,37 @@ namespace pxsim {
             this.reference.shadowMap.type = THREE.PCFSoftShadowMap;
             this.reference.setClearColor(Palette.LightCyan);
 
-            this._runRenderLoop();
+            this.runRenderLoop();
         }
 
-        public animate() {
-            if (!this._scene3d) {
-                return;
-            }
+        public runRenderLoop() {
+            this._callbackRequestId = requestAnimationFrame((time: number) => {
+                if (!this._paused) {
+                    if (this._stats) {
+                        this._stats.begin();
+                    }
 
-            this._scene3d.animate(this._clock.getDelta());
+                    if (this._scene3d) {
+                        this._scene3d.animate(this._clock.getDelta());
+
+                        if (this._scene3d.camera) {
+                            this.reference.render(this._scene3d, this._scene3d.camera);
+                        }
+                    }
+
+                    if (this._stats) {
+                        this._stats.end();
+                    }
+                }
+
+                this.runRenderLoop();
+            });
         }
 
-        public render() {
-            if (!this._scene3d) {
-                return;
-            }
-
-            const camera = this._scene3d.camera;
-            if (camera) {
-                this.reference.render(this._scene3d.reference, camera.reference);
+        public stopRenderLoop() {
+            if (0 !== this._callbackRequestId) {
+                cancelAnimationFrame(this._callbackRequestId);
+                this._callbackRequestId = 0;
             }
         }
 
@@ -100,10 +112,6 @@ namespace pxsim {
             this.reference.setSize(width, height);
 
             this._updateSceneCameraSize();
-        }
-
-        protected _onDispose() {
-            this._stopRenderLoop();
         }
 
         protected _updateSceneCameraSize() {
@@ -118,30 +126,8 @@ namespace pxsim {
             }
         }
 
-        private _runRenderLoop() {
-            this._callbackRequestId = requestAnimationFrame((time: number) => {
-                if (!this._paused) {
-                    if (this._stats) {
-                        this._stats.begin();
-                    }
-
-                    this.animate();
-                    this.render();
-
-                    if (this._stats) {
-                        this._stats.end();
-                    }
-                }
-
-                this._runRenderLoop();
-            });
-        }
-
-        private _stopRenderLoop() {
-            if (0 !== this._callbackRequestId) {
-                cancelAnimationFrame(this._callbackRequestId);
-                this._callbackRequestId = 0;
-            }
+        protected _onDispose() {
+            this.stopRenderLoop();
         }
     }
 }

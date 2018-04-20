@@ -4,6 +4,20 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
+//% blockNamespace=Math
+declare class Vector {
+    //% group="Vector"
+    //% shim=.vectorToString
+    toString(): string;
+}
+
+//% blockNamespace=Math
+declare class Quaternion {
+    //% group="Quaternion"
+    //% shim=.quaternionToString
+    toString(): string;
+}
+
 //@ts-ignore
 declare namespace Math {
     /**
@@ -16,7 +30,6 @@ declare namespace Math {
     //% block="X %x|Y %y|Z %z"
     //% group="Vector"
     //% shim=math3d::vector
-    //@ts-ignore
     function vector(x?: number, y?: number, z?: number): Vector;
 
     /**
@@ -26,7 +39,6 @@ declare namespace Math {
     //% block="zero vector"
     //% group="Vector"
     //% shim=math3d::zeroVector
-    //@ts-ignore
     function zeroVector(): Vector;
 
     /**
@@ -36,7 +48,6 @@ declare namespace Math {
     //% block="unit vector"
     //% group="Vector"
     //% shim=math3d::unitVector
-    //@ts-ignore
     function unitVector(): Vector;
 
     /**
@@ -49,7 +60,6 @@ declare namespace Math {
     //% block="%a=math_unit_vector|%op|%b=math_unit_vector"
     //% group="Vector"
     //% shim=math3d::vectorOp
-    //@ts-ignore
     function vectorOp(a: Vector, op: MathOp, b: Vector): Vector;
 
     /**
@@ -62,8 +72,17 @@ declare namespace Math {
     //% block="%a=math_unit_vector|%op|scalar %s"
     //% group="Vector"
     //% shim=math3d::vectorScalarOp
-    //@ts-ignore
     function vectorScalarOp(a: Vector, op: MathOp, s: number): Vector;
+
+    /**
+     * Zero quaternion.
+     */
+    //% blockId=math_zero_quaternion
+    //% block="zero quaternion"
+    //% group="Quaternion"
+    //% shim=math3d::zeroQuaternion
+    //% advanced=true
+    function zeroQuaternion(): Quaternion;
 
     /**
      * Convert degress to radians.

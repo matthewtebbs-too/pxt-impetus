@@ -7,7 +7,7 @@
 /// <reference path="_runtime.ts"/>
 
 namespace pxsim {
-    export class World3dImpl extends rt.DisposableObject {
+    export class World3d extends rt.DisposableObject {
         protected static _sidFromMouseButtonEvent(event: MouseEvent): ScopeId | undefined {
             let sid;
 
@@ -24,17 +24,17 @@ namespace pxsim {
 
         private _renderer: Renderer;
 
-        private _scene: Scene3dImpl;
+        private _scene: Scene3d;
 
         public get renderer(): Renderer {
             return this._renderer;
         }
 
-        public get scene(): Scene3dImpl {
+        public get scene(): Scene3d {
             return this._scene;
         }
 
-        public set scene(scene: Scene3dImpl) {
+        public set scene(scene: Scene3d) {
             this._scene = scene;
         }
 
@@ -43,7 +43,7 @@ namespace pxsim {
 
             this._renderer = new Renderer(id);
 
-            this._scene = new Scene3dImpl();
+            this._scene = new Scene3d();
             this._updateRendererScene();
 
             const container = document.getElementById(this._renderer.id as string);
@@ -74,9 +74,9 @@ namespace pxsim {
                 container.innerHTML = '';
             }
 
-            Helper.safeObjectDispose(this._renderer.scene); /* TODO$: put someplace else */
-
-            this._renderer.dispose();
+            /* TODO$: put somewhere else */
+            Helper.safeObjectDispose(this._renderer.scene);
+            Helper.safeObjectDispose(this._renderer);
         }
 
         protected _updateRendererScene() {
@@ -88,7 +88,7 @@ namespace pxsim {
         }
 
         protected _onDocumentMouseMove = (event: MouseEvent) => this._onDocumentMouseEvent(ScopeId.MouseDevice, EventId.Move, event);
-        protected _onDocumentMouseClick = (event: MouseEvent) => this._onDocumentMouseEvent(World3dImpl._sidFromMouseButtonEvent(event), EventId.Click, event);
+        protected _onDocumentMouseClick = (event: MouseEvent) => this._onDocumentMouseEvent(World3d._sidFromMouseButtonEvent(event), EventId.Click, event);
 
         protected _onDocumentMouseEvent = (sid: ScopeId | undefined, evid: EventId, event: MouseEvent) => {
             event.preventDefault();
@@ -106,11 +106,11 @@ namespace pxsim {
 }
 
 namespace pxsim.world {
-    export function world(): World3dImpl | null {
+    export function world(): World3d | null {
         return singletonWorldBoard().world;
     }
 
-    export function scene(): Scene3dImpl | null {
+    export function scene(): Scene3d | null {
         const world3d = pxsim.world.world();
         return world3d ? world3d.scene : null;
     }
