@@ -354,13 +354,6 @@ declare class Scene3d extends Object3d {
     camera: Camera;
 
     /**
-     * Origin.
-     */
-    //% blockCombine
-    //% shim=.origin property
-    readonly origin: Vector;
-
-    /**
      * Background color.
      */
     //% blockCombine
@@ -380,7 +373,7 @@ declare class Scene3d extends Object3d {
      * Add object to scene.
      */
     //% blockId=add_object
-    //% block="add to %scene=world_scene %object3d|at %position=world_origin"
+    //% block="add to %scene=world_scene %object3d|at %position=math_zero_vector"
     //% shim=.addAt
     addAt(object3d: Object3d, position: Vector): void;
 

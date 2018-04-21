@@ -38,10 +38,6 @@ namespace pxsim {
             this._controls.update();
         }
 
-        public get origin(): Vector {
-            return math3d.zeroVector();
-        }
-
         public get camera(): Camera {
             return this._camera;
         }

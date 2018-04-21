@@ -172,7 +172,7 @@
   "Palette.White|block": "white",
   "Palette.YellowGreen|block": "yellow green",
   "Palette.Yellow|block": "yellow",
-  "Scene3d.addAt|block": "add to %scene=world_scene %object3d|at %position=world_origin",
+  "Scene3d.addAt|block": "add to %scene=world_scene %object3d|at %position=math_zero_vector",
   "Scene3d.remove|block": "remove from %scene=world_scene %object3d",
   "SimplePalette.Black|block": "black",
   "SimplePalette.Blue|block": "blue",

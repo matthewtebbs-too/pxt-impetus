@@ -124,7 +124,6 @@
   "Scene3d.ambientColor": "Ambient light color.",
   "Scene3d.backgroundColor": "Background color.",
   "Scene3d.camera": "Active camera.",
-  "Scene3d.origin": "Origin.",
   "Scene3d.remove": "Remove object from scene.",
   "String": "Combine, split, and search text strings.\n\nCombine, split, and search text strings.",
   "String.charAt": "Return the character at the specified index.",
