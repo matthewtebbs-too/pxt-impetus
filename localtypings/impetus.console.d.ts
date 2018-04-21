@@ -4,6 +4,8 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
+/// <reference path='impetus.enums.d.ts'/>
+
 //% color="#002050" icon="\uf120" block="Console" weight=0
 //% advanced=true
 //@ts-ignore

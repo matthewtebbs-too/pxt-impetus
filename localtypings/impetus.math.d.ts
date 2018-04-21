@@ -4,6 +4,8 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
+/// <reference path='impetus.enums.d.ts'/>
+
 //% blockNamespace=Math
 declare class Vector {
     //% group="Vector"
