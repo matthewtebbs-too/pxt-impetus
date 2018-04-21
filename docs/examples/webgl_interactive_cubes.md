@@ -17,12 +17,12 @@ Hover over a floating cube.
     boxshape = design.boxShape(20, 20, 20)
     for (let i = 0; i < 2000; i++) {
         boxobject = object.fromShapeAndMaterial(boxshape, design.materialOfColor(design.randomColor()))
-        world.scene().addAt(boxobject, Math.vector(Math.randomRange(-400, 400), Math.randomRange(-400, 400), Math.randomRange(-400, 400)))
+        world.scene().addAt(boxobject, scene.randomPositionInCube(800));
     }
     scene.onAnimate(function (msec) {
         theta += 0.1 * msec / (1 / 60)
         world.scene().camera.position = Math.vector(100 * Math.sin(Math.degreesInRadians(theta)), 100 * Math.sin(Math.degreesInRadians(theta)), 100 * Math.cos(Math.degreesInRadians(theta)))
-        world.scene().camera.lookAtPosition(world.scene().origin)
+        world.scene().camera.lookAtPosition(Math.zeroVector())
         if (intersected) {
             object.materialOf(intersected).emissive = design.standardColor(Palette.Black)
         }
@@ -43,7 +43,4 @@ Hover over a floating cube.
     input.onMouseLeave(function () {
         mouseIn = false
     })
-```
-
-```package
 ```

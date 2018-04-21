@@ -6606,7 +6606,7 @@ var pxt;
             }
             Helpers.mkWhile = mkWhile;
             function mkComment(text) {
-                return mkStmt(mkText("// " + text));
+                return mkText("// " + text);
             }
             Helpers.mkComment = mkComment;
             function mkMultiComment(text) {
@@ -6632,7 +6632,7 @@ var pxt;
             }
             Helpers.mkMultiComment = mkMultiComment;
             function mkAssign(x, e) {
-                return mkStmt(mkSimpleCall("=", [x, e]));
+                return mkSimpleCall("=", [x, e]);
             }
             Helpers.mkAssign = mkAssign;
             function mkParenthesizedExpression(expression) {
@@ -8723,6 +8723,722 @@ var pxt;
         }
         streams.postPayloadAsync = postPayloadAsync;
     })(streams = pxt.streams || (pxt.streams = {}));
+})(pxt || (pxt = {}));
+var pxt;
+(function (pxt) {
+    var svgUtil;
+    (function (svgUtil) {
+        var PatternUnits;
+        (function (PatternUnits) {
+            PatternUnits[PatternUnits["userSpaceOnUse"] = 0] = "userSpaceOnUse";
+            PatternUnits[PatternUnits["objectBoundingBox"] = 1] = "objectBoundingBox";
+        })(PatternUnits = svgUtil.PatternUnits || (svgUtil.PatternUnits = {}));
+        var LengthUnit;
+        (function (LengthUnit) {
+            LengthUnit[LengthUnit["em"] = 0] = "em";
+            LengthUnit[LengthUnit["ex"] = 1] = "ex";
+            LengthUnit[LengthUnit["px"] = 2] = "px";
+            LengthUnit[LengthUnit["in"] = 3] = "in";
+            LengthUnit[LengthUnit["cm"] = 4] = "cm";
+            LengthUnit[LengthUnit["mm"] = 5] = "mm";
+            LengthUnit[LengthUnit["pt"] = 6] = "pt";
+            LengthUnit[LengthUnit["pc"] = 7] = "pc";
+            LengthUnit[LengthUnit["percent"] = 8] = "percent";
+        })(LengthUnit = svgUtil.LengthUnit || (svgUtil.LengthUnit = {}));
+        var BaseElement = /** @class */ (function () {
+            function BaseElement(type) {
+                this.el = elt(type);
+            }
+            BaseElement.prototype.attr = function (attributes) {
+                for (var at in attributes) {
+                    this.setAttribute(at, attributes[at]);
+                }
+                return this;
+            };
+            BaseElement.prototype.setAttribute = function (name, value) {
+                this.el.setAttribute(name, value.toString());
+                return this;
+            };
+            BaseElement.prototype.id = function (id) {
+                return this.setAttribute("id", id);
+            };
+            BaseElement.prototype.setClass = function () {
+                var classes = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    classes[_i] = arguments[_i];
+                }
+                return this.setAttribute("class", classes.join(" "));
+            };
+            BaseElement.prototype.appendClass = function (className) {
+                this.el.classList.add(className);
+                return this;
+            };
+            BaseElement.prototype.removeClass = function (className) {
+                this.el.classList.remove(className);
+            };
+            BaseElement.prototype.title = function (text) {
+                if (!this.titleElement) {
+                    this.titleElement = elt("title");
+                    // Title has to be the first child in the DOM
+                    if (this.el.firstChild) {
+                        this.el.insertBefore(this.titleElement, this.el.firstChild);
+                    }
+                    else {
+                        this.el.appendChild(this.titleElement);
+                    }
+                }
+                this.titleElement.textContent = text;
+            };
+            BaseElement.prototype.setVisible = function (visible) {
+                return this.setAttribute("visibility", visible ? "visible" : "hidden");
+            };
+            return BaseElement;
+        }());
+        svgUtil.BaseElement = BaseElement;
+        var DrawContext = /** @class */ (function (_super) {
+            __extends(DrawContext, _super);
+            function DrawContext() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            DrawContext.prototype.draw = function (type) {
+                var el = drawable(type /*FIXME?*/);
+                this.el.appendChild(el.el);
+                return el;
+            };
+            DrawContext.prototype.element = function (type, cb) {
+                cb(this.draw(type /*FIXME?*/));
+                return this;
+            };
+            DrawContext.prototype.group = function () {
+                var g = new Group();
+                this.el.appendChild(g.el);
+                return g;
+            };
+            DrawContext.prototype.appendChild = function (child) {
+                this.el.appendChild(child.el);
+            };
+            return DrawContext;
+        }(BaseElement));
+        svgUtil.DrawContext = DrawContext;
+        var SVG = /** @class */ (function (_super) {
+            __extends(SVG, _super);
+            function SVG(parent) {
+                var _this = _super.call(this, "svg") || this;
+                if (parent) {
+                    parent.appendChild(_this.el);
+                }
+                return _this;
+            }
+            SVG.prototype.define = function (cb) {
+                if (!this.defs) {
+                    this.defs = new DefsElement(this.el);
+                }
+                cb(this.defs);
+                return this;
+            };
+            return SVG;
+        }(DrawContext));
+        svgUtil.SVG = SVG;
+        var Group = /** @class */ (function (_super) {
+            __extends(Group, _super);
+            function Group(parent) {
+                var _this = _super.call(this, "g") || this;
+                if (parent) {
+                    parent.appendChild(_this.el);
+                }
+                return _this;
+            }
+            Group.prototype.translate = function (x, y) {
+                this.left = x;
+                this.top = y;
+                return this.updateTransform();
+            };
+            Group.prototype.scale = function (factor) {
+                this.scaleFactor = factor;
+                return this.updateTransform();
+            };
+            Group.prototype.updateTransform = function () {
+                var transform = "";
+                if (this.left != undefined) {
+                    transform += "translate(" + this.left + " " + this.top + ")";
+                }
+                if (this.scaleFactor != undefined) {
+                    transform += " scale(" + this.scaleFactor + ")";
+                }
+                this.setAttribute("transform", transform);
+                return this;
+            };
+            return Group;
+        }(DrawContext));
+        svgUtil.Group = Group;
+        var Pattern = /** @class */ (function (_super) {
+            __extends(Pattern, _super);
+            function Pattern() {
+                return _super.call(this, "pattern") || this;
+            }
+            Pattern.prototype.units = function (kind) {
+                return this.setAttribute("patternUnits", kind === PatternUnits.objectBoundingBox ? "objectBoundingBox" : "userSpaceOnUse");
+            };
+            Pattern.prototype.contentUnits = function (kind) {
+                return this.setAttribute("patternContentUnits", kind === PatternUnits.objectBoundingBox ? "objectBoundingBox" : "userSpaceOnUse");
+            };
+            Pattern.prototype.size = function (width, height) {
+                this.setAttribute("width", width);
+                this.setAttribute("height", height);
+                return this;
+            };
+            return Pattern;
+        }(DrawContext));
+        svgUtil.Pattern = Pattern;
+        var DefsElement = /** @class */ (function (_super) {
+            __extends(DefsElement, _super);
+            function DefsElement(parent) {
+                var _this = _super.call(this, "defs") || this;
+                parent.appendChild(_this.el);
+                return _this;
+            }
+            DefsElement.prototype.create = function (type, id) {
+                var el;
+                switch (type) {
+                    case "path":
+                        el = new Path();
+                        break;
+                    case "pattern":
+                        el = new Pattern();
+                        break;
+                    case "radialGradient":
+                        el = new RadialGradient();
+                        break;
+                    case "linearGradient":
+                        el = new LinearGradient();
+                        break;
+                    default: el = new BaseElement(type);
+                }
+                el.id(id);
+                this.el.appendChild(el.el);
+                return el;
+            };
+            return DefsElement;
+        }(BaseElement));
+        svgUtil.DefsElement = DefsElement;
+        var Drawable = /** @class */ (function (_super) {
+            __extends(Drawable, _super);
+            function Drawable() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            Drawable.prototype.at = function (x, y) {
+                this.setAttribute("x", x);
+                this.setAttribute("y", y);
+                return this;
+            };
+            Drawable.prototype.moveTo = function (x, y) {
+                return this.at(x, y);
+            };
+            Drawable.prototype.fill = function (color, opacity) {
+                this.setAttribute("fill", color);
+                if (opacity != undefined) {
+                    this.opacity(opacity);
+                }
+                return this;
+            };
+            Drawable.prototype.opacity = function (opacity) {
+                return this.setAttribute("fill-opacity", opacity);
+            };
+            Drawable.prototype.stroke = function (color, width) {
+                this.setAttribute("stroke", color);
+                if (width != undefined) {
+                    this.strokeWidth(width);
+                }
+                return this;
+            };
+            Drawable.prototype.strokeWidth = function (width) {
+                return this.setAttribute("stroke-width", width);
+            };
+            Drawable.prototype.strokeOpacity = function (opacity) {
+                return this.setAttribute("stroke-opacity", opacity);
+            };
+            Drawable.prototype.onDown = function (handler) {
+                svgUtil.events.down(this.el, handler);
+                return this;
+            };
+            Drawable.prototype.onUp = function (handler) {
+                svgUtil.events.up(this.el, handler);
+                return this;
+            };
+            Drawable.prototype.onMove = function (handler) {
+                svgUtil.events.move(this.el, handler);
+                return this;
+            };
+            Drawable.prototype.onEnter = function (handler) {
+                svgUtil.events.enter(this.el, handler);
+                return this;
+            };
+            Drawable.prototype.onLeave = function (handler) {
+                svgUtil.events.leave(this.el, handler);
+                return this;
+            };
+            Drawable.prototype.onClick = function (handler) {
+                svgUtil.events.click(this.el, handler);
+                return this;
+            };
+            return Drawable;
+        }(DrawContext));
+        svgUtil.Drawable = Drawable;
+        var Text = /** @class */ (function (_super) {
+            __extends(Text, _super);
+            function Text(text) {
+                var _this = _super.call(this, "text") || this;
+                if (text != undefined) {
+                    _this.text(text);
+                }
+                return _this;
+            }
+            Text.prototype.text = function (text) {
+                this.el.textContent = text;
+                return this;
+            };
+            Text.prototype.fontFamily = function (family) {
+                return this.setAttribute("font-family", family);
+            };
+            Text.prototype.fontSize = function (size, units) {
+                return this.setAttribute("font-size", lengthWithUnits(size, units));
+            };
+            Text.prototype.alignmentBaseline = function (type) {
+                return this.setAttribute("alignment-baseline", type);
+            };
+            Text.prototype.anchor = function (type) {
+                return this.setAttribute("text-anchor", type);
+            };
+            return Text;
+        }(Drawable));
+        svgUtil.Text = Text;
+        var Rect = /** @class */ (function (_super) {
+            __extends(Rect, _super);
+            function Rect() {
+                return _super.call(this, "rect") || this;
+            }
+            ;
+            Rect.prototype.width = function (width, unit) {
+                if (unit === void 0) { unit = LengthUnit.px; }
+                return this.setAttribute("width", lengthWithUnits(width, unit));
+            };
+            Rect.prototype.height = function (height, unit) {
+                if (unit === void 0) { unit = LengthUnit.px; }
+                return this.setAttribute("height", lengthWithUnits(height, unit));
+            };
+            Rect.prototype.corner = function (radius) {
+                return this.corners(radius, radius);
+            };
+            Rect.prototype.corners = function (rx, ry) {
+                this.setAttribute("rx", rx);
+                this.setAttribute("ry", ry);
+                return this;
+            };
+            Rect.prototype.size = function (width, height, unit) {
+                if (unit === void 0) { unit = LengthUnit.px; }
+                this.width(width, unit);
+                this.height(height, unit);
+                return this;
+            };
+            return Rect;
+        }(Drawable));
+        svgUtil.Rect = Rect;
+        var Circle = /** @class */ (function (_super) {
+            __extends(Circle, _super);
+            function Circle() {
+                return _super.call(this, "circle") || this;
+            }
+            Circle.prototype.at = function (cx, cy) {
+                this.setAttribute("cx", cx);
+                this.setAttribute("cy", cy);
+                return this;
+            };
+            Circle.prototype.radius = function (r) {
+                return this.setAttribute("r", r);
+            };
+            return Circle;
+        }(Drawable));
+        svgUtil.Circle = Circle;
+        var Ellipse = /** @class */ (function (_super) {
+            __extends(Ellipse, _super);
+            function Ellipse() {
+                return _super.call(this, "ellipse") || this;
+            }
+            Ellipse.prototype.at = function (cx, cy) {
+                this.setAttribute("cx", cx);
+                this.setAttribute("cy", cy);
+                return this;
+            };
+            Ellipse.prototype.radius = function (rx, ry) {
+                this.setAttribute("rx", rx);
+                this.setAttribute("ry", ry);
+                return this;
+            };
+            return Ellipse;
+        }(Drawable));
+        var Line = /** @class */ (function (_super) {
+            __extends(Line, _super);
+            function Line() {
+                return _super.call(this, "line") || this;
+            }
+            Line.prototype.at = function (x1, y1, x2, y2) {
+                this.from(x1, y1);
+                if (x2 != undefined && y2 != undefined) {
+                    this.to(x2, y2);
+                }
+                return this;
+            };
+            Line.prototype.from = function (x1, y1) {
+                this.setAttribute("x1", x1);
+                this.setAttribute("y1", y1);
+                return this;
+            };
+            Line.prototype.to = function (x2, y2) {
+                this.setAttribute("x2", x2);
+                this.setAttribute("y2", y2);
+                return this;
+            };
+            return Line;
+        }(Drawable));
+        svgUtil.Line = Line;
+        var PolyElement = /** @class */ (function (_super) {
+            __extends(PolyElement, _super);
+            function PolyElement() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            PolyElement.prototype.points = function (points) {
+                return this.setAttribute("points", points);
+            };
+            PolyElement.prototype.with = function (points) {
+                return this.points(points.map(function (_a) {
+                    var x = _a.x, y = _a.y;
+                    return x + " " + y;
+                }).join(","));
+            };
+            return PolyElement;
+        }(Drawable));
+        svgUtil.PolyElement = PolyElement;
+        var Polyline = /** @class */ (function (_super) {
+            __extends(Polyline, _super);
+            function Polyline() {
+                return _super.call(this, "polyline") || this;
+            }
+            return Polyline;
+        }(PolyElement));
+        svgUtil.Polyline = Polyline;
+        var Polygon = /** @class */ (function (_super) {
+            __extends(Polygon, _super);
+            function Polygon() {
+                return _super.call(this, "polygon") || this;
+            }
+            return Polygon;
+        }(PolyElement));
+        svgUtil.Polygon = Polygon;
+        var Path = /** @class */ (function (_super) {
+            __extends(Path, _super);
+            function Path() {
+                var _this = _super.call(this, "path") || this;
+                _this.d = new PathContext();
+                return _this;
+            }
+            Path.prototype.update = function () {
+                return this.setAttribute("d", this.d.toAttribute());
+            };
+            Path.prototype.path = function (cb) {
+                cb(this.d);
+                return this.update();
+            };
+            return Path;
+        }(Drawable));
+        svgUtil.Path = Path;
+        var Gradient = /** @class */ (function (_super) {
+            __extends(Gradient, _super);
+            function Gradient() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            Gradient.prototype.units = function (kind) {
+                return this.setAttribute("gradientUnits", kind === PatternUnits.objectBoundingBox ? "objectBoundingBox" : "userSpaceOnUse");
+            };
+            Gradient.prototype.stop = function (offset, color, opacity) {
+                var s = elt("stop");
+                s.setAttribute("offset", offset + "%");
+                if (color != undefined) {
+                    s.setAttribute("stop-color", color);
+                }
+                if (opacity != undefined) {
+                    s.setAttribute("stop-opacity", opacity);
+                }
+                this.el.appendChild(s);
+                return this;
+            };
+            return Gradient;
+        }(BaseElement));
+        svgUtil.Gradient = Gradient;
+        var LinearGradient = /** @class */ (function (_super) {
+            __extends(LinearGradient, _super);
+            function LinearGradient() {
+                return _super.call(this, "linearGradient") || this;
+            }
+            LinearGradient.prototype.start = function (x1, y1) {
+                this.setAttribute("x1", x1);
+                this.setAttribute("y1", y1);
+                return this;
+            };
+            LinearGradient.prototype.end = function (x2, y2) {
+                this.setAttribute("x2", x2);
+                this.setAttribute("y2", y2);
+                return this;
+            };
+            return LinearGradient;
+        }(Gradient));
+        svgUtil.LinearGradient = LinearGradient;
+        var RadialGradient = /** @class */ (function (_super) {
+            __extends(RadialGradient, _super);
+            function RadialGradient() {
+                return _super.call(this, "radialGradient") || this;
+            }
+            RadialGradient.prototype.center = function (cx, cy) {
+                this.setAttribute("cx", cx);
+                this.setAttribute("cy", cy);
+                return this;
+            };
+            RadialGradient.prototype.focus = function (fx, fy, fr) {
+                this.setAttribute("fx", fx);
+                this.setAttribute("fy", fy);
+                this.setAttribute("fr", fr);
+                return this;
+            };
+            RadialGradient.prototype.radius = function (r) {
+                return this.setAttribute("r", r);
+            };
+            return RadialGradient;
+        }(Gradient));
+        svgUtil.RadialGradient = RadialGradient;
+        function elt(type) {
+            var el = document.createElementNS("http://www.w3.org/2000/svg", type);
+            return el;
+        }
+        function drawable(type) {
+            switch (type) {
+                case "text": return new Text();
+                case "circle": return new Circle();
+                case "rect": return new Rect();
+                case "line": return new Line();
+                case "polygon": return new Polygon();
+                case "polyline": return new Polyline();
+                case "path": return new Path();
+                default: return new Drawable(type);
+            }
+        }
+        var PathContext = /** @class */ (function () {
+            function PathContext() {
+                this.ops = [];
+            }
+            PathContext.prototype.clear = function () {
+                this.ops = [];
+            };
+            PathContext.prototype.moveTo = function (x, y) {
+                return this.op("M", x, y);
+            };
+            PathContext.prototype.moveBy = function (dx, dy) {
+                return this.op("m", dx, dy);
+            };
+            PathContext.prototype.lineTo = function (x, y) {
+                return this.op("L", x, y);
+            };
+            PathContext.prototype.lineBy = function (dx, dy) {
+                return this.op("l", dx, dy);
+            };
+            PathContext.prototype.cCurveTo = function (c1x, c1y, c2x, c2y, x, y) {
+                return this.op("C", c1x, c1y, c2x, c2y, x, y);
+            };
+            PathContext.prototype.cCurveBy = function (dc1x, dc1y, dc2x, dc2y, dx, dy) {
+                return this.op("c", dc1x, dc1y, dc2x, dc2y, dx, dy);
+            };
+            PathContext.prototype.qCurveTo = function (cx, cy, x, y) {
+                return this.op("Q", cx, cy, x, y);
+            };
+            PathContext.prototype.qCurveBy = function (dcx, dcy, dx, dy) {
+                return this.op("q", dcx, dcy, dx, dy);
+            };
+            PathContext.prototype.sCurveTo = function (cx, cy, x, y) {
+                return this.op("S", cx, cy, x, y);
+            };
+            PathContext.prototype.sCurveBy = function (dcx, dcy, dx, dy) {
+                return this.op("s", dcx, dcy, dx, dy);
+            };
+            PathContext.prototype.tCurveTo = function (x, y) {
+                return this.op("T", x, y);
+            };
+            PathContext.prototype.tCurveBy = function (dx, dy) {
+                return this.op("t", dx, dy);
+            };
+            PathContext.prototype.arcTo = function (rx, ry, xRotate, large, sweepClockwise, x, y) {
+                return this.op("A", rx, ry, xRotate, large ? 1 : 0, sweepClockwise ? 1 : 0, x, y);
+            };
+            PathContext.prototype.close = function () {
+                return this.op("z");
+            };
+            PathContext.prototype.toAttribute = function () {
+                return this.ops.map(function (op) { return op.op + " " + op.args.join(" "); }).join(" ");
+            };
+            PathContext.prototype.op = function (op) {
+                var args = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    args[_i - 1] = arguments[_i];
+                }
+                this.ops.push({
+                    op: op,
+                    args: args
+                });
+                return this;
+            };
+            return PathContext;
+        }());
+        svgUtil.PathContext = PathContext;
+        function lengthWithUnits(value, unit) {
+            switch (unit) {
+                case LengthUnit.em: return value + "em";
+                case LengthUnit.ex: return value + "ex";
+                case LengthUnit.px: return value + "px";
+                case LengthUnit.in: return value + "in";
+                case LengthUnit.cm: return value + "cm";
+                case LengthUnit.mm: return value + "mm";
+                case LengthUnit.pt: return value + "pt";
+                case LengthUnit.pc: return value + "pc";
+                case LengthUnit.percent: return value + "%";
+                default: return value.toString();
+            }
+        }
+    })(svgUtil = pxt.svgUtil || (pxt.svgUtil = {}));
+})(pxt || (pxt = {}));
+(function (pxt) {
+    var svgUtil;
+    (function (svgUtil) {
+        var events;
+        (function (events) {
+            function isTouchEnabled() {
+                return typeof window !== "undefined" &&
+                    ('ontouchstart' in window // works on most browsers
+                        || (navigator && navigator.maxTouchPoints > 0)); // works on IE10/11 and Surface);
+            }
+            events.isTouchEnabled = isTouchEnabled;
+            function hasPointerEvents() {
+                return typeof window != "undefined" && !!window.PointerEvent;
+            }
+            events.hasPointerEvents = hasPointerEvents;
+            function down(el, handler) {
+                if (hasPointerEvents()) {
+                    el.addEventListener("pointerdown", handler);
+                }
+                else if (isTouchEnabled()) {
+                    el.addEventListener("mousedown", handler);
+                    el.addEventListener("touchstart", handler);
+                }
+                else {
+                    el.addEventListener("mousedown", handler);
+                }
+            }
+            events.down = down;
+            function up(el, handler) {
+                if (hasPointerEvents()) {
+                    el.addEventListener("pointerup", handler);
+                }
+                else if (isTouchEnabled()) {
+                    el.addEventListener("mouseup", handler);
+                }
+                else {
+                    el.addEventListener("mouseup", handler);
+                }
+            }
+            events.up = up;
+            function enter(el, handler) {
+                if (hasPointerEvents()) {
+                    el.addEventListener("pointerover", function (e) {
+                        handler(!!(e.buttons & 1));
+                    });
+                }
+                else if (isTouchEnabled()) {
+                    el.addEventListener("touchstart", function (e) {
+                        handler(true);
+                    });
+                }
+                else {
+                    el.addEventListener("mouseover", function (e) {
+                        handler(!!(e.buttons & 1));
+                    });
+                }
+            }
+            events.enter = enter;
+            function leave(el, handler) {
+                if (hasPointerEvents()) {
+                    el.addEventListener("pointerleave", handler);
+                }
+                else if (isTouchEnabled()) {
+                    el.addEventListener("touchend", handler);
+                }
+                else {
+                    el.addEventListener("mouseleave", handler);
+                }
+            }
+            events.leave = leave;
+            function move(el, handler) {
+                if (hasPointerEvents()) {
+                    el.addEventListener("pointermove", handler);
+                }
+                else if (isTouchEnabled()) {
+                    el.addEventListener("touchmove", handler);
+                }
+                else {
+                    el.addEventListener("mousemove", handler);
+                }
+            }
+            events.move = move;
+            function click(el, handler) {
+                el.addEventListener("click", handler);
+            }
+            events.click = click;
+        })(events = svgUtil.events || (svgUtil.events = {}));
+    })(svgUtil = pxt.svgUtil || (pxt.svgUtil = {}));
+})(pxt || (pxt = {}));
+(function (pxt) {
+    var svgUtil;
+    (function (svgUtil) {
+        var helpers;
+        (function (helpers) {
+            var CenteredText = /** @class */ (function (_super) {
+                __extends(CenteredText, _super);
+                function CenteredText() {
+                    return _super !== null && _super.apply(this, arguments) || this;
+                }
+                CenteredText.prototype.at = function (cx, cy) {
+                    this.cx = cx;
+                    this.cy = cy;
+                    this.rePosition();
+                    return this;
+                };
+                CenteredText.prototype.text = function (text, fontSizePixels) {
+                    if (fontSizePixels === void 0) { fontSizePixels = 12; }
+                    _super.prototype.text.call(this, text);
+                    this.fontSizePixels = fontSizePixels;
+                    this.setAttribute("font-size", fontSizePixels + "px");
+                    this.rePosition();
+                    return this;
+                };
+                CenteredText.prototype.rePosition = function () {
+                    if (this.cx == undefined || this.cy == undefined || this.fontSizePixels == undefined) {
+                        return;
+                    }
+                    this.setAttribute("x", this.cx);
+                    this.setAttribute("y", this.cy);
+                    this.setAttribute("text-anchor", "middle");
+                    this.setAttribute("alignment-baseline", "middle");
+                };
+                return CenteredText;
+            }(svgUtil.Text));
+            helpers.CenteredText = CenteredText;
+        })(helpers = svgUtil.helpers || (svgUtil.helpers = {}));
+    })(svgUtil = pxt.svgUtil || (pxt.svgUtil = {}));
 })(pxt || (pxt = {}));
 var pxt;
 (function (pxt) {

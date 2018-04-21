@@ -1231,7 +1231,7 @@ Blockly.WorkspaceComment.prototype.dispose=function(){this.workspace&&(Blockly.E
 Blockly.WorkspaceComment.prototype.setWidth=function(a){this.width_=a};Blockly.WorkspaceComment.prototype.getXY=function(){return this.xy_.clone()};Blockly.WorkspaceComment.prototype.moveBy=function(a,b){var c=new Blockly.Events.CommentMove(this);this.xy_.translate(a,b);c.recordNew();Blockly.Events.fire(c)};Blockly.WorkspaceComment.prototype.getHeight=function(){return this.height_};Blockly.WorkspaceComment.prototype.setHeight=function(a){this.height_=a};
 Blockly.WorkspaceComment.prototype.getWidth=function(){return this.width_};Blockly.WorkspaceComment.prototype.setWidth=function(a){this.width_=a};Blockly.WorkspaceComment.prototype.isDeletable=function(){return this.deletable_&&!(this.workspace&&this.workspace.options.readOnly)};Blockly.WorkspaceComment.prototype.setDeletable=function(a){this.deletable_=a};Blockly.WorkspaceComment.prototype.isMovable=function(){return this.movable_&&!(this.workspace&&this.workspace.options.readOnly)};
 Blockly.WorkspaceComment.prototype.setMovable=function(a){this.movable_=a};Blockly.WorkspaceComment.prototype.isEditable=function(){return this.editable_};Blockly.WorkspaceComment.prototype.setEditable=function(a){this.editable_=a};Blockly.WorkspaceComment.prototype.getContent=function(){return this.content_};Blockly.WorkspaceComment.prototype.setContent=function(a){this.content_!=a&&(Blockly.Events.fire(new Blockly.Events.CommentChange(this,this.content_,a)),this.content_=a)};
-Blockly.WorkspaceComment.prototype.toXmlWithXY=function(a){a=this.toXml(a);a.setAttribute("x",Math.round(this.xy_.x));a.setAttribute("y",Math.round(this.xy_.y));a.setAttribute("h",this.height_);a.setAttribute("w",this.width_);return a};Blockly.WorkspaceComment.prototype.toXml=function(a){var b=goog.dom.createDom("comment");a||b.setAttribute("id",this.id);b.textContent=this.getContent();return b};
+Blockly.WorkspaceComment.prototype.getRelativeToSurfaceXY=function(){return this.xy_};Blockly.WorkspaceComment.prototype.toXmlWithXY=function(a){a=this.toXml(a);a.setAttribute("x",Math.round(this.xy_.x));a.setAttribute("y",Math.round(this.xy_.y));a.setAttribute("h",this.height_);a.setAttribute("w",this.width_);return a};Blockly.WorkspaceComment.prototype.toXml=function(a){var b=goog.dom.createDom("comment");a||b.setAttribute("id",this.id);b.textContent=this.getContent();return b};
 Blockly.WorkspaceComment.fireCreateEvent=function(a){if(Blockly.Events.isEnabled()){var b=Blockly.Events.getGroup();b||Blockly.Events.setGroup(!0);try{Blockly.Events.fire(new Blockly.Events.CommentCreate(a))}finally{b||Blockly.Events.setGroup(!1)}}};
 Blockly.WorkspaceComment.fromXml=function(a,b){var c=Blockly.WorkspaceComment.parseAttributes(a);c=new Blockly.WorkspaceComment(b,c.content,c.h,c.w,c.id);var d=parseInt(a.getAttribute("x"),10),e=parseInt(a.getAttribute("y"),10);isNaN(d)||isNaN(e)||c.moveBy(d,e);Blockly.WorkspaceComment.fireCreateEvent(c);return c};
 Blockly.WorkspaceComment.parseAttributes=function(a){var b=a.getAttribute("h"),c=a.getAttribute("w");return{id:a.getAttribute("id"),h:b?parseInt(b,10):100,w:c?parseInt(c,10):100,x:parseInt(a.getAttribute("x"),10),y:parseInt(a.getAttribute("y"),10),content:a.textContent}};
@@ -3836,10 +3836,7 @@ var pxt;
                 return blocks.H.mkAssign(blocks.H.mkPropertyAccess(args[1].op.replace(/.*\./, "").replace(/@set/, ""), args[0]), args[2]);
             }
             else if (func.f == "@change@") {
-                return blocks.mkStmt(blocks.H.mkSimpleCall("+=", [
-                    blocks.H.mkPropertyAccess(args[1].op.replace(/.*\./, "").replace(/@set/, ""), args[0]),
-                    args[2]
-                ]));
+                return blocks.H.mkSimpleCall("+=", [blocks.H.mkPropertyAccess(args[1].op.replace(/.*\./, "").replace(/@set/, ""), args[0]), args[2]]);
             }
             else if (func.isExtensionMethod) {
                 if (func.attrs.defaultInstance) {
@@ -4518,6 +4515,7 @@ var pxt;
             registerFieldEditor('togglehighlow', pxtblockly.FieldToggleHighLow);
             registerFieldEditor('colornumber', pxtblockly.FieldColorNumber);
             registerFieldEditor('images', pxtblockly.FieldImages);
+            registerFieldEditor('sprite', pxtblockly.FieldSpriteEditor);
         }
         blocks.initFieldEditors = initFieldEditors;
         function registerFieldEditor(selector, field, validator) {
@@ -11980,4 +11978,2043 @@ var pxtblockly;
         }
         AudioContextManager.tone = tone;
     })(AudioContextManager = pxtblockly.AudioContextManager || (pxtblockly.AudioContextManager = {}));
+})(pxtblockly || (pxtblockly = {}));
+var pxtblockly;
+(function (pxtblockly) {
+    /**
+     * 16-color sprite
+     */
+    var Bitmap = /** @class */ (function () {
+        function Bitmap(width, height, x0, y0) {
+            if (x0 === void 0) { x0 = 0; }
+            if (y0 === void 0) { y0 = 0; }
+            this.width = width;
+            this.height = height;
+            this.x0 = x0;
+            this.y0 = y0;
+            this.buf = new Uint8Array(Math.ceil(width * height / 2));
+        }
+        Bitmap.prototype.set = function (col, row, value) {
+            if (col < this.width && row < this.height && col >= 0 && row >= 0) {
+                var index = this.coordToIndex(col, row);
+                this.setCore(index, value);
+            }
+        };
+        Bitmap.prototype.get = function (col, row) {
+            if (col < this.width && row < this.height && col >= 0 && row >= 0) {
+                var index = this.coordToIndex(col, row);
+                return this.getCore(index);
+            }
+            return 0;
+        };
+        Bitmap.prototype.copy = function (col, row, width, height) {
+            if (col === void 0) { col = 0; }
+            if (row === void 0) { row = 0; }
+            if (width === void 0) { width = this.width; }
+            if (height === void 0) { height = this.height; }
+            var sub = new Bitmap(width, height);
+            sub.x0 = col;
+            sub.y0 = row;
+            for (var c = 0; c < width; c++) {
+                for (var r = 0; r < height; r++) {
+                    sub.set(c, r, this.get(col + c, row + r));
+                }
+            }
+            return sub;
+        };
+        Bitmap.prototype.apply = function (change) {
+            for (var c = 0; c < change.width; c++) {
+                for (var r = 0; r < change.height; r++) {
+                    this.set(change.x0 + c, change.y0 + r, change.get(c, r));
+                }
+            }
+        };
+        Bitmap.prototype.coordToIndex = function (col, row) {
+            return col + row * this.width;
+        };
+        Bitmap.prototype.getCore = function (index) {
+            var cell = Math.floor(index / 2);
+            if (index % 2 === 0) {
+                return this.buf[cell] & 0xf;
+            }
+            else {
+                return (this.buf[cell] & 0xf0) >> 4;
+            }
+        };
+        Bitmap.prototype.setCore = function (index, value) {
+            var cell = Math.floor(index / 2);
+            if (index % 2 === 0) {
+                this.buf[cell] = (this.buf[cell] & 0xf0) | (value & 0xf);
+            }
+            else {
+                this.buf[cell] = (this.buf[cell] & 0x0f) | ((value & 0xf) << 4);
+            }
+        };
+        return Bitmap;
+    }());
+    pxtblockly.Bitmap = Bitmap;
+    var Bitmask = /** @class */ (function () {
+        function Bitmask(width, height) {
+            this.width = width;
+            this.height = height;
+            this.mask = new Uint8Array(Math.ceil(width * height / 8));
+        }
+        Bitmask.prototype.set = function (col, row) {
+            var cellIndex = col + this.width * row;
+            var index = cellIndex >> 3;
+            var offset = cellIndex & 7;
+            this.mask[index] |= (1 << offset);
+        };
+        Bitmask.prototype.get = function (col, row) {
+            var cellIndex = col + this.width * row;
+            var index = cellIndex >> 3;
+            var offset = cellIndex & 7;
+            return (this.mask[index] >> offset) & 1;
+        };
+        return Bitmask;
+    }());
+    pxtblockly.Bitmask = Bitmask;
+    function resizeBitmap(img, width, height) {
+        var result = new Bitmap(width, height);
+        result.apply(img);
+        return result;
+    }
+    pxtblockly.resizeBitmap = resizeBitmap;
+})(pxtblockly || (pxtblockly = {}));
+var pxtblockly;
+(function (pxtblockly) {
+    function mergeProps(base, overrides) {
+        if (!overrides) {
+            return base;
+        }
+        for (var key in overrides) {
+            base[key] = overrides[key];
+        }
+        return base;
+    }
+    pxtblockly.mergeProps = mergeProps;
+})(pxtblockly || (pxtblockly = {}));
+/// <reference path="./util.ts" />
+var pxtblockly;
+(function (pxtblockly) {
+    var svg = pxt.svgUtil;
+    /**
+     * An SVG grid of pixels
+     */
+    var Grid = /** @class */ (function () {
+        function Grid(props, root) {
+            this.root = root;
+            this.gridProps = pxtblockly.mergeProps(defaultGridProps(), props);
+            this.updateDimensions();
+            this.group = new svg.Group();
+            this.buildDom();
+        }
+        Grid.prototype.outerWidth = function () {
+            var x = this.cellToCoord(this.columns - 1, 0)[0];
+            return x + this.gridProps.cellWidth + this.gridProps.outerMargin;
+        };
+        Grid.prototype.outerHeight = function () {
+            var y = this.cellToCoord(0, this.rows - 1)[1];
+            return y + this.gridProps.cellHeight + this.gridProps.outerMargin;
+        };
+        Grid.prototype.getView = function () {
+            return this.group;
+        };
+        Grid.prototype.translate = function (x, y) {
+            this.group.translate(x, y);
+        };
+        Grid.prototype.scale = function (ratio) {
+            this.group.scale(ratio);
+        };
+        Grid.prototype.resizeGrid = function (rowLength, numCells) {
+            this.gridProps.rowLength = rowLength;
+            this.gridProps.numCells = numCells;
+            this.updateDimensions();
+            if (numCells > this.cells.length) {
+                while (this.cells.length < numCells) {
+                    this.cells.push(this.buildCell());
+                }
+            }
+            else if (numCells < this.cells.length) {
+                while (this.cells.length > numCells) {
+                    var c = this.cells.pop();
+                    this.cellGroup.el.removeChild(c.el);
+                }
+            }
+            this.layout();
+        };
+        Grid.prototype.setCellDimensions = function (width, height) {
+            if (height === void 0) { height = width; }
+            this.gridProps.cellWidth = width;
+            this.gridProps.cellHeight = height;
+            this.layout();
+        };
+        Grid.prototype.setGridDimensions = function (width, height, lockAspectRatio) {
+            if (height === void 0) { height = width; }
+            if (lockAspectRatio === void 0) { lockAspectRatio = true; }
+            var totalCellWidth = this.columns * this.gridProps.cellWidth;
+            var totalCellHeight = this.rows * this.gridProps.cellHeight;
+            var targetWidth = width - (this.outerWidth() - totalCellWidth);
+            var targetHeight = height - (this.outerHeight() - totalCellHeight);
+            var maxCellWidth = this.gridProps.cellWidth * (targetWidth / totalCellWidth);
+            var maxCellHeight = this.gridProps.cellHeight * (targetHeight / totalCellHeight);
+            if (lockAspectRatio) {
+                var aspectRatio = this.gridProps.cellWidth / this.gridProps.cellHeight;
+                if (aspectRatio >= 1) {
+                    var w = Math.min(maxCellWidth, maxCellHeight * aspectRatio);
+                    this.setCellDimensions(w, w * aspectRatio);
+                }
+                else {
+                    var h = Math.min(maxCellHeight, maxCellWidth / aspectRatio);
+                    this.setCellDimensions(h / aspectRatio, h);
+                }
+            }
+            else {
+                this.setCellDimensions(maxCellWidth, maxCellHeight);
+            }
+        };
+        Grid.prototype.setCellColor = function (column, row, color, opacity) {
+            if (column < 0 || row < 0 || column >= this.columns || row >= this.rows) {
+                return;
+            }
+            column = Math.floor(column);
+            row = Math.floor(row);
+            var cell = this.getCell(this.cellToIndex(column, row));
+            if (color != null) {
+                cell.setVisible(true);
+                cell.fill(color, opacity);
+            }
+            else {
+                cell.setVisible(false);
+            }
+        };
+        Grid.prototype.setRootId = function (id) {
+            this.group.id(id);
+        };
+        Grid.prototype.down = function (handler) {
+            this.initDragSurface();
+            this.gesture.subscribe(GestureType.Down, handler);
+        };
+        Grid.prototype.up = function (handler) {
+            this.initDragSurface();
+            this.gesture.subscribe(GestureType.Up, handler);
+        };
+        Grid.prototype.drag = function (handler) {
+            this.initDragSurface();
+            this.gesture.subscribe(GestureType.Drag, handler);
+        };
+        Grid.prototype.move = function (handler) {
+            this.initDragSurface();
+            this.gesture.subscribe(GestureType.Move, handler);
+        };
+        Grid.prototype.leave = function (handler) {
+            this.initDragSurface();
+            this.gesture.subscribe(GestureType.Leave, handler);
+        };
+        Grid.prototype.cellToCoord = function (column, row) {
+            var x = this.gridProps.outerMargin + column * (this.gridProps.cellWidth + this.gridProps.columnMargin);
+            var y = this.gridProps.outerMargin + row * (this.gridProps.cellHeight + this.gridProps.rowMargin);
+            return [x, y];
+        };
+        Grid.prototype.coordToCell = function (x, y) {
+            var column = Math.floor((x - this.gridProps.outerMargin) / (this.gridProps.cellWidth + this.gridProps.columnMargin));
+            var row = Math.floor((y - this.gridProps.outerMargin) / (this.gridProps.cellHeight + this.gridProps.rowMargin));
+            return [column, row];
+        };
+        Grid.prototype.indexToCell = function (index) {
+            var col = index % this.gridProps.rowLength;
+            var row = Math.floor(index / this.gridProps.rowLength);
+            return [col, row];
+        };
+        Grid.prototype.cellToIndex = function (col, row) {
+            return row * this.gridProps.rowLength + col;
+        };
+        Grid.prototype.clientToCell = function (clientX, clientY) {
+            if (!this.point)
+                this.point = this.root.el.createSVGPoint();
+            this.point.x = clientX;
+            this.point.y = clientY;
+            var cursor = this.point.matrixTransform(this.root.el.getScreenCTM().inverse());
+            return this.coordToCell(cursor.x - this.group.left, cursor.y - this.group.top);
+        };
+        Grid.prototype.buildDom = function () {
+            this.cells = [];
+            if (this.gridProps.backgroundFill) {
+                this.background = this.group.draw("rect")
+                    .size(this.outerWidth(), this.outerHeight())
+                    .fill(this.gridProps.backgroundFill);
+            }
+            this.cellGroup = this.group.group();
+            var count = 0;
+            for (var col = 0; col < this.columns; col++) {
+                for (var row = 0; row < this.rows; row++) {
+                    this.cells.push(this.buildCell());
+                    count++;
+                    if (count > this.gridProps.numCells) {
+                        return;
+                    }
+                }
+            }
+            this.layout();
+        };
+        Grid.prototype.buildCell = function () {
+            var cell = this.cellGroup.draw("rect")
+                .size(this.gridProps.cellWidth, this.gridProps.cellHeight)
+                .fill(this.gridProps.defaultColor);
+            if (this.gridProps.cornerRadius) {
+                cell.corner(this.gridProps.cornerRadius);
+            }
+            if (this.gridProps.cellClass) {
+                cell.setAttribute("class", this.gridProps.cellClass);
+            }
+            return cell;
+        };
+        Grid.prototype.layout = function () {
+            // Position grid cells
+            for (var c = 0; c < this.columns; c++) {
+                for (var r = 0; r < this.rows; r++) {
+                    var _a = this.cellToCoord(c, r), x = _a[0], y = _a[1];
+                    var index = this.cellToIndex(c, r);
+                    this.getCell(index)
+                        .at(x, y)
+                        .size(this.gridProps.cellWidth, this.gridProps.cellHeight)
+                        .id(this.gridProps.cellIdPrefix + "-" + index)
+                        .attr({ "data-grid-index": index });
+                }
+            }
+            // Resize gesture surface and background
+            if (this.dragSurface) {
+                this.dragSurface.size(this.outerWidth(), this.outerHeight());
+            }
+            if (this.background) {
+                this.background.size(this.outerWidth(), this.outerHeight());
+            }
+        };
+        Grid.prototype.getCell = function (index) {
+            return this.cells[index];
+        };
+        Grid.prototype.initDragSurface = function () {
+            var _this = this;
+            if (!this.dragSurface && this.root) {
+                this.gesture = new GestureState();
+                this.dragSurface = this.group.draw("rect")
+                    .opacity(0)
+                    .width(this.outerWidth())
+                    .height(this.outerHeight());
+                this.dragSurface.el.addEventListener("pointermove", function (ev) {
+                    var _a = _this.clientToCell(ev.clientX, ev.clientY), col = _a[0], row = _a[1];
+                    if (ev.buttons & 1) {
+                        _this.gesture.handle(InputEvent.Down, col, row);
+                    }
+                    _this.gesture.handle(InputEvent.Move, col, row);
+                });
+                this.dragSurface.el.addEventListener("pointerdown", function (ev) {
+                    var _a = _this.clientToCell(ev.clientX, ev.clientY), col = _a[0], row = _a[1];
+                    _this.gesture.handle(InputEvent.Down, col, row);
+                });
+                this.dragSurface.el.addEventListener("pointerup", function (ev) {
+                    var _a = _this.clientToCell(ev.clientX, ev.clientY), col = _a[0], row = _a[1];
+                    _this.gesture.handle(InputEvent.Up, col, row);
+                });
+                this.dragSurface.el.addEventListener("pointerclick", function (ev) {
+                    var _a = _this.clientToCell(ev.clientX, ev.clientY), col = _a[0], row = _a[1];
+                    _this.gesture.handle(InputEvent.Down, col, row);
+                    _this.gesture.handle(InputEvent.Up, col, row);
+                });
+                this.dragSurface.el.addEventListener("pointerleave", function (ev) {
+                    var _a = _this.clientToCell(ev.clientX, ev.clientY), col = _a[0], row = _a[1];
+                    _this.gesture.handle(InputEvent.Leave, col, row);
+                });
+            }
+        };
+        Grid.prototype.updateDimensions = function () {
+            this.columns = this.gridProps.rowLength;
+            this.rows = Math.ceil(this.gridProps.numCells / this.columns);
+        };
+        return Grid;
+    }());
+    pxtblockly.Grid = Grid;
+    var InputEvent;
+    (function (InputEvent) {
+        InputEvent[InputEvent["Up"] = 0] = "Up";
+        InputEvent[InputEvent["Down"] = 1] = "Down";
+        InputEvent[InputEvent["Move"] = 2] = "Move";
+        InputEvent[InputEvent["Leave"] = 3] = "Leave";
+    })(InputEvent || (InputEvent = {}));
+    var GestureType;
+    (function (GestureType) {
+        GestureType[GestureType["Up"] = 0] = "Up";
+        GestureType[GestureType["Down"] = 1] = "Down";
+        GestureType[GestureType["Move"] = 2] = "Move";
+        GestureType[GestureType["Drag"] = 3] = "Drag";
+        GestureType[GestureType["Leave"] = 4] = "Leave";
+    })(GestureType || (GestureType = {}));
+    var GestureState = /** @class */ (function () {
+        function GestureState() {
+            this.isDown = false;
+            this.handlers = {};
+        }
+        GestureState.prototype.handle = function (event, col, row) {
+            switch (event) {
+                case InputEvent.Up:
+                    this.update(col, row);
+                    this.isDown = false;
+                    this.fire(GestureType.Up);
+                    break;
+                case InputEvent.Down:
+                    if (!this.isDown) {
+                        this.isDown = true;
+                        this.fire(GestureType.Down);
+                    }
+                    break;
+                case InputEvent.Move:
+                    if (col === this.lastCol && row === this.lastRow)
+                        return;
+                    this.update(col, row);
+                    if (this.isDown) {
+                        this.fire(GestureType.Drag);
+                    }
+                    else {
+                        this.fire(GestureType.Move);
+                    }
+                    break;
+                case InputEvent.Leave:
+                    this.update(col, row);
+                    this.isDown = false;
+                    this.fire(GestureType.Leave);
+                    break;
+            }
+        };
+        GestureState.prototype.subscribe = function (type, handler) {
+            this.handlers[type] = handler;
+        };
+        GestureState.prototype.update = function (col, row) {
+            this.lastCol = col;
+            this.lastRow = row;
+        };
+        GestureState.prototype.fire = function (type) {
+            if (this.handlers[type]) {
+                this.handlers[type](this.lastCol, this.lastRow);
+            }
+        };
+        return GestureState;
+    }());
+    function defaultGridProps() {
+        return {
+            rowLength: 16,
+            numCells: 16 * 16,
+            cellWidth: 10,
+            cellHeight: 10,
+            outerMargin: 0,
+            columnMargin: 0,
+            rowMargin: 0,
+            cornerRadius: 0,
+            defaultColor: "#ffffff",
+            cellIdPrefix: uniquePrefix()
+        };
+    }
+    pxtblockly.defaultGridProps = defaultGridProps;
+    var current = 0;
+    function uniquePrefix() {
+        return "grid" + current++;
+    }
+    pxtblockly.uniquePrefix = uniquePrefix;
+})(pxtblockly || (pxtblockly = {}));
+/// <reference path="./bitmap.ts" />
+var pxtblockly;
+(function (pxtblockly) {
+    var PaintTool;
+    (function (PaintTool) {
+        PaintTool[PaintTool["Normal"] = 0] = "Normal";
+        PaintTool[PaintTool["Rectangle"] = 1] = "Rectangle";
+        PaintTool[PaintTool["Outline"] = 2] = "Outline";
+        PaintTool[PaintTool["Circle"] = 3] = "Circle";
+        PaintTool[PaintTool["Fill"] = 4] = "Fill";
+        PaintTool[PaintTool["Line"] = 5] = "Line";
+        PaintTool[PaintTool["Erase"] = 6] = "Erase";
+    })(PaintTool = pxtblockly.PaintTool || (pxtblockly.PaintTool = {}));
+    var Edit = /** @class */ (function () {
+        function Edit(canvasWidth, canvasHeight, color, toolWidth) {
+            this.canvasWidth = canvasWidth;
+            this.canvasHeight = canvasHeight;
+            this.color = color;
+            this.toolWidth = toolWidth;
+        }
+        Edit.prototype.doEdit = function (bitmap) {
+            if (this.isStarted) {
+                this.doEditCore(bitmap);
+            }
+        };
+        Edit.prototype.start = function (cursorCol, cursorRow) {
+            this.isStarted = true;
+            this.startCol = cursorCol;
+            this.startRow = cursorRow;
+        };
+        Edit.prototype.drawCursor = function (col, row, draw) {
+            draw(col, row);
+        };
+        return Edit;
+    }());
+    pxtblockly.Edit = Edit;
+    var SelectionEdit = /** @class */ (function (_super) {
+        __extends(SelectionEdit, _super);
+        function SelectionEdit() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        SelectionEdit.prototype.update = function (col, row) {
+            this.endCol = col;
+            this.endRow = row;
+        };
+        SelectionEdit.prototype.topLeft = function () {
+            return [Math.min(this.startCol, this.endCol), Math.min(this.startRow, this.endRow)];
+        };
+        SelectionEdit.prototype.bottomRight = function () {
+            return [Math.max(this.startCol, this.endCol), Math.max(this.startRow, this.endRow)];
+        };
+        return SelectionEdit;
+    }(Edit));
+    pxtblockly.SelectionEdit = SelectionEdit;
+    /**
+     * Regular old drawing tool
+     */
+    var PaintEdit = /** @class */ (function (_super) {
+        __extends(PaintEdit, _super);
+        function PaintEdit(canvasWidth, canvasHeight, color, toolWidth) {
+            var _this = _super.call(this, canvasWidth, canvasHeight, color, toolWidth) || this;
+            _this.mask = new pxtblockly.Bitmask(canvasWidth, canvasHeight);
+            return _this;
+        }
+        PaintEdit.prototype.update = function (col, row) {
+            var _this = this;
+            this.drawCore(col, row, function (c, r) { return _this.mask.set(c, r); });
+        };
+        PaintEdit.prototype.drawCursor = function (col, row, draw) {
+            this.drawCore(col, row, draw);
+        };
+        PaintEdit.prototype.doEditCore = function (bitmap) {
+            for (var c = 0; c < bitmap.width; c++) {
+                for (var r = 0; r < bitmap.height; r++) {
+                    if (this.mask.get(c, r)) {
+                        bitmap.set(c, r, this.color);
+                    }
+                }
+            }
+        };
+        PaintEdit.prototype.drawCore = function (col, row, setPixel) {
+            col = col - Math.floor(this.toolWidth / 2);
+            row = row - Math.floor(this.toolWidth / 2);
+            for (var i = 0; i < this.toolWidth; i++) {
+                for (var j = 0; j < this.toolWidth; j++) {
+                    var c = col + i;
+                    var r = row + j;
+                    if (c >= 0 && c < this.canvasWidth && r >= 0 && r < this.canvasHeight) {
+                        setPixel(col + i, row + j);
+                    }
+                }
+            }
+        };
+        return PaintEdit;
+    }(Edit));
+    pxtblockly.PaintEdit = PaintEdit;
+    /**
+     * Tool for drawing filled rectangles
+     */
+    var RectangleEdit = /** @class */ (function (_super) {
+        __extends(RectangleEdit, _super);
+        function RectangleEdit() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        RectangleEdit.prototype.doEditCore = function (bitmap) {
+            var tl = this.topLeft();
+            var br = this.bottomRight();
+            for (var c = tl[0]; c <= br[0]; c++) {
+                for (var r = tl[1]; r <= br[1]; r++) {
+                    bitmap.set(c, r, this.color);
+                }
+            }
+        };
+        return RectangleEdit;
+    }(SelectionEdit));
+    pxtblockly.RectangleEdit = RectangleEdit;
+    /**
+     * Tool for drawing empty rectangles
+     */
+    var OutlineEdit = /** @class */ (function (_super) {
+        __extends(OutlineEdit, _super);
+        function OutlineEdit() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        OutlineEdit.prototype.doEditCore = function (bitmap) {
+            var tl = this.topLeft();
+            var br = this.bottomRight();
+            for (var i = 0; i < this.toolWidth; i++) {
+                this.drawRectangle(bitmap, [tl[0] + i, tl[1] + i], [br[0] - i, br[1] - i]);
+            }
+        };
+        OutlineEdit.prototype.drawRectangle = function (bitmap, tl, br) {
+            if (tl[0] > br[0] || tl[1] > br[1])
+                return;
+            for (var c = tl[0]; c <= br[0]; c++) {
+                bitmap.set(c, tl[1], this.color);
+                bitmap.set(c, br[1], this.color);
+            }
+            for (var r = tl[1]; r <= br[1]; r++) {
+                bitmap.set(tl[0], r, this.color);
+                bitmap.set(br[0], r, this.color);
+            }
+        };
+        return OutlineEdit;
+    }(SelectionEdit));
+    pxtblockly.OutlineEdit = OutlineEdit;
+    /**
+     * Tool for drawing straight lines
+     */
+    var LineEdit = /** @class */ (function (_super) {
+        __extends(LineEdit, _super);
+        function LineEdit() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        LineEdit.prototype.doEditCore = function (bitmap) {
+            this.bresenham(this.startCol, this.startRow, this.endCol, this.endRow, bitmap);
+        };
+        LineEdit.prototype.drawCursor = function (col, row, draw) {
+            this.drawCore(col, row, draw);
+        };
+        // https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+        LineEdit.prototype.bresenham = function (x0, y0, x1, y1, bitmap) {
+            var _this = this;
+            var dx = x1 - x0;
+            var dy = y1 - y0;
+            var draw = function (c, r) { return bitmap.set(c, r, _this.color); };
+            if (dx === 0) {
+                var startY = dy >= 0 ? y0 : y1;
+                var endY = dy >= 0 ? y1 : y0;
+                for (var y_1 = startY; y_1 <= endY; y_1++) {
+                    this.drawCore(x0, y_1, draw);
+                }
+                return;
+            }
+            var xStep = dx > 0 ? 1 : -1;
+            var yStep = dy > 0 ? 1 : -1;
+            var dErr = Math.abs(dy / dx);
+            var err = 0;
+            var y = y0;
+            for (var x = x0; xStep > 0 ? x <= x1 : x >= x1; x += xStep) {
+                this.drawCore(x, y, draw);
+                err += dErr;
+                while (err >= 0.5) {
+                    if (yStep > 0 ? y <= y1 : y >= y1) {
+                        this.drawCore(x, y, draw);
+                    }
+                    y += yStep;
+                    err -= 1;
+                }
+            }
+        };
+        // This is surely not the most efficient approach for drawing thick lines...
+        LineEdit.prototype.drawCore = function (col, row, draw) {
+            col = col - Math.floor(this.toolWidth / 2);
+            row = row - Math.floor(this.toolWidth / 2);
+            for (var i = 0; i < this.toolWidth; i++) {
+                for (var j = 0; j < this.toolWidth; j++) {
+                    var c = col + i;
+                    var r = row + j;
+                    draw(c, r);
+                }
+            }
+        };
+        return LineEdit;
+    }(SelectionEdit));
+    pxtblockly.LineEdit = LineEdit;
+    /**
+     * Tool for circular outlines
+     */
+    var CircleEdit = /** @class */ (function (_super) {
+        __extends(CircleEdit, _super);
+        function CircleEdit() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        CircleEdit.prototype.doEditCore = function (bitmap) {
+            var tl = this.topLeft();
+            var br = this.bottomRight();
+            var dx = br[0] - tl[0];
+            var dy = br[1] - tl[1];
+            if (dx < dy) {
+                br[1] = tl[1] + dx;
+            }
+            else {
+                br[0] = tl[0] + dy;
+            }
+            var radius = Math.floor((br[0] - tl[0]) / 2);
+            var cx = tl[0] + radius;
+            var cy = tl[1] + radius;
+            this.midpoint(cx, cy, radius, bitmap);
+        };
+        // https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
+        CircleEdit.prototype.midpoint = function (cx, cy, radius, bitmap) {
+            var x = radius;
+            var y = 0;
+            var err = 0;
+            while (x >= y) {
+                bitmap.set(cx + x, cy + y, this.color);
+                bitmap.set(cx + x, cy - y, this.color);
+                bitmap.set(cx + y, cy + x, this.color);
+                bitmap.set(cx + y, cy - x, this.color);
+                bitmap.set(cx - y, cy + x, this.color);
+                bitmap.set(cx - y, cy - x, this.color);
+                bitmap.set(cx - x, cy + y, this.color);
+                bitmap.set(cx - x, cy - y, this.color);
+                if (err <= 0) {
+                    y += 1;
+                    err += 2 * y + 1;
+                }
+                if (err > 0) {
+                    x -= 1;
+                    err -= 2 * x + 1;
+                }
+            }
+        };
+        return CircleEdit;
+    }(SelectionEdit));
+    pxtblockly.CircleEdit = CircleEdit;
+    var FillEdit = /** @class */ (function (_super) {
+        __extends(FillEdit, _super);
+        function FillEdit() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        FillEdit.prototype.start = function (col, row) {
+            this.isStarted = true;
+            this.col = col;
+            this.row = row;
+        };
+        FillEdit.prototype.update = function (col, row) {
+            this.col = col;
+            this.row = row;
+        };
+        FillEdit.prototype.doEditCore = function (bitmap) {
+            var replColor = bitmap.get(this.col, this.row);
+            if (replColor === this.color) {
+                return;
+            }
+            var mask = new pxtblockly.Bitmask(bitmap.width, bitmap.height);
+            mask.set(this.col, this.row);
+            var q = [[this.col, this.row]];
+            while (q.length) {
+                var _a = q.pop(), c = _a[0], r = _a[1];
+                if (bitmap.get(c, r) === replColor) {
+                    bitmap.set(c, r, this.color);
+                    tryPush(c + 1, r);
+                    tryPush(c - 1, r);
+                    tryPush(c, r + 1);
+                    tryPush(c, r - 1);
+                }
+            }
+            function tryPush(x, y) {
+                if (x >= 0 && x < mask.width && y >= 0 && y < mask.height && !mask.get(x, y)) {
+                    mask.set(x, y);
+                    q.push([x, y]);
+                }
+            }
+        };
+        return FillEdit;
+    }(Edit));
+    pxtblockly.FillEdit = FillEdit;
+})(pxtblockly || (pxtblockly = {}));
+/// <reference path="./bitmap.ts" />
+/// <reference path="./grid.ts" />
+/// <reference path="./tools.ts" />
+/// <reference path="./util.ts" />
+var pxtblockly;
+(function (pxtblockly) {
+    var svg = pxt.svgUtil;
+    var BitmapImage = /** @class */ (function (_super) {
+        __extends(BitmapImage, _super);
+        function BitmapImage(props, img, palette, root) {
+            var _this = _super.call(this, bitmapImageProps(props, img), root) || this;
+            _this.image = img;
+            _this.palette = palette;
+            _this.repaint();
+            return _this;
+        }
+        BitmapImage.prototype.repaint = function () {
+            for (var c = 0; c < this.image.width; c++) {
+                for (var r = 0; r < this.image.height; r++) {
+                    this.setCellColor(c, r, this.palette[this.image.get(c, r)]);
+                }
+            }
+        };
+        BitmapImage.prototype.writeColor = function (col, row, color) {
+            var old = this.image.get(col, row);
+            this.image.set(col, row, color);
+            this.drawColor(col, row, color);
+        };
+        BitmapImage.prototype.drawColor = function (col, row, color) {
+            this.setCellColor(col, row, this.palette[color]);
+        };
+        BitmapImage.prototype.restore = function (bitmap, repaint) {
+            if (repaint === void 0) { repaint = false; }
+            if (bitmap.height != this.image.height || bitmap.width != this.image.width) {
+                this.image = bitmap.copy();
+                this.resizeGrid(bitmap.width, bitmap.width * bitmap.height);
+            }
+            else {
+                this.image.apply(bitmap);
+            }
+            if (repaint) {
+                this.repaint();
+            }
+        };
+        BitmapImage.prototype.applyEdit = function (edit) {
+            edit.doEdit(this.image);
+            this.repaint();
+        };
+        BitmapImage.prototype.bitmap = function () {
+            return this.image;
+        };
+        BitmapImage.prototype.showOverlay = function () {
+            if (!this.overlay) {
+                this.overlay = new svg.Group;
+                if (this.dragSurface) {
+                    this.group.el.insertBefore(this.overlay.el, this.dragSurface.el);
+                }
+                else {
+                    this.group.appendChild(this.overlay);
+                }
+            }
+            else {
+                this.overlay.el.innerHTML = "";
+                if (this.overlayFade) {
+                    this.overlayFade.kill();
+                }
+            }
+            var width = this.outerWidth();
+            var height = this.outerHeight();
+            for (var c = 0; c < this.columns; c++) {
+                var x = this.cellToCoord(c, 0)[0];
+                this.overlay.draw("line")
+                    .stroke("#898989")
+                    .strokeWidth(1)
+                    .at(x, 0, x, height);
+            }
+            for (var r = 0; r < this.rows; r++) {
+                var _a = this.cellToCoord(0, r), y = _a[1];
+                this.overlay.draw("line")
+                    .stroke("#898989")
+                    .strokeWidth(1)
+                    .at(0, y, width, y);
+            }
+            var toastWidth = 100;
+            var toastHeight = 40;
+            this.overlay.draw("rect")
+                .at(width / 2 - toastWidth / 2, height / 2 - toastHeight / 2)
+                .fill("#898989")
+                .corner(2)
+                .size(toastWidth, toastHeight);
+            this.overlay.draw("text")
+                .text(this.columns + "x" + this.rows)
+                .at(width / 2, height / 2)
+                .fontSize(30, svg.LengthUnit.px)
+                .fill("white")
+                .alignmentBaseline("middle")
+                .anchor("middle");
+            this.overlayFade = new Fade(this.overlay, 750, 500);
+        };
+        return BitmapImage;
+    }(pxtblockly.Grid));
+    pxtblockly.BitmapImage = BitmapImage;
+    function bitmapImageProps(props, bitmap) {
+        var defaultProps = pxtblockly.defaultGridProps();
+        defaultProps.rowLength = bitmap.width;
+        defaultProps.numCells = bitmap.width * bitmap.height;
+        return pxtblockly.mergeProps(defaultProps, props);
+    }
+    var Fade = /** @class */ (function () {
+        function Fade(target, delay, duration) {
+            var _this = this;
+            this.target = target;
+            this.start = Date.now() + delay;
+            this.end = this.start + duration;
+            this.slope = 1 / duration;
+            this.dead = false;
+            target.setAttribute("fill-opacity", 1);
+            target.setAttribute("stroke-opacity", 1);
+            setTimeout(function () { return requestAnimationFrame(function () { return _this.frame(); }); }, delay);
+        }
+        Fade.prototype.frame = function () {
+            var _this = this;
+            if (this.dead)
+                return;
+            var now = Date.now();
+            if (now < this.end) {
+                var v = 1 - (this.slope * (now - this.start));
+                this.target.setAttribute("fill-opacity", v);
+                this.target.setAttribute("stroke-opacity", v);
+                requestAnimationFrame(function () { return _this.frame(); });
+            }
+            else {
+                this.target.el.innerHTML = "";
+            }
+        };
+        Fade.prototype.kill = function () {
+            this.dead = true;
+        };
+        return Fade;
+    }());
+})(pxtblockly || (pxtblockly = {}));
+var pxtblockly;
+(function (pxtblockly) {
+    var svg = pxt.svgUtil;
+    var Button = /** @class */ (function () {
+        function Button(props) {
+            this.props = props;
+            this.enabled = true;
+            this.buildDom();
+        }
+        Button.prototype.onClick = function (clickHandler) {
+            this.clickHandler = clickHandler;
+        };
+        Button.prototype.translate = function (x, y) {
+            this.root.translate(x, y);
+        };
+        Button.prototype.getView = function () {
+            return this.root;
+        };
+        Button.prototype.addClass = function (className) {
+            this.root.appendClass(className);
+        };
+        Button.prototype.removeClass = function (className) {
+            this.root.removeClass(className);
+        };
+        Button.prototype.title = function (text) {
+            this.root.title(text);
+        };
+        Button.prototype.setDimensions = function (width, height) {
+            this.props.width = width;
+            this.props.height = height;
+            this.layout();
+        };
+        Button.prototype.setEnabled = function (enabled) {
+            if (enabled != this.enabled) {
+                this.enabled = enabled;
+                if (this.enabled) {
+                    this.root.removeClass("disabled");
+                }
+                else {
+                    this.root.appendClass("disabled");
+                }
+            }
+        };
+        Button.prototype.setVisible = function (visible) {
+            this.root.setVisible(visible);
+        };
+        Button.prototype.buildDom = function () {
+            var _this = this;
+            this.root = new svg.Group();
+            this.background = this.root.draw("rect")
+                .corner(this.props.cornerRadius);
+            if (this.props.rootClass) {
+                this.root.setClass(this.props.rootClass);
+            }
+            if (this.props.backgroundClass) {
+                this.background.setClass(this.props.backgroundClass);
+            }
+            this.drawContent();
+            this.root.el.addEventListener("click", function () {
+                _this.handleClick();
+            });
+            this.layout();
+        };
+        // To be overridden by subclass
+        Button.prototype.drawContent = function () { };
+        // To be overridden by subclass
+        Button.prototype.layoutContent = function (contentWidth, contentHeight, top, left) { };
+        Button.prototype.handleClick = function () {
+            if (this.clickHandler && this.enabled) {
+                this.clickHandler();
+            }
+        };
+        Button.prototype.layout = function () {
+            this.background.size(this.props.width, this.props.height);
+            var contentWidth = this.props.width - this.props.padding * 2;
+            var contentHeight = this.props.height - this.props.padding * 2;
+            this.layoutContent(contentWidth, contentHeight, this.props.padding, this.props.padding);
+        };
+        return Button;
+    }());
+    pxtblockly.Button = Button;
+    var FontIconButton = /** @class */ (function (_super) {
+        __extends(FontIconButton, _super);
+        function FontIconButton(props) {
+            var _this = _super.call(this, props) || this;
+            _this.props = props;
+            return _this;
+        }
+        FontIconButton.prototype.drawContent = function () {
+            this.icon = this.root.draw("text")
+                .fontFamily(this.props.iconFont)
+                .text(this.props.iconString)
+                .anchor("middle")
+                .alignmentBaseline("middle");
+            if (this.props.iconClass) {
+                this.icon.setClass(this.props.iconClass);
+            }
+        };
+        FontIconButton.prototype.layoutContent = function (contentWidth, contentHeight, top, left) {
+            this.icon.at(left + contentWidth / 2, top + contentHeight / 2)
+                .fontSize(contentHeight, svg.LengthUnit.px);
+        };
+        return FontIconButton;
+    }(Button));
+    pxtblockly.FontIconButton = FontIconButton;
+    var CursorSizeButton = /** @class */ (function (_super) {
+        __extends(CursorSizeButton, _super);
+        function CursorSizeButton(props) {
+            var _this = _super.call(this, props) || this;
+            _this.props = props;
+            return _this;
+        }
+        CursorSizeButton.prototype.drawContent = function () {
+            this.cursor = this.root.draw("rect")
+                .fill(this.props.cursorFill);
+        };
+        CursorSizeButton.prototype.layoutContent = function (contentWidth, contentHeight, top, left) {
+            var unit = Math.min(contentWidth, contentHeight) / 3;
+            var sideLength = this.props.cursorSideLength * unit;
+            this.cursor.at(left + contentWidth / 2 - sideLength / 2, top + contentHeight / 2 - sideLength / 2)
+                .size(sideLength, sideLength);
+        };
+        return CursorSizeButton;
+    }(Button));
+    pxtblockly.CursorSizeButton = CursorSizeButton;
+})(pxtblockly || (pxtblockly = {}));
+/// <reference path="./grid.ts" />
+var pxtblockly;
+(function (pxtblockly) {
+    var svg = pxt.svgUtil;
+    var lf = pxt.Util.lf;
+    var ColorPalette = /** @class */ (function (_super) {
+        __extends(ColorPalette, _super);
+        function ColorPalette(props) {
+            var _this = _super.call(this, toGridProps(pxtblockly.mergeProps(defaultPaletteProps(), props))) || this;
+            _this.props = pxtblockly.mergeProps(defaultPaletteProps(), props);
+            _this.selected = 0;
+            // SVG elements are drawn according to their order in the DOM. The selected color's
+            // rect may grow in size (larger stroke width) so in order to prevent it from being
+            // overlapped by other elements we can clone it at the end of the DOM with a "use"
+            // element
+            _this.selectedClone = new svg.BaseElement("use");
+            _this.group.appendChild(_this.selectedClone);
+            _this.initColors();
+            return _this;
+        }
+        ColorPalette.prototype.colorForIndex = function (index) {
+            if (this.props.emptySwatchDisabled) {
+                return this.props.colors[index];
+            }
+            else if (index === 0) {
+                return this.props.emptySwatchFill;
+            }
+            else {
+                return this.props.colors[index - 1];
+            }
+        };
+        ColorPalette.prototype.setSelected = function (index) {
+            this.setCellHighlighted(this.selected, false);
+            this.selected = index;
+            this.setCellHighlighted(this.selected, true);
+            if (this.handler) {
+                this.handler(this.selected);
+            }
+        };
+        ColorPalette.prototype.selectedColor = function () {
+            return this.colorForIndex(this.selected);
+        };
+        ColorPalette.prototype.setCellHighlighted = function (index, highlighted) {
+            var cell = this.getCell(index);
+            if (highlighted) {
+                cell.removeClass(this.props.unselectedClass);
+                cell.appendClass(this.props.selectedClass);
+                this.selectedClone.setAttribute("href", cell.el.getAttribute("id"));
+            }
+            else {
+                cell.removeClass(this.props.selectedClass);
+                cell.appendClass(this.props.unselectedClass);
+            }
+        };
+        ColorPalette.prototype.onColorSelected = function (handler) {
+            this.handler = handler;
+        };
+        ColorPalette.prototype.initColors = function () {
+            var _this = this;
+            var _loop_4 = function (i) {
+                var cell = this_3.getCell(i);
+                if (i === 0) {
+                    cell.title(lf("Color Index 0 (Transparent)"));
+                }
+                else {
+                    cell.title(lf("Color Index {0}", i));
+                }
+                cell.fill(this_3.colorForIndex(i));
+                cell.onDown(function () { return _this.setSelected(i); });
+                this_3.setCellHighlighted(i, false);
+            };
+            var this_3 = this;
+            for (var i = 0; i < this.gridProps.numCells; i++) {
+                _loop_4(i);
+            }
+            this.setSelected(0);
+        };
+        return ColorPalette;
+    }(pxtblockly.Grid));
+    pxtblockly.ColorPalette = ColorPalette;
+    function defaultPaletteProps() {
+        return {
+            colors: ["red", "green", "blue"],
+            rowLength: 4,
+            emptySwatchDisabled: false,
+            emptySwatchFill: "lightgrey",
+            selectedClass: "palette-selected",
+            unselectedClass: "palette-unselected",
+            cellWidth: 10,
+            cellHeight: 10,
+            columnMargin: 1,
+            rowMargin: 1,
+            outerMargin: 1,
+            cornerRadius: 0,
+            defaultColor: "#ffffff",
+            cellIdPrefix: pxtblockly.uniquePrefix()
+        };
+    }
+    function toGridProps(props) {
+        var res = pxtblockly.mergeProps(pxtblockly.defaultGridProps(), props);
+        res.numCells = props.colors.length + (props.emptySwatchDisabled ? 0 : 1);
+        return res;
+    }
+})(pxtblockly || (pxtblockly = {}));
+/// <reference path="./tools.ts" />
+var pxtblockly;
+(function (pxtblockly) {
+    var lf = pxt.Util.lf;
+    // The ratio of the toolbar height that is taken up by the options (as opposed to the buttons)
+    var TOOLBAR_OPTIONS_RATIO = 0.333333;
+    var Toolbar = /** @class */ (function () {
+        function Toolbar(g, props, host) {
+            this.g = g;
+            this.props = props;
+            this.host = host;
+            // Index of the selected tool (e.g. shapes)
+            this.activeButtonIndex = 0;
+            // Index of the selected option for a tool (e.g. shapes > circle)
+            this.activeOptionIndex = 0;
+            this.activeCursorSizeIndex = 0;
+            this.selectedSizePreset = 2;
+            this.toolsBar = g.group();
+            this.optionBar = g.group();
+            this.dropdownOptions = this.optionBar.group();
+            this.initTools();
+            this.initControls();
+            this.createOptionsBar();
+            this.setSizePresets([
+                [8, 8],
+                [8, 16],
+                [16, 16],
+                [16, 32],
+                [32, 32],
+            ]);
+            this.layout();
+        }
+        Toolbar.prototype.outerWidth = function () {
+            return this.props.width;
+        };
+        Toolbar.prototype.outerHeight = function () {
+            return this.props.height;
+        };
+        Toolbar.prototype.translate = function (x, y) {
+            this.g.translate(x, y);
+        };
+        Toolbar.prototype.setDimensions = function (width, height) {
+            if (this.props.width != width || this.props.height != height) {
+                this.props.width = width;
+                this.props.height = height;
+                this.layout();
+            }
+        };
+        Toolbar.prototype.resetTool = function () {
+            this.setTool(0, false);
+        };
+        Toolbar.prototype.setUndoState = function (enabled) {
+            this.undoButton.setEnabled(enabled);
+        };
+        Toolbar.prototype.setRedoState = function (enabled) {
+            this.redoButton.setEnabled(enabled);
+        };
+        Toolbar.prototype.setSizePresets = function (presets) {
+            var _this = this;
+            this.sizePresets = presets;
+            if (this.sizePresets && this.sizePresets.length) {
+                var canvasColumns_1 = this.host.canvasWidth();
+                var canvasRows_1 = this.host.canvasHeight();
+                this.sizePresets.forEach(function (_a, index) {
+                    var columns = _a[0], rows = _a[1];
+                    if (columns === canvasColumns_1 && rows === canvasRows_1) {
+                        _this.selectedSizePreset = index;
+                    }
+                });
+                this.resizeButton.setVisible(true);
+            }
+            else {
+                this.resizeButton.setVisible(false);
+            }
+        };
+        Toolbar.prototype.initTools = function () {
+            var _this = this;
+            this.tools = [
+                { title: lf("Pencil"), tool: pxtblockly.PaintTool.Normal, icon: "\uf040" },
+                { title: lf("Erase"), tool: pxtblockly.PaintTool.Erase, icon: "\uf12d" },
+                { title: lf("Fill"), tool: pxtblockly.PaintTool.Fill, icon: "\uf0d0" },
+                {
+                    title: lf("Shapes"),
+                    tool: pxtblockly.PaintTool.Rectangle,
+                    icon: "\uf096",
+                    options: [
+                        { title: lf("Rectangle"), tool: pxtblockly.PaintTool.Rectangle, icon: "\uf096" },
+                        { title: lf("Line"), tool: pxtblockly.PaintTool.Line, icon: "\uf07e" },
+                        { title: lf("Circle"), tool: pxtblockly.PaintTool.Circle, icon: "\uf10c" },
+                    ]
+                },
+            ];
+            this.toolButtons = this.tools.map(function (tool, index) {
+                var toolBtn = _this.addButton(tool.icon);
+                toolBtn.title(tool.title);
+                toolBtn.onClick(function () {
+                    if (index === _this.activeButtonIndex)
+                        return;
+                    _this.setTool(index);
+                    if (tool.options && tool.options.length) {
+                        _this.showOptions(tool.options);
+                    }
+                    else {
+                        _this.clearOptions();
+                    }
+                });
+                return toolBtn;
+            });
+            this.setTool(0);
+        };
+        Toolbar.prototype.initControls = function () {
+            var _this = this;
+            this.undoButton = this.addButton("\uf0e2");
+            this.undoButton.title(lf("Undo"));
+            this.undoButton.onClick(function () {
+                _this.host.undo();
+            });
+            this.redoButton = this.addButton("\uf01e");
+            this.redoButton.title(lf("Redo"));
+            this.redoButton.onClick(function () {
+                _this.host.redo();
+            });
+            this.resizeButton = this.addButton("\uf0b2");
+            this.resizeButton.title(lf("Change sprite size"));
+            this.resizeButton.onClick(function () {
+                _this.selectedSizePreset = (_this.selectedSizePreset + 1) % _this.sizePresets.length;
+                var _a = _this.sizePresets[_this.selectedSizePreset], width = _a[0], height = _a[1];
+                _this.host.resize(width, height);
+            });
+        };
+        Toolbar.prototype.createOptionsBar = function () {
+            var _this = this;
+            this.cursorSizes = [];
+            var _loop_5 = function (i) {
+                var btn = mkCursorSizeButton(i + 1, this_4.props.height);
+                btn.title(sizeAdjective(i));
+                this_4.cursorSizes.push(btn);
+                this_4.optionBar.appendChild(btn.getView());
+                btn.onClick(function () {
+                    _this.setToolWidth(i);
+                });
+            };
+            var this_4 = this;
+            for (var i = 0; i < 3; i++) {
+                _loop_5(i);
+            }
+            this.setToolWidth(0);
+        };
+        Toolbar.prototype.addButton = function (icon) {
+            var btn = mkToolbarButton(icon, this.props.height, 4);
+            this.toolsBar.appendChild(btn.getView());
+            return btn;
+        };
+        Toolbar.prototype.layout = function () {
+            var _this = this;
+            this.optionsHeight = TOOLBAR_OPTIONS_RATIO * this.props.height;
+            this.toolbarHeight = this.props.height - this.optionsHeight - this.props.rowMargin;
+            this.toolButtons.forEach(function (tButton, i) { return _this.layoutButton(tButton, i, true); });
+            this.layoutButton(this.undoButton, 2, false);
+            this.layoutButton(this.redoButton, 1, false);
+            this.layoutButton(this.resizeButton, 0, false);
+            this.optionBar.translate(0, this.toolbarHeight + this.props.rowMargin);
+            this.cursorSizes.forEach(function (button, i) {
+                button.setDimensions(_this.optionsHeight, _this.optionsHeight);
+                button.translate(i * (_this.optionsHeight + _this.props.optionsMargin), 0);
+            });
+            this.layoutDropdown();
+        };
+        Toolbar.prototype.layoutButton = function (button, index, fromLeft) {
+            button.setDimensions(this.toolbarHeight, this.toolbarHeight);
+            if (fromLeft) {
+                button.translate(index * (this.toolbarHeight + this.props.buttonMargin), 0);
+            }
+            else {
+                button.translate(this.props.width - (index + 1) * (this.toolbarHeight + this.props.buttonMargin), 0);
+            }
+        };
+        Toolbar.prototype.layoutDropdown = function () {
+            var _this = this;
+            if (!this.optionButtons)
+                return;
+            var dropdownStart = this.toolButtons[this.activeButtonIndex].getView().left;
+            this.dropdownOptions.translate(dropdownStart, 0);
+            this.optionButtons.forEach(function (button, i) {
+                button.translate(i * (_this.optionsHeight + _this.props.optionsMargin), 0);
+            });
+        };
+        Toolbar.prototype.setTool = function (index, isOption) {
+            if (isOption === void 0) { isOption = false; }
+            if (!isOption) {
+                this.highlightTool(this.activeButtonIndex, false);
+                this.activeButtonIndex = index;
+                this.highlightTool(this.activeButtonIndex, true);
+                this.host.setActiveTool(this.tools[index].tool);
+            }
+            else {
+                this.highlightOption(this.activeOptionIndex, false);
+                this.activeOptionIndex = index;
+                this.highlightOption(this.activeOptionIndex, true);
+                this.host.setActiveTool(this.tools[this.activeButtonIndex].options[index].tool);
+            }
+        };
+        Toolbar.prototype.setToolWidth = function (index) {
+            this.highlightCursorSize(this.activeCursorSizeIndex, false);
+            this.activeCursorSizeIndex = index;
+            this.highlightCursorSize(this.activeCursorSizeIndex, true);
+            this.host.setToolWidth(1 + 2 * index);
+        };
+        Toolbar.prototype.highlightCursorSize = function (index, highlighted) {
+            this.highlight(this.cursorSizes[index], "toolbar-button-selected", highlighted);
+        };
+        Toolbar.prototype.highlightTool = function (index, highlighted) {
+            this.highlight(this.toolButtons[index], "toolbar-button-selected", highlighted);
+        };
+        Toolbar.prototype.highlightOption = function (index, highlighted) {
+            if (this.optionButtons) {
+                this.highlight(this.optionButtons[index], "toolbar-option-selected", highlighted);
+            }
+        };
+        Toolbar.prototype.highlight = function (button, cssClass, highlighted) {
+            if (button) {
+                if (highlighted) {
+                    button.addClass(cssClass);
+                }
+                else {
+                    button.removeClass(cssClass);
+                }
+            }
+        };
+        Toolbar.prototype.showOptions = function (options) {
+            var _this = this;
+            this.clearOptions();
+            this.optionButtons = options.map(function (option, index) {
+                var button = mkToolbarButton(option.icon, _this.optionsHeight, 2);
+                button.title(option.title);
+                button.onClick(function () {
+                    _this.setTool(index, true);
+                });
+                _this.dropdownOptions.appendChild(button.getView());
+                return button;
+            });
+            this.layoutDropdown();
+            this.setTool(0, true);
+        };
+        Toolbar.prototype.clearOptions = function () {
+            this.dropdownOptions.el.innerHTML = "";
+            this.optionButtons = undefined;
+        };
+        return Toolbar;
+    }());
+    pxtblockly.Toolbar = Toolbar;
+    function mkCursorSizeButton(size, sideLength) {
+        return new pxtblockly.CursorSizeButton({
+            width: sideLength,
+            height: sideLength,
+            padding: 2,
+            cornerRadius: 2,
+            rootClass: "toolbar-button",
+            backgroundClass: "toolbar-button-background",
+            cursorFill: "black",
+            cursorSideLength: size
+        });
+    }
+    function mkToolbarButton(icon, sideLength, padding) {
+        return new pxtblockly.FontIconButton({
+            width: sideLength,
+            height: sideLength,
+            cornerRadius: 2,
+            padding: padding,
+            iconFont: "Icons",
+            iconString: icon,
+            rootClass: "toolbar-button",
+            backgroundClass: "toolbar-button-background",
+            iconClass: "toolbar-button-icon"
+        });
+    }
+    function sizeAdjective(cursorIndex) {
+        switch (cursorIndex) {
+            case 0: return lf("Small Cursor");
+            case 1: return lf("Medium Cursor");
+            case 2: return lf("Large Cursor");
+        }
+        return undefined;
+    }
+})(pxtblockly || (pxtblockly = {}));
+/// <reference path="./grid.ts" />
+/// <reference path="./bitmap.ts" />
+/// <reference path="./tools.ts" />
+/// <reference path="./toolbar.ts" />
+var pxtblockly;
+(function (pxtblockly) {
+    var svg = pxt.svgUtil;
+    // Absolute editor height
+    var TOTAL_HEIGHT = 350;
+    // Editor padding on all sides
+    var PADDING = 8;
+    var PADDING_BOTTOM = 3;
+    // Height of toolbar (the buttons above the canvas)
+    var TOOLBAR_HEIGHT = 55;
+    // Spacing between the toolbar and the canvas
+    var TOOLBAR_CANVAS_MARGIN = 5;
+    // Height of the bar that displays editor size and info below the canvas
+    var REPORTER_BAR_HEIGHT = 13;
+    // Spacing between the canvas and reporter bar
+    var REPORTER_BAR_CANVAS_MARGIN = 5;
+    // Border width between palette swatches
+    var PALETTE_INNER_BORDER = 2;
+    // Border width around the outside of the palette
+    var PALETTE_OUTER_BORDER = 3;
+    // Spacing between palette and paint surface
+    var PALETTE_CANVAS_MARGIN = 0;
+    // Total allowed height of paint surface
+    var CANVAS_HEIGHT = TOTAL_HEIGHT - TOOLBAR_HEIGHT - TOOLBAR_CANVAS_MARGIN
+        - REPORTER_BAR_HEIGHT - REPORTER_BAR_CANVAS_MARGIN - PADDING * 2;
+    var SpriteEditor = /** @class */ (function () {
+        function SpriteEditor(bitmap) {
+            var _this = this;
+            this.activeTool = pxtblockly.PaintTool.Normal;
+            this.toolWidth = 1;
+            this.color = 1;
+            this.undoStack = [];
+            this.redoStack = [];
+            this.columns = 16;
+            this.rows = 16;
+            this.colors = pxt.appTarget.runtime.palette.slice(1);
+            this.columns = bitmap.width;
+            this.rows = bitmap.height;
+            this.state = bitmap.copy();
+            this.root = new svg.SVG();
+            this.group = this.root.group();
+            this.makeTransparencyFill();
+            this.palette = new pxtblockly.ColorPalette({
+                rowLength: 2,
+                emptySwatchDisabled: false,
+                cellClass: "palette-swatch",
+                emptySwatchFill: 'url("#alpha-background")',
+                outerMargin: PALETTE_OUTER_BORDER,
+                columnMargin: PALETTE_INNER_BORDER,
+                rowMargin: PALETTE_INNER_BORDER,
+                backgroundFill: "black",
+                colors: this.colors
+            });
+            this.palette.setRootId("sprite-editor-palette");
+            this.paintSurface = new pxtblockly.BitmapImage({
+                outerMargin: 0,
+                backgroundFill: 'url("#alpha-background")',
+                cellClass: "pixel-cell"
+            }, this.state.copy(), [null].concat(this.colors), this.root);
+            this.paintSurface.setRootId("sprite-editor-canvas");
+            this.paintSurface.drag(function (col, row) {
+                _this.debug("gesture (" + pxtblockly.PaintTool[_this.activeTool] + ")");
+                _this.setCell(col, row, _this.color, false);
+                _this.setCursorInfo(col, row);
+            });
+            this.paintSurface.up(function (col, row) {
+                _this.debug("gesture end (" + pxtblockly.PaintTool[_this.activeTool] + ")");
+                _this.commit();
+            });
+            this.paintSurface.down(function (col, row) {
+                _this.setCell(col, row, _this.color, false);
+            });
+            this.paintSurface.move(function (col, row) {
+                _this.drawCursor(col, row);
+                _this.setCursorInfo(col, row);
+            });
+            this.paintSurface.leave(function () {
+                if (_this.edit) {
+                    _this.paintSurface.repaint();
+                }
+                if (_this.edit.isStarted) {
+                    _this.commit();
+                }
+                _this.cursorInfo.text("");
+            });
+            this.group.appendChild(this.paintSurface.getView());
+            this.group.appendChild(this.palette.getView());
+            this.toolbar = new pxtblockly.Toolbar(this.group.group(), {
+                height: TOOLBAR_HEIGHT,
+                width: CANVAS_HEIGHT,
+                buttonMargin: 5,
+                optionsMargin: 3,
+                rowMargin: 5
+            }, this);
+            this.palette.setSelected(this.color);
+            this.palette.onColorSelected(function (color) {
+                _this.setActiveColor(color);
+            });
+            this.setActiveColor(this.color);
+            this.drawReporterBar();
+            this.updateUndoRedo();
+            document.addEventListener("keydown", function (ev) {
+                if (ev.key === "Undo" || (ev.ctrlKey && ev.key === "z")) {
+                    _this.undo();
+                }
+                else if (ev.key === "Redo" || (ev.ctrlKey && ev.key === "y")) {
+                    _this.redo();
+                }
+            });
+        }
+        SpriteEditor.prototype.setCell = function (col, row, color, commit) {
+            if (commit) {
+                this.state.set(col, row, color);
+                this.paintCell(col, row, color);
+            }
+            else {
+                if (!this.edit.isStarted) {
+                    this.edit.start(col, row);
+                }
+                this.edit.update(col, row);
+                this.paintEdit(this.edit);
+            }
+        };
+        SpriteEditor.prototype.render = function (el) {
+            el.appendChild(this.root.el);
+            this.layout();
+            this.root.attr({ "width": this.outerWidth() + "px", "height": this.outerHeight() + "px" });
+        };
+        SpriteEditor.prototype.layout = function () {
+            if (!this.root) {
+                return;
+            }
+            var paintAreaTop = TOOLBAR_HEIGHT + TOOLBAR_CANVAS_MARGIN + PADDING;
+            this.palette.setGridDimensions(CANVAS_HEIGHT);
+            this.palette.translate(PADDING, paintAreaTop);
+            var paintAreaLeft = PADDING + this.palette.outerWidth() + PALETTE_CANVAS_MARGIN;
+            this.paintSurface.setGridDimensions(CANVAS_HEIGHT);
+            var canvasLeft = paintAreaLeft + CANVAS_HEIGHT / 2 - this.paintSurface.outerWidth() / 2;
+            this.paintSurface.translate(canvasLeft, paintAreaTop);
+            this.repoterBar.translate(paintAreaLeft, paintAreaTop + CANVAS_HEIGHT + REPORTER_BAR_CANVAS_MARGIN);
+            this.canvasDimensions.at(CANVAS_HEIGHT - this.canvasDimensions.el.getComputedTextLength(), 0);
+            this.width = paintAreaLeft + CANVAS_HEIGHT + PADDING;
+            this.height = paintAreaTop + CANVAS_HEIGHT + PADDING_BOTTOM + REPORTER_BAR_CANVAS_MARGIN + REPORTER_BAR_HEIGHT;
+            this.toolbar.translate(PADDING, PADDING);
+            this.toolbar.setDimensions(this.width - PADDING * 2, TOOLBAR_HEIGHT);
+        };
+        SpriteEditor.prototype.setPreview = function (preview, width) {
+            this.preview = preview;
+            this.previewWidth = width;
+        };
+        SpriteEditor.prototype.rePaint = function () {
+            this.paintSurface.repaint();
+            if (this.preview) {
+                this.preview.repaint();
+            }
+        };
+        SpriteEditor.prototype.setActiveColor = function (color, setPalette) {
+            if (setPalette === void 0) { setPalette = false; }
+            if (setPalette) {
+                this.palette.setSelected(color);
+            }
+            else {
+                this.color = color;
+                // If the user is erasing, go back to pencil
+                if (this.activeTool === pxtblockly.PaintTool.Erase) {
+                    this.toolbar.resetTool();
+                    this.activeTool = pxtblockly.PaintTool.Normal;
+                }
+                this.edit = this.newEdit(this.color);
+            }
+        };
+        SpriteEditor.prototype.setActiveTool = function (tool) {
+            this.activeTool = tool;
+            this.edit = this.newEdit(this.color);
+        };
+        SpriteEditor.prototype.setToolWidth = function (width) {
+            this.toolWidth = width;
+            this.edit = this.newEdit(this.color);
+            // Cursor doesn't affect fill, so switch to pencil
+            if (this.activeTool === pxtblockly.PaintTool.Fill) {
+                this.toolbar.resetTool();
+                this.activeTool = pxtblockly.PaintTool.Normal;
+            }
+        };
+        SpriteEditor.prototype.undo = function () {
+            if (this.undoStack.length) {
+                this.debug("undo");
+                var todo = this.undoStack.pop();
+                this.pushState(false);
+                this.restore(todo);
+            }
+            this.updateUndoRedo();
+        };
+        SpriteEditor.prototype.redo = function () {
+            if (this.redoStack.length) {
+                this.debug("redo");
+                var todo = this.redoStack.pop();
+                this.pushState(true);
+                this.restore(todo);
+            }
+            this.updateUndoRedo();
+        };
+        SpriteEditor.prototype.resize = function (width, height) {
+            if (!this.cachedState) {
+                this.cachedState = this.state.copy();
+                this.undoStack.push(this.cachedState);
+                this.redoStack = [];
+            }
+            this.columns = width;
+            this.rows = height;
+            this.state = pxtblockly.resizeBitmap(this.cachedState, width, height);
+            this.paintSurface.restore(this.state, true);
+            this.paintSurface.setGridDimensions(CANVAS_HEIGHT);
+            this.preview.restore(this.state, true);
+            this.preview.setGridDimensions(this.previewWidth);
+            this.canvasDimensions.text(this.columns + "x" + this.rows);
+            this.layout();
+            this.paintSurface.showOverlay();
+            // Canvas size changed and some edits rely on that (like paint)
+            this.edit = this.newEdit(this.color);
+        };
+        SpriteEditor.prototype.setSizePresets = function (presets) {
+            this.toolbar.setSizePresets(presets);
+        };
+        SpriteEditor.prototype.canvasWidth = function () {
+            return this.columns;
+        };
+        SpriteEditor.prototype.canvasHeight = function () {
+            return this.rows;
+        };
+        SpriteEditor.prototype.outerWidth = function () {
+            return this.width;
+        };
+        SpriteEditor.prototype.outerHeight = function () {
+            return this.height;
+        };
+        SpriteEditor.prototype.drawReporterBar = function () {
+            this.repoterBar = this.group.group();
+            this.canvasDimensions = this.repoterBar.draw("text")
+                .fontSize(REPORTER_BAR_HEIGHT, svg.LengthUnit.px)
+                .fontFamily("monospace")
+                .fill("white")
+                .alignmentBaseline("hanging")
+                .text(this.columns + "x" + this.rows);
+            this.cursorInfo = this.repoterBar.draw("text")
+                .fontSize(REPORTER_BAR_HEIGHT, svg.LengthUnit.px)
+                .fontFamily("monospace")
+                .alignmentBaseline("hanging")
+                .fill("white");
+        };
+        SpriteEditor.prototype.drawCursor = function (col, row) {
+            var _this = this;
+            if (this.edit) {
+                this.paintSurface.repaint();
+                this.edit.drawCursor(col, row, function (c, r) { return _this.paintSurface.drawColor(c, r, _this.edit.color); });
+            }
+        };
+        SpriteEditor.prototype.setCursorInfo = function (col, row) {
+            this.cursorInfo.text(col + "," + row);
+        };
+        SpriteEditor.prototype.paintEdit = function (edit) {
+            this.paintSurface.restore(this.state);
+            this.paintSurface.applyEdit(edit);
+            if (this.preview) {
+                this.preview.restore(this.state);
+                this.preview.applyEdit(edit);
+            }
+        };
+        SpriteEditor.prototype.commit = function () {
+            if (this.edit) {
+                if (this.cachedState) {
+                    this.cachedState = undefined;
+                }
+                this.pushState(true);
+                this.paintEdit(this.edit);
+                this.state.apply(this.paintSurface.image);
+                this.edit = this.newEdit(this.color);
+                this.redoStack = [];
+            }
+        };
+        SpriteEditor.prototype.pushState = function (undo) {
+            var cp = this.state.copy();
+            if (undo) {
+                this.undoStack.push(cp);
+            }
+            else {
+                this.redoStack.push(cp);
+            }
+            this.updateUndoRedo();
+        };
+        SpriteEditor.prototype.restore = function (bitmap) {
+            this.state.apply(bitmap);
+            this.paintSurface.restore(bitmap, true);
+            if (this.preview) {
+                this.preview.restore(bitmap, true);
+            }
+        };
+        SpriteEditor.prototype.updateUndoRedo = function () {
+            this.toolbar.setUndoState(this.undoStack.length > 0);
+            this.toolbar.setRedoState(this.redoStack.length > 0);
+        };
+        SpriteEditor.prototype.paintCell = function (col, row, color) {
+            this.paintSurface.writeColor(col, row, color);
+            if (this.preview) {
+                this.preview.writeColor(col, row, color);
+            }
+        };
+        SpriteEditor.prototype.newEdit = function (color) {
+            switch (this.activeTool) {
+                case pxtblockly.PaintTool.Normal: return new pxtblockly.PaintEdit(this.columns, this.rows, color, this.toolWidth);
+                case pxtblockly.PaintTool.Rectangle: return new pxtblockly.OutlineEdit(this.columns, this.rows, color, this.toolWidth);
+                case pxtblockly.PaintTool.Outline: return new pxtblockly.OutlineEdit(this.columns, this.rows, color, this.toolWidth);
+                case pxtblockly.PaintTool.Line: return new pxtblockly.LineEdit(this.columns, this.rows, color, this.toolWidth);
+                case pxtblockly.PaintTool.Circle: return new pxtblockly.CircleEdit(this.columns, this.rows, color, this.toolWidth);
+                case pxtblockly.PaintTool.Erase: return new pxtblockly.PaintEdit(this.columns, this.rows, 0, this.toolWidth);
+                case pxtblockly.PaintTool.Fill: return new pxtblockly.FillEdit(this.columns, this.rows, color, this.toolWidth);
+            }
+        };
+        SpriteEditor.prototype.debug = function (msg) {
+            // if (this.debugText) {
+            //     this.debugText.text("DEBUG: " + msg);
+            // }
+        };
+        SpriteEditor.prototype.makeTransparencyFill = function () {
+            this.root.define(function (defs) {
+                var p = defs.create("pattern", "alpha-background")
+                    .size(10, 10)
+                    .units(svg.PatternUnits.userSpaceOnUse);
+                p.draw("rect")
+                    .at(0, 0)
+                    .size(10, 10)
+                    .fill("white");
+                p.draw("rect")
+                    .at(0, 0)
+                    .size(5, 5)
+                    .fill("#dedede");
+                p.draw("rect")
+                    .at(5, 5)
+                    .size(5, 5)
+                    .fill("#dedede");
+            });
+        };
+        return SpriteEditor;
+    }());
+    pxtblockly.SpriteEditor = SpriteEditor;
+})(pxtblockly || (pxtblockly = {}));
+/// <reference path="./spriteEditor.ts" />
+/// <reference path="../../../built/pxtlib.d.ts" />
+var pxtblockly;
+(function (pxtblockly) {
+    var svg = pxt.svgUtil;
+    // It's a square
+    var TOTAL_WIDTH = 55;
+    var PADDING = 5;
+    var BG_PADDING = 4;
+    var BG_WIDTH = TOTAL_WIDTH - PADDING * 2;
+    var PREVIEW_WIDTH = TOTAL_WIDTH - PADDING * 2 - BG_PADDING * 2;
+    // These are the characters used to compile, for a list of every supported character see parseBitmap()
+    var hexChars = [".", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
+    var FieldSpriteEditor = /** @class */ (function (_super) {
+        __extends(FieldSpriteEditor, _super);
+        function FieldSpriteEditor(text, params, validator) {
+            var _this = _super.call(this, text, validator) || this;
+            _this.isFieldCustom_ = true;
+            _this.params = parseFieldOptions(params);
+            if (!_this.state) {
+                _this.state = new pxtblockly.Bitmap(_this.params.initWidth, _this.params.initHeight);
+            }
+            return _this;
+        }
+        FieldSpriteEditor.prototype.init = function () {
+            if (this.fieldGroup_) {
+                // Field has already been initialized once.
+                return;
+            }
+            // Build the DOM.
+            this.fieldGroup_ = Blockly.utils.createSvgElement('g', {}, null);
+            if (!this.visible_) {
+                this.fieldGroup_.style.display = 'none';
+            }
+            if (!this.state) {
+                this.state = new pxtblockly.Bitmap(this.params.initWidth, this.params.initHeight);
+            }
+            this.redrawPreview();
+            this.updateEditable();
+            this.sourceBlock_.getSvgRoot().appendChild(this.fieldGroup_);
+            // Force a render.
+            this.render_();
+            this.mouseDownWrapper_ = Blockly.bindEventWithChecks_(this.getClickTarget_(), "mousedown", this, this.onMouseDown_);
+        };
+        /**
+         * Show the inline free-text editor on top of the text.
+         * @private
+         */
+        FieldSpriteEditor.prototype.showEditor_ = function () {
+            var _this = this;
+            // If there is an existing drop-down someone else owns, hide it immediately and clear it.
+            Blockly.DropDownDiv.hideWithoutAnimation();
+            Blockly.DropDownDiv.clearContent();
+            var contentDiv = Blockly.DropDownDiv.getContentDiv();
+            this.editor = new pxtblockly.SpriteEditor(this.preview.bitmap());
+            this.editor.setPreview(this.preview, PREVIEW_WIDTH);
+            this.editor.render(contentDiv);
+            this.editor.rePaint();
+            this.editor.setActiveColor(this.params.initColor, true);
+            this.editor.setSizePresets(this.params.sizes);
+            Blockly.DropDownDiv.setColour("#2c3e50", "#2c3e50");
+            Blockly.DropDownDiv.showPositionedByBlock(this, this.sourceBlock_, function () {
+                _this.state = _this.preview.image;
+                if (_this.sourceBlock_ && Blockly.Events.isEnabled()) {
+                    Blockly.Events.fire(new Blockly.Events.BlockChange(_this.sourceBlock_, 'field', _this.name, _this.text_, _this.getText()));
+                }
+                goog.style.setHeight(contentDiv, null);
+                goog.style.setWidth(contentDiv, null);
+                goog.style.setStyle(contentDiv, "overflow", null);
+                goog.style.setStyle(contentDiv, "max-height", null);
+            });
+            this.editor.layout();
+            goog.style.setHeight(contentDiv, this.editor.outerHeight() + 1);
+            goog.style.setWidth(contentDiv, this.editor.outerWidth() + 1);
+            goog.style.setStyle(contentDiv, "overflow", "hidden");
+            goog.style.setStyle(contentDiv, "max-height", "500px");
+        };
+        FieldSpriteEditor.prototype.isInFlyout = function () {
+            return this.sourceBlock_.workspace.getParentSvg().className.baseVal == "blocklyFlyout";
+        };
+        FieldSpriteEditor.prototype.render_ = function () {
+            _super.prototype.render_.call(this);
+            if (this.preview) {
+                this.size_.height = TOTAL_WIDTH;
+                this.size_.width = TOTAL_WIDTH;
+            }
+        };
+        FieldSpriteEditor.prototype.getText = function () {
+            if (!this.state) {
+                return "img``";
+            }
+            var res = "img`";
+            for (var r = 0; r < this.state.height; r++) {
+                res += "\n";
+                for (var c = 0; c < this.state.width; c++) {
+                    res += hexChars[this.state.get(c, r)] + " ";
+                }
+            }
+            res += "\n`";
+            return res;
+        };
+        FieldSpriteEditor.prototype.setText = function (newText) {
+            if (newText == null) {
+                return;
+            }
+            this.parseBitmap(newText);
+            if (this.preview) {
+                this.redrawPreview();
+            }
+            _super.prototype.setText.call(this, newText);
+        };
+        FieldSpriteEditor.prototype.redrawPreview = function () {
+            this.fieldGroup_.innerHTML = "";
+            var bg = new svg.Rect()
+                .at(PADDING, PADDING)
+                .size(BG_WIDTH, BG_WIDTH)
+                .fill("#dedede")
+                .stroke("#898989", 1)
+                .corner(4);
+            var palette = pxt.U.clone(pxt.appTarget.runtime.palette);
+            palette[0] = null;
+            this.preview = new pxtblockly.BitmapImage({
+                //backgroundFill: this.sourceBlock_.getColourSecondary(),
+                outerMargin: 2,
+                cellClass: "pixel-cell"
+            }, this.state, palette);
+            this.preview.translate(PADDING + BG_PADDING, PADDING + BG_PADDING);
+            this.preview.setGridDimensions(PREVIEW_WIDTH);
+            this.fieldGroup_.appendChild(bg.el);
+            this.fieldGroup_.appendChild(this.preview.getView().el);
+        };
+        FieldSpriteEditor.prototype.parseBitmap = function (newText) {
+            // Strip the tagged template string business and the whitespace. We don't have to exhaustively
+            // replace encoded characters because the compiler will catch any disallowed characters and throw
+            // an error before the decompilation happens. 96 is backtick and 9 is tab
+            newText = newText.replace(/[ `]|(?:&#96;)|(?:&#9;)|(?:img)/g, "").trim();
+            newText = newText.replace(/&#10;/g, "\n");
+            var rows = newText.split("\n");
+            // We support "ragged" sprites so not all rows will be the same length
+            var sprite = [];
+            var spriteWidth = 0;
+            for (var r = 0; r < rows.length; r++) {
+                var row = rows[r];
+                var rowValues = [];
+                for (var c = 0; c < row.length; c++) {
+                    // This list comes from libs/screen/targetOverrides.ts
+                    switch (row[c]) {
+                        case "0":
+                        case ".":
+                            rowValues.push(0);
+                            break;
+                        case "1":
+                        case "#":
+                            rowValues.push(1);
+                            break;
+                        case "2":
+                        case "T":
+                            rowValues.push(2);
+                            break;
+                        case "3":
+                        case "t":
+                            rowValues.push(3);
+                            break;
+                        case "4":
+                        case "N":
+                            rowValues.push(4);
+                            break;
+                        case "5":
+                        case "n":
+                            rowValues.push(5);
+                            break;
+                        case "6":
+                        case "G":
+                            rowValues.push(6);
+                            break;
+                        case "7":
+                        case "g":
+                            rowValues.push(7);
+                            break;
+                        case "8":
+                            rowValues.push(8);
+                            break;
+                        case "9":
+                            rowValues.push(9);
+                            break;
+                        case "a":
+                        case "A":
+                        case "R":
+                            rowValues.push(10);
+                            break;
+                        case "b":
+                        case "B":
+                        case "P":
+                            rowValues.push(11);
+                            break;
+                        case "c":
+                        case "C":
+                        case "p":
+                            rowValues.push(12);
+                            break;
+                        case "d":
+                        case "D":
+                        case "O":
+                            rowValues.push(13);
+                            break;
+                        case "e":
+                        case "E":
+                        case "Y":
+                            rowValues.push(14);
+                            break;
+                        case "f":
+                        case "F":
+                        case "W":
+                            rowValues.push(15);
+                            break;
+                    }
+                }
+                if (rowValues.length) {
+                    sprite.push(rowValues);
+                    spriteWidth = Math.max(spriteWidth, rowValues.length);
+                }
+            }
+            var spriteHeight = sprite.length;
+            if (spriteHeight === 0 || spriteWidth === 0) {
+                // This isn't great because it changes the underlying code; the user entered
+                // an empty/invalid sprite and we are converting it to an empty 16x16 sprite
+                // next time the project saves. The best behavior would be to flag this in
+                // the decompiler and return a grey block but that's not supported.
+                return;
+            }
+            this.state = new pxtblockly.Bitmap(spriteWidth, spriteHeight);
+            for (var r = 0; r < spriteHeight; r++) {
+                var row = sprite[r];
+                for (var c = 0; c < spriteWidth; c++) {
+                    if (c < row.length) {
+                        this.state.set(c, r, row[c]);
+                    }
+                    else {
+                        this.state.set(c, r, 0);
+                    }
+                }
+            }
+        };
+        return FieldSpriteEditor;
+    }(Blockly.Field));
+    pxtblockly.FieldSpriteEditor = FieldSpriteEditor;
+    function parseFieldOptions(opts) {
+        var parsed = {
+            sizes: [
+                [8, 8],
+                [8, 16],
+                [16, 16],
+                [16, 32],
+                [32, 32],
+            ],
+            initColor: 1,
+            initWidth: 16,
+            initHeight: 16,
+        };
+        if (!opts) {
+            return parsed;
+        }
+        if (opts.sizes != null) {
+            var pairs = opts.sizes.split(";");
+            var sizes = [];
+            for (var i = 0; i < pairs.length; i++) {
+                var pair = pairs[i].split(",");
+                if (pair.length !== 2) {
+                    continue;
+                }
+                var width = parseInt(pair[0]);
+                var height = parseInt(pair[1]);
+                if (isNaN(width) || isNaN(height)) {
+                    continue;
+                }
+                sizes.push([width, height]);
+            }
+            parsed.sizes = sizes;
+        }
+        parsed.initColor = withDefault(opts.initColor, parsed.initColor);
+        parsed.initWidth = withDefault(opts.initWidth, parsed.initWidth);
+        parsed.initHeight = withDefault(opts.initHeight, parsed.initHeight);
+        return parsed;
+        function withDefault(raw, def) {
+            var res = parseInt(raw);
+            if (isNaN(res)) {
+                return def;
+            }
+            return res;
+        }
+    }
 })(pxtblockly || (pxtblockly = {}));

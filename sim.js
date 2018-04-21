@@ -530,6 +530,8 @@ var pxsim;
 (function (pxsim) {
     pxsim.VectorConstructor = THREE.Vector3;
     pxsim.QuaternionConstructor = THREE.Quaternion;
+    pxsim.EulerConstructor = THREE.Euler;
+    pxsim.SphericalConstructor = THREE.Spherical;
 })(pxsim || (pxsim = {}));
 (function (pxsim) {
     var math;
@@ -662,13 +664,6 @@ var pxsim;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Scene3d.prototype, "origin", {
-            get: function () {
-                return pxsim.math3d.zeroVector();
-            },
-            enumerable: true,
-            configurable: true
-        });
         Object.defineProperty(Scene3d.prototype, "camera", {
             get: function () {
                 return this._camera;
@@ -753,6 +748,15 @@ var pxsim;
 (function (pxsim) {
     var scene;
     (function (scene) {
+        function randomPositionInSphere(diameter) {
+            var spherical = new pxsim.SphericalConstructor(Math.random() * diameter * .5, Math.random() * Math.PI * 2., Math.random() * Math.PI * 2.);
+            return new pxsim.VectorConstructor().setFromSpherical(spherical);
+        }
+        scene.randomPositionInSphere = randomPositionInSphere;
+        function randomPositionInCube(size) {
+            return new pxsim.VectorConstructor(Math.random() * size, Math.random() * size, Math.random() * size).addScalar(size * -.5);
+        }
+        scene.randomPositionInCube = randomPositionInCube;
         function intersectedObjectAt(x, y) {
             var scene3d = pxsim.world.scene();
             var objects = scene3d ? scene3d.intersectedObjects(x, y) : null;
