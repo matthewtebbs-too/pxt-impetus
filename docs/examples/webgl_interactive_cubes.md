@@ -17,7 +17,7 @@ Hover over a floating cube.
     boxshape = design.boxShape(20, 20, 20)
     for (let i = 0; i < 2000; i++) {
         boxobject = object.fromShapeAndMaterial(boxshape, design.materialOfColor(design.randomColor()))
-        world.scene().addAt(boxobject, Math.vector(Math.randomRange(-400, 400), Math.randomRange(-400, 400), Math.randomRange(-400, 400)))
+        world.scene().addAt(boxobject, scene.randomPositionInCube(800));
     }
     scene.onAnimate(function (msec) {
         theta += 0.1 * msec / (1 / 60)
@@ -43,7 +43,4 @@ Hover over a floating cube.
     input.onMouseLeave(function () {
         mouseIn = false
     })
-```
-
-```package
 ```

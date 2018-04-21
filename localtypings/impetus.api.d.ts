@@ -349,7 +349,6 @@ declare class Scene3d extends Object3d {
      * Active camera.
      */
     //% blockCombine
-    //% blockCombineShadow=world_scene
     //% shim=.camera property
     camera: Camera;
 
@@ -388,6 +387,24 @@ declare class Scene3d extends Object3d {
 
 //% color="#d92680" icon="\uf03e" block="Scene" weight=95
 declare namespace scene { /* image icon */
+     /**
+     * Random position in sphere.
+     * @param diameter value, eg: 1
+     */
+    //% blockId=scene_random_positioninsphere
+    //% block="random position in %side diameter sphere"
+    //% shim=scene::randomPositionInSphere
+    function randomPositionInSphere(diameter: number): Vector;
+
+    /**
+     * Random position in cube.
+     * @param size value, eg: 1
+     */
+    //% blockId=scene_random_positionincube
+    //% block="random position in %size size cube"
+    //% shim=scene::randomPositionInCube
+    function randomPositionInCube(size: number): Vector;
+
     /**
      * Intersect the view of the current scene with the active camera.
      */

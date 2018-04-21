@@ -224,6 +224,8 @@
   "parseInt|block": "parse to integer %text",
   "scene.intersectedObjectAt|block": "intersected object at %x|%y",
   "scene.onAnimate|block": "on scene animate",
+  "scene.randomPositionInCube|block": "random position in %size size cube",
+  "scene.randomPositionInSphere|block": "random position in %side diameter sphere",
   "scene|block": "Scene",
   "world.scene|block": "scene",
   "world|block": "World",

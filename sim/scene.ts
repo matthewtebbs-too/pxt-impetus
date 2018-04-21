@@ -123,6 +123,21 @@ namespace pxsim {
 }
 
 namespace pxsim.scene {
+    export function randomPositionInSphere(diameter: number): Vector {
+        const spherical = new SphericalConstructor(
+            Math.random() * diameter * .5,
+            Math.random() * Math.PI * 2.,
+            Math.random() * Math.PI * 2.);
+        return new VectorConstructor().setFromSpherical(spherical);
+    }
+
+    export function randomPositionInCube(size: number): Vector {
+        return new VectorConstructor(
+            Math.random() * size,
+            Math.random() * size,
+            Math.random() * size).addScalar(size * -.5);
+    }
+
     export function intersectedObjectAt(x: number, y: number): Object3d | null {
         const scene3d = pxsim.world.scene();
         const objects = scene3d ? scene3d.intersectedObjects(x, y) : null;

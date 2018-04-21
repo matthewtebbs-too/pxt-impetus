@@ -16,6 +16,16 @@ namespace pxsim {
 
     // tslint:disable-next-line:variable-name
     export const QuaternionConstructor = THREE.Quaternion;
+
+    export type Euler = THREE.Euler;
+
+    // tslint:disable-next-line:variable-name
+    export const EulerConstructor = THREE.Euler;
+
+    export type Spherical = THREE.Spherical;
+
+    // tslint:disable-next-line:variable-name
+    export const SphericalConstructor = THREE.Spherical;
 }
 
 namespace pxsim.math {

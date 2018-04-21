@@ -192,5 +192,9 @@
   "parseInt": "Convert a string to an integer.",
   "scene.intersectedObjectAt": "Intersect the view of the current scene with the active camera.",
   "scene.onAnimate": "Code to run when the scene is animated before each frame.",
+  "scene.randomPositionInCube": "Random position in cube.",
+  "scene.randomPositionInCube|param|size": "value, eg: 1",
+  "scene.randomPositionInSphere": "Random position in sphere.",
+  "scene.randomPositionInSphere|param|diameter": "value, eg: 1",
   "world.scene": "Get current scene."
 }
