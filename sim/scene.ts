@@ -7,14 +7,19 @@
 /// <reference path='object.ts'/>
 
 namespace pxsim {
-    export class Scene3d extends Object3dMixin(THREE.Scene) {
-        private _ambientlight: AmbientLight;
-        private _camera: Camera;
+    export type Raycaster = THREE.Raycaster;
 
+    // tslint:disable-next-line:variable-name
+    export const RaycasterConstructor = THREE.Raycaster;
+}
+
+namespace pxsim {
+    export class Scene3d extends Object3dMixin(THREE.Scene) {
         private _physicsworld: PhysicsWorld = new PhysicsWorld();
 
-        private _raycaster: THREE.Raycaster;
-        private _controls: THREE.OrbitControls;
+        private _ambientlight: AmbientLight;
+        private _camera: Camera;
+        private _raycaster: Raycaster;
 
         public get physicsWorld(): PhysicsWorld {
             return this._physicsworld;
@@ -29,13 +34,9 @@ namespace pxsim {
             this.addAt(this._ambientlight, math3d.zeroVector());
 
             this._camera = new PerspectiveCamera();
-            this.addAt(this._camera, new VectorConstructor(-40, 20, 15));
+            this._camera.position.set(-40, 20, 15);
 
-            this._raycaster = new THREE.Raycaster();
-
-            this._controls = new THREE.OrbitControls(this._camera);
-            this._controls.target.set(0, 2, 0);
-            this._controls.update();
+            this._raycaster = new RaycasterConstructor();
         }
 
         public get camera(): Camera {
@@ -93,12 +94,13 @@ namespace pxsim {
             singletonWorldBoard().events!.queue(ScopeId.Scene, EventId.Animate, timeStep);
         }
 
-        public intersectedObjects(x: number, y: number): Object3d[] | null {
+        // tslint:disable-next-line:variable-name
+        public intersectedObjects(x_: number, y_: number): Object3d[] | null {
             if (!this._camera) {
                 return null;
             }
 
-            this._raycaster.setFromCamera(new THREE.Vector2(x, y), this._camera);
+            this._raycaster.setFromCamera({x: x_, y: y_}, this._camera);
             const intersections = this._raycaster.intersectObjects(this.children);
 
             return intersections ? intersections.map(intersection => intersection.object as any) : null;

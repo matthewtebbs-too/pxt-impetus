@@ -7,6 +7,13 @@
 /// <reference path="_runtime.ts"/>
 
 namespace pxsim {
+    export type Clock = THREE.Clock;
+
+    // tslint:disable-next-line:variable-name
+    export const ClockConstructor = THREE.Clock;
+}
+
+namespace pxsim {
     export class Renderer extends rt.ProxyObject<THREE.WebGLRenderer> {
         private static _renderers: _Map<rt.ObjId, THREE.WebGLRenderer> = new Map<rt.ObjId, THREE.WebGLRenderer>();
 
@@ -27,11 +34,8 @@ namespace pxsim {
         private _domElement: HTMLElement = document.createElement('div');
 
         private _scene3d: Scene3d | null = null;
-        private _camera: Camera | null = null;
         private _stats: Stats = new Stats();
-
-        private _clock: THREE.Clock = new THREE.Clock();
-
+        private _clock: Clock = new ClockConstructor();
         private _paused: boolean = false;
 
         private _callbackRequestId: number = 0;
@@ -115,15 +119,12 @@ namespace pxsim {
         }
 
         protected _updateSceneCameraSize() {
-            if (!this._scene3d) {
+            if (!this._scene3d || !this._scene3d.camera) {
                 return;
             }
 
-            const camera = this._scene3d.camera;
-            if (camera) {
-                const size = this.reference.getSize();
-                camera.setSize(size.width, size.height);
-            }
+            const size = this.reference.getSize();
+            this._scene3d.camera.setSize(size.width, size.height);
         }
 
         protected _onDispose() {

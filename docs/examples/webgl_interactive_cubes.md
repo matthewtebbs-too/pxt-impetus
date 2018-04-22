@@ -12,7 +12,7 @@ Hover over a floating cube.
     let theta = 0
     theta = 0
     world.scene().backgroundColor = design.standardColor(Palette.LightCyan)
-
+    world.scene().camera = design.perspectiveCamera();
     world.scene().addAt(design.directionalLight(design.colorPicker(0xffffff), 1), Math.vector(5, 20, 0))
     boxshape = design.boxShape(20, 20, 20)
     for (let i = 0; i < 2000; i++) {
@@ -43,4 +43,7 @@ Hover over a floating cube.
     input.onMouseLeave(function () {
         mouseIn = false
     })
+```
+
+```package
 ```

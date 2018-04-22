@@ -171,6 +171,7 @@
   "design.directionalLight|param|intensity": "number, eg: 1",
   "design.materialOfColor": "Solid color material.",
   "design.materialOfColor|param|color": "Color",
+  "design.perspectiveCamera": "Perspective camera.",
   "design.planeShape": "Plane shape.",
   "design.planeShape|param|height": "number, eg: 100",
   "design.planeShape|param|width": "number, eg: 100",

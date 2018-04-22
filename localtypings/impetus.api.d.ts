@@ -310,14 +310,6 @@ declare namespace design {
 //% color="#7f26d9" icon="\uf1b2" block="Object" weight=99
 declare namespace object { /* cube icon */
     /**
-     * Create object with shape.
-     */
-    //% blockId=object3d_from_shape3d_and_material
-    //% block="object with shape %shape=shape3d_box|and material %material=material_with_color"
-    //% shim=mesh::fromShapeAndMaterial
-    function fromShapeAndMaterial(shape3d: Shape3d, material: Material): Mesh3d;
-
-    /**
      * 
      * Return material from the object, or null if it has none.
      */
@@ -325,6 +317,14 @@ declare namespace object { /* cube icon */
     //% block="material of %object3d"
     //% shim=mesh::materialOf
     function materialOf(object3d: Object3d): Material;
+
+    /**
+     * Create object with shape.
+     */
+    //% blockId=object3d_from_shape3d_and_material
+    //% block="object with shape %shape=shape3d_box|and material %material=material_of_color"
+    //% shim=mesh::fromShapeAndMaterial
+    function fromShapeAndMaterial(shape3d: Shape3d, material: Material): Mesh3d;
 }
 
 //%
@@ -335,8 +335,15 @@ declare class Light extends Object3d {
 declare class Camera extends Object3d {
 }
 
-//% color="#ffffff" icon="\uf030" block="Camera" weight=96
-declare namespace camera { /* camera icon */
+declare namespace design {
+    /**
+     * Perspective camera.
+     */
+    //% blockId=camera_perspective
+    //% block="perspective camera"
+    //% group="Camera"
+    //% shim=camera::perspectiveCamera
+    function perspectiveCamera(): Camera;
 }
 
 //%
@@ -349,6 +356,7 @@ declare class Scene3d extends Object3d {
      * Active camera.
      */
     //% blockCombine
+    //% blockCombineShadow=camera_perspective
     //% shim=.camera property
     camera: Camera;
 

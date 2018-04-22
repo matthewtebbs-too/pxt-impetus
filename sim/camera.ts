@@ -7,8 +7,25 @@
 /// <reference path="object.ts"/>
 
 namespace pxsim {
+    export type OrbitControls = THREE.OrbitControls;
+
+    // tslint:disable-next-line:variable-name
+    export const OrbitControlsConstructor = THREE.OrbitControls;
+}
+
+namespace pxsim {
     export function CameraMixin<T extends rt.ObjectConstructor<THREE.Camera>>(base: T) {
         return class extends base {
+            private _controls: OrbitControls;
+
+            constructor(...args: any[]) {
+                super(args);
+
+                this._controls = new OrbitControlsConstructor(this);
+                this._controls.target.set(0, 0, 0);
+                this._controls.update();
+            }
+
             public setSize(width: number, height: number) {
                 /* do nothing */
             }
