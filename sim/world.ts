@@ -22,29 +22,22 @@ namespace pxsim {
             return sid;
         }
 
+        private _scene3d: Scene3d | null = new Scene3d();
         private _renderer: Renderer;
 
-        private _scene: Scene3d;
+        public get scene(): Scene3d | null {
+            return this._scene3d;
+        }
 
         public get renderer(): Renderer {
             return this._renderer;
-        }
-
-        public get scene(): Scene3d {
-            return this._scene;
-        }
-
-        public set scene(scene: Scene3d) {
-            this._scene = scene;
         }
 
         constructor(id: rt.ObjId = 'container') {
             super();
 
             this._renderer = new Renderer(id);
-
-            this._scene = new Scene3d();
-            this._updateRendererScene();
+            this._renderer.scene = this._scene3d;
 
             const container = document.getElementById(this._renderer.id as string);
             if (container) {
@@ -78,13 +71,8 @@ namespace pxsim {
                 container.innerHTML = '';
             }
 
-            /* TODO$: put somewhere else */
-            Helper.safeObjectDispose(this._renderer.scene);
             Helper.safeObjectDispose(this._renderer);
-        }
-
-        protected _updateRendererScene() {
-            this._renderer.scene = this._scene;
+            Helper.safeObjectDispose(this._scene3d);
         }
 
         protected _onWindowResize = () => {
