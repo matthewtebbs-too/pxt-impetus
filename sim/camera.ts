@@ -19,7 +19,7 @@ namespace pxsim {
             private _controls: OrbitControls;
 
             constructor(...args: any[]) {
-                super(args);
+                super(...args);
 
                 this._controls = new OrbitControlsConstructor(this);
                 this._controls.target.set(0, 0, 0);
