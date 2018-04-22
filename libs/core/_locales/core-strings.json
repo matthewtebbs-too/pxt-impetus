@@ -201,7 +201,7 @@
   "design.colorWheel|block": "%color",
   "design.coneShape|block": "cone of radius %radius|height %height",
   "design.cylinderShape|block": "cylinder of radius %radius|height %height",
-  "design.directionalLight|block": "%color=color_picker directional light|with intensity %intensity",
+  "design.directionalLight|block": "%color=color_picker directional light|with %intensity intensity",
   "design.materialOfColor|block": "%color=color_picker material",
   "design.perspectiveCamera|block": "perspective camera",
   "design.planeShape|block": "plane of width %radius|height %height",
