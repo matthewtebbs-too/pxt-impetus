@@ -17,9 +17,9 @@ namespace pxsim {
     export class Scene3d extends Object3dMixin(THREE.Scene) {
         private _physicsworld: PhysicsWorld = new PhysicsWorld();
 
-        private _ambientlight: AmbientLight;
-        private _camera: Camera;
-        private _raycaster: Raycaster;
+        private _camera: Camera | null = null;
+        private _ambientlight: AmbientLight = new AmbientLight();
+        private _raycaster: Raycaster = new RaycasterConstructor();
 
         public get physicsWorld(): PhysicsWorld {
             return this._physicsworld;
@@ -30,20 +30,14 @@ namespace pxsim {
 
             this.background = new ColorConstructor(Palette.LightGray);
 
-            this._ambientlight = new AmbientLight();
             this.addAt(this._ambientlight, math3d.zeroVector());
-
-            this._camera = new PerspectiveCamera();
-            this._camera.position.set(-40, 20, 15);
-
-            this._raycaster = new RaycasterConstructor();
         }
 
-        public get camera(): Camera {
+        public get camera(): Camera | null {
             return this._camera;
         }
 
-        public set camera(camera: Camera) {
+        public set camera(camera: Camera | null) {
             this._camera = camera;
         }
 

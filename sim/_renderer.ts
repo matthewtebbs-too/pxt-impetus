@@ -52,9 +52,8 @@ namespace pxsim {
             return this._scene3d;
         }
 
-        public set scene(value: Scene3d | null) {
-            this._scene3d = value;
-            this._updateSceneCameraSize();
+        public set scene(scene3d: Scene3d | null) {
+            this._scene3d = scene3d;
         }
 
         public get isPaused(): boolean {
@@ -83,21 +82,22 @@ namespace pxsim {
         public runRenderLoop() {
             this._callbackRequestId = requestAnimationFrame((time: number) => {
                 if (!this._paused) {
-                    if (this._stats) {
-                        this._stats.begin();
-                    }
+                    this._stats.begin();
 
-                    if (this._scene3d) {
-                        this._scene3d.animate(this._clock.getDelta());
+                    const scene3d = this._scene3d;
+                    if (scene3d) {
+                        scene3d.animate(this._clock.getDelta());
 
-                        if (this._scene3d.camera) {
-                            this.reference.render(this._scene3d, this._scene3d.camera);
+                        const camera = scene3d.camera;
+                        if (camera) {
+                            const size = this.reference.getSize();
+                            camera.setSize(size.width, size.height);
+
+                            this.reference.render(scene3d, camera);
                         }
                     }
 
-                    if (this._stats) {
-                        this._stats.end();
-                    }
+                    this._stats.end();
                 }
 
                 this.runRenderLoop();
@@ -114,17 +114,6 @@ namespace pxsim {
         public resize(width: number, height: number, devicePixelRatio: number) {
             this.reference.setPixelRatio(devicePixelRatio);
             this.reference.setSize(width, height);
-
-            this._updateSceneCameraSize();
-        }
-
-        protected _updateSceneCameraSize() {
-            if (!this._scene3d || !this._scene3d.camera) {
-                return;
-            }
-
-            const size = this.reference.getSize();
-            this._scene3d.camera.setSize(size.width, size.height);
         }
 
         protected _onDispose() {

@@ -36,6 +36,8 @@ namespace pxsim {
     export class Camera extends CameraMixin(Object3dMixin(THREE.Camera)) { }
 
     export class PerspectiveCamera extends CameraMixin(Object3dMixin(THREE.PerspectiveCamera)) {
+        private _oldaspect: number = 0.;
+
         constructor(fov?: number, near?: number, far?: number) {
             super(fov || 60, 1, near || .2, far || 2000);
         }
@@ -43,8 +45,11 @@ namespace pxsim {
         public setSize(width: number, height: number) {
             super.setSize(width, height);
 
-            this.aspect = width / height;
-            this.updateProjectionMatrix();
+            const newaspect = this.aspect = width / height;
+            if (this._oldaspect !== newaspect) {
+                this._oldaspect = newaspect;
+                this.updateProjectionMatrix();
+            }
         }
     }
 }
