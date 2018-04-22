@@ -1,2 +1,105 @@
 <xml xmlns="http://www.w3.org/1999/xhtml">
+  <variables></variables>
+  <block type="pxt-on-start" x="0" y="0">
+    <statement name="HANDLER">
+      <block type="Scene3d.Camera_blockCombine_set">
+        <field name="property">Scene3d.camera</field>
+        <value name="scene3d">
+          <block type="world_scene"></block>
+        </value>
+        <value name="value">
+          <block type="camera_perspective"></block>
+        </value>
+        <next>
+          <block type="Object3d.Vector_blockCombine_set">
+            <field name="property">Object3d.position</field>
+            <value name="object3d">
+              <block type="Scene3d.Camera_blockCombine_get">
+                <field name="property">Scene3d.camera</field>
+                <value name="scene3d">
+                  <block type="world_scene"></block>
+                </value>
+              </block>
+            </value>
+            <value name="value">
+              <block type="math_vector">
+                <value name="x">
+                  <shadow type="math_number">
+                    <field name="NUM">0</field>
+                  </shadow>
+                </value>
+                <value name="y">
+                  <shadow type="math_number">
+                    <field name="NUM">20</field>
+                  </shadow>
+                </value>
+                <value name="z">
+                  <shadow type="math_number">
+                    <field name="NUM">20</field>
+                  </shadow>
+                </value>
+              </block>
+            </value>
+            <next>
+              <block type="object3d_look_at">
+                <value name="object3d">
+                  <block type="Scene3d.Camera_blockCombine_get">
+                    <field name="property">Scene3d.camera</field>
+                    <value name="scene3d">
+                      <block type="world_scene"></block>
+                    </value>
+                  </block>
+                </value>
+                <value name="position">
+                  <shadow type="math_vector"></shadow>
+                  <block type="math_zero_vector"></block>
+                </value>
+                <next>
+                  <block type="add_object">
+                    <value name="scene">
+                      <shadow type="world_scene"></shadow>
+                    </value>
+                    <value name="object3d">
+                      <block type="light_directional">
+                        <value name="color">
+                          <shadow type="color_picker">
+                            <field name="color">0xffffff</field>
+                          </shadow>
+                        </value>
+                        <value name="intensity">
+                          <shadow type="math_number">
+                            <field name="NUM">1</field>
+                          </shadow>
+                        </value>
+                      </block>
+                    </value>
+                    <value name="position">
+                      <shadow type="math_zero_vector"></shadow>
+                      <block type="math_vector">
+                        <value name="x">
+                          <shadow type="math_number">
+                            <field name="NUM">5</field>
+                          </shadow>
+                        </value>
+                        <value name="y">
+                          <shadow type="math_number">
+                            <field name="NUM">20</field>
+                          </shadow>
+                        </value>
+                        <value name="z">
+                          <shadow type="math_number">
+                            <field name="NUM">0</field>
+                          </shadow>
+                        </value>
+                      </block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
 </xml>
