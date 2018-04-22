@@ -201,11 +201,22 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
+    pxsim.OrbitControlsConstructor = THREE.OrbitControls;
+})(pxsim || (pxsim = {}));
+(function (pxsim) {
     function CameraMixin(base) {
         return (function (_super) {
             __extends(class_2, _super);
             function class_2() {
-                return _super !== null && _super.apply(this, arguments) || this;
+                var args = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    args[_i] = arguments[_i];
+                }
+                var _this = _super.apply(this, args) || this;
+                _this._controls = new pxsim.OrbitControlsConstructor(_this);
+                _this._controls.target.set(0, 0, 0);
+                _this._controls.update();
+                return _this;
             }
             class_2.prototype.setSize = function (width, height) {
             };
@@ -224,12 +235,17 @@ var pxsim;
     var PerspectiveCamera = (function (_super) {
         __extends(PerspectiveCamera, _super);
         function PerspectiveCamera(fov, near, far) {
-            return _super.call(this, fov || 60, 1, near || .2, far || 2000) || this;
+            var _this = _super.call(this, fov || 60, 1, near || .2, far || 2000) || this;
+            _this._oldaspect = 0.;
+            return _this;
         }
         PerspectiveCamera.prototype.setSize = function (width, height) {
             _super.prototype.setSize.call(this, width, height);
-            this.aspect = width / height;
-            this.updateProjectionMatrix();
+            var newaspect = this.aspect = width / height;
+            if (this._oldaspect !== newaspect) {
+                this._oldaspect = newaspect;
+                this.updateProjectionMatrix();
+            }
         };
         return PerspectiveCamera;
     }(CameraMixin(pxsim.Object3dMixin(THREE.PerspectiveCamera))));
@@ -641,20 +657,19 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
+    pxsim.RaycasterConstructor = THREE.Raycaster;
+})(pxsim || (pxsim = {}));
+(function (pxsim) {
     var Scene3d = (function (_super) {
         __extends(Scene3d, _super);
         function Scene3d() {
             var _this = _super.call(this) || this;
             _this._physicsworld = new pxsim.PhysicsWorld();
-            _this.background = new pxsim.ColorConstructor(13882323);
+            _this._camera = null;
             _this._ambientlight = new pxsim.AmbientLight();
+            _this._raycaster = new pxsim.RaycasterConstructor();
+            _this.background = new pxsim.ColorConstructor(13882323);
             _this.addAt(_this._ambientlight, pxsim.math3d.zeroVector());
-            _this._camera = new pxsim.PerspectiveCamera();
-            _this.addAt(_this._camera, new pxsim.VectorConstructor(-40, 20, 15));
-            _this._raycaster = new THREE.Raycaster();
-            _this._controls = new THREE.OrbitControls(_this._camera);
-            _this._controls.target.set(0, 2, 0);
-            _this._controls.update();
             return _this;
         }
         Object.defineProperty(Scene3d.prototype, "physicsWorld", {
@@ -723,11 +738,11 @@ var pxsim;
             this._physicsworld.animate(timeStep);
             pxsim.singletonWorldBoard().events.queue(1, 0, timeStep);
         };
-        Scene3d.prototype.intersectedObjects = function (x, y) {
+        Scene3d.prototype.intersectedObjects = function (x_, y_) {
             if (!this._camera) {
                 return null;
             }
-            this._raycaster.setFromCamera(new THREE.Vector2(x, y), this._camera);
+            this._raycaster.setFromCamera({ x: x_, y: y_ }, this._camera);
             var intersections = this._raycaster.intersectObjects(this.children);
             return intersections ? intersections.map(function (intersection) { return intersection.object; }) : null;
         };
@@ -930,6 +945,7 @@ var pxsim;
         function World3d(id) {
             if (id === void 0) { id = 'container'; }
             var _this = _super.call(this) || this;
+            _this._scene3d = new pxsim.Scene3d();
             _this._onWindowResize = function () {
                 _this._renderer.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio);
             };
@@ -950,8 +966,7 @@ var pxsim;
                 _this._onDocumentEvent(sid, evid, event, new pxsim.EventCoordValue(x, y));
             };
             _this._renderer = new pxsim.Renderer(id);
-            _this._scene = new pxsim.Scene3d();
-            _this._updateRendererScene();
+            _this._renderer.scene = _this._scene3d;
             var container = document.getElementById(_this._renderer.id);
             if (container) {
                 container.innerHTML = '';
@@ -983,19 +998,16 @@ var pxsim;
             }
             return sid;
         };
-        Object.defineProperty(World3d.prototype, "renderer", {
+        Object.defineProperty(World3d.prototype, "scene", {
             get: function () {
-                return this._renderer;
+                return this._scene3d;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(World3d.prototype, "scene", {
+        Object.defineProperty(World3d.prototype, "renderer", {
             get: function () {
-                return this._scene;
-            },
-            set: function (scene) {
-                this._scene = scene;
+                return this._renderer;
             },
             enumerable: true,
             configurable: true
@@ -1010,11 +1022,8 @@ var pxsim;
             if (container) {
                 container.innerHTML = '';
             }
-            pxsim.Helper.safeObjectDispose(this._renderer.scene);
             pxsim.Helper.safeObjectDispose(this._renderer);
-        };
-        World3d.prototype._updateRendererScene = function () {
-            this._renderer.scene = this._scene;
+            pxsim.Helper.safeObjectDispose(this._scene3d);
         };
         return World3d;
     }(rt.DisposableObject));
@@ -1206,6 +1215,9 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
+    pxsim.ClockConstructor = THREE.Clock;
+})(pxsim || (pxsim = {}));
+(function (pxsim) {
     var Renderer = (function (_super) {
         __extends(Renderer, _super);
         function Renderer(id) {
@@ -1213,9 +1225,8 @@ var pxsim;
             var _this = _super.call(this, Renderer._instantiateReference(id)) || this;
             _this._domElement = document.createElement('div');
             _this._scene3d = null;
-            _this._camera = null;
             _this._stats = new Stats();
-            _this._clock = new THREE.Clock();
+            _this._clock = new pxsim.ClockConstructor();
             _this._paused = false;
             _this._callbackRequestId = 0;
             _this._id = id;
@@ -1254,9 +1265,8 @@ var pxsim;
             get: function () {
                 return this._scene3d;
             },
-            set: function (value) {
-                this._scene3d = value;
-                this._updateSceneCameraSize();
+            set: function (scene3d) {
+                this._scene3d = scene3d;
             },
             enumerable: true,
             configurable: true
@@ -1279,18 +1289,18 @@ var pxsim;
             var _this = this;
             this._callbackRequestId = requestAnimationFrame(function (time) {
                 if (!_this._paused) {
-                    if (_this._stats) {
-                        _this._stats.begin();
-                    }
-                    if (_this._scene3d) {
-                        _this._scene3d.animate(_this._clock.getDelta());
-                        if (_this._scene3d.camera) {
-                            _this.reference.render(_this._scene3d, _this._scene3d.camera);
+                    _this._stats.begin();
+                    var scene3d = _this._scene3d;
+                    if (scene3d) {
+                        scene3d.animate(_this._clock.getDelta());
+                        var camera_1 = scene3d.camera;
+                        if (camera_1) {
+                            var size = _this.reference.getSize();
+                            camera_1.setSize(size.width, size.height);
+                            _this.reference.render(scene3d, camera_1);
                         }
                     }
-                    if (_this._stats) {
-                        _this._stats.end();
-                    }
+                    _this._stats.end();
                 }
                 _this.runRenderLoop();
             });
@@ -1304,17 +1314,6 @@ var pxsim;
         Renderer.prototype.resize = function (width, height, devicePixelRatio) {
             this.reference.setPixelRatio(devicePixelRatio);
             this.reference.setSize(width, height);
-            this._updateSceneCameraSize();
-        };
-        Renderer.prototype._updateSceneCameraSize = function () {
-            if (!this._scene3d) {
-                return;
-            }
-            var camera = this._scene3d.camera;
-            if (camera) {
-                var size = this.reference.getSize();
-                camera.setSize(size.width, size.height);
-            }
         };
         Renderer.prototype._onDispose = function () {
             this.stopRenderLoop();

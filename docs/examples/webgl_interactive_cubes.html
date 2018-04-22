@@ -464,8 +464,10 @@
     let mouseX = 0
     let theta = 0
     theta = 0
+    world.scene().camera = design.perspectiveCamera()
+    world.scene().camera.position = Math.vector(0, 20, 20)
+    world.scene().camera.lookAtPosition(Math.zeroVector())
     world.scene().backgroundColor = design.standardColor(Palette.LightCyan)
-
     world.scene().addAt(design.directionalLight(design.colorPicker(0xffffff), 1), Math.vector(5, 20, 0))
     boxshape = design.boxShape(20, 20, 20)
     for (let i = 0; i &lt; 2000; i++) {
@@ -496,6 +498,7 @@
     input.onMouseLeave(function () {
         mouseIn = false
     })</code></pre>
+<pre><code class="lang-package"></code></pre>
 
     </div>
 
