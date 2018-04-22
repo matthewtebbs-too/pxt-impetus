@@ -2525,8 +2525,15 @@ var pxt;
             if (/^https?:\/\//i.test(path))
                 return path;
             var monacoPaths = window.MonacoPaths || {};
-            var url = monacoPaths[path] || (pxt.webConfig.commitCdnUrl + path);
-            return url;
+            var blobPath = monacoPaths[path];
+            // find compute blob url
+            if (blobPath)
+                return blobPath;
+            // might have been exanded already
+            if (path.startsWith(pxt.webConfig.commitCdnUrl))
+                return path;
+            // append CDN
+            return pxt.webConfig.commitCdnUrl + path;
         }
         function loadStyleAsync(path, rtl) {
             if (rtl)

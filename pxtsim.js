@@ -1623,14 +1623,9 @@ var pxsim;
                     if (!v)
                         return null;
                     if (v instanceof pxsim.RefObject) {
-                        var value = undefined;
-                        try {
-                            value = JSON.stringify(pxsim.RefObject.toAny(v));
-                        }
-                        catch (e) { }
                         return {
                             id: v.id,
-                            value: value
+                            preview: pxsim.RefObject.toDebugString(v)
                         };
                     }
                     return { text: "(object)" };
@@ -1643,7 +1638,7 @@ var pxsim;
             for (var _i = 0, _a = Object.keys(frame); _i < _a.length; _i++) {
                 var k = _a[_i];
                 if (/___\d+$/.test(k)) {
-                    r[k] = valToJSON(frame[k]);
+                    r[k.replace(/___\d+$/, '')] = valToJSON(frame[k]);
                 }
             }
             return r;
@@ -1791,7 +1786,8 @@ var pxsim;
             this.lastBreak = breakMsg;
             this.state = new StoppedState(this.lastBreak, this.breakpoints, this.projectDir);
             if (breakMsg.exceptionMessage) {
-                this.sendEvent(new pxsim.protocol.StoppedEvent("exception", SimDebugSession.THREAD_ID, breakMsg.exceptionMessage));
+                var message = breakMsg.exceptionMessage.replace(/___\d+/g, '');
+                this.sendEvent(new pxsim.protocol.StoppedEvent("exception", SimDebugSession.THREAD_ID, message));
             }
             else {
                 this.sendEvent(new pxsim.protocol.StoppedEvent("breakpoint", SimDebugSession.THREAD_ID));
@@ -2701,12 +2697,25 @@ var pxsim;
             if (pxsim.runtime && pxsim.runtime.refCountingDebug)
                 console.log("RefObject id:" + this.id + " refs:" + this.refcnt);
         };
+        // render a debug preview string
+        RefObject.prototype.toDebugString = function () {
+            return "(object)";
+        };
         RefObject.toAny = function (o) {
-            if (o instanceof RefMap)
-                return o.toAny();
-            if (o instanceof pxsim.RefCollection)
+            if (o && o.toAny)
                 return o.toAny();
             return o;
+        };
+        RefObject.toDebugString = function (o) {
+            if (o === null)
+                return "null";
+            if (o === undefined)
+                return "undefined;";
+            if (o.toDebugString)
+                return o.toDebugString();
+            if (typeof o == "string")
+                return JSON.stringify(o);
+            return o.toString();
         };
         return RefObject;
     }());
@@ -3285,6 +3294,20 @@ var pxsim;
         };
         RefCollection.prototype.toAny = function () {
             return this.data.map(function (v) { return pxsim.RefObject.toAny(v); });
+        };
+        RefCollection.prototype.toDebugString = function () {
+            var s = "[";
+            for (var i = 0; i < this.data.length; ++i) {
+                if (i > 0)
+                    s += ",";
+                s += pxsim.RefObject.toDebugString(this.data[i]);
+                if (s.length > 15) {
+                    s += "...";
+                    break;
+                }
+            }
+            s += "]";
+            return s;
         };
         RefCollection.prototype.destroy = function () {
             var data = this.data;
@@ -4913,6 +4936,9 @@ var pxsim;
             this.traceInterval = intervalMs;
             this.postDebuggerMessage("traceConfig", { interval: intervalMs });
         };
+        SimulatorDriver.prototype.variables = function (id) {
+            this.postDebuggerMessage("variables", { variablesReference: id });
+        };
         SimulatorDriver.prototype.handleSimulatorCommand = function (msg) {
             if (this.options.onSimulatorCommand)
                 this.options.onSimulatorCommand(msg);
@@ -4945,6 +4971,10 @@ var pxsim;
                         this.options.onTraceMessage(msg);
                     }
                     break;
+                case "variables":
+                    if (this.options.onVariables) {
+                        this.options.onVariables(msg);
+                    }
             }
         };
         SimulatorDriver.prototype.postDebuggerMessage = function (subtype, data) {
