@@ -259,7 +259,7 @@ declare namespace design {
      * @param intensity number, eg: 1
      */
     //% blockId=light_directional
-    //% block="%color=color_picker directional light|with intensity %intensity"
+    //% block="%color=color_picker directional light|with %intensity intensity"
     //% group="Light"
     //% shim=light::directionalLight
     function directionalLight(color?: Color, intensity?: number): Light;
