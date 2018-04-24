@@ -356,7 +356,7 @@ declare class Scene3d extends Object3d {
      * Active camera.
      */
     //% blockCombine
-    //% blockCombineShadow=camera_perspective
+    //% blockCombineShadow=world_scene,camera_perspective
     //% shim=.camera property
     camera: Camera;
 
@@ -364,7 +364,7 @@ declare class Scene3d extends Object3d {
      * Background color.
      */
     //% blockCombine
-    //% blockCombineShadow=color_picker
+    //% blockCombineShadow=world_scene,color_picker
     //% shim=.backgroundColor property
     backgroundColor: Color;
 
@@ -372,7 +372,7 @@ declare class Scene3d extends Object3d {
      * Ambient light color.
      */
     //% blockCombine
-    //% blockCombineShadow=color_picker
+    //% blockCombineShadow=world_scene,color_picker
     //% shim=.ambientColor property
     ambientColor: Color;
 
