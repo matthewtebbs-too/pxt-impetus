@@ -28,7 +28,8 @@ namespace pxsim {
         constructor() {
             super();
 
-            this.background = new ColorConstructor(Palette.LightGray);
+            this.background = new ColorConstructor(Palette.SkyBlue);
+            this._ambientlight.color.setScalar(.5);
 
             this.addAt(this._ambientlight, math3d.zeroVector());
         }
