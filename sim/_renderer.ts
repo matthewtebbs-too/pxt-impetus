@@ -74,7 +74,7 @@ namespace pxsim {
 
             this.reference.shadowMap.enabled = true;
             this.reference.shadowMap.type = THREE.PCFSoftShadowMap;
-            this.reference.setClearColor(Palette.LightCyan);
+            this.reference.setClearColor(Palette.LightGray);
 
             this.runRenderLoop();
         }
@@ -83,6 +83,8 @@ namespace pxsim {
             this._callbackRequestId = requestAnimationFrame((time: number) => {
                 if (!this._paused) {
                     this._stats.begin();
+
+                    let wasRendered = false;
 
                     const scene3d = this._scene3d;
                     if (scene3d) {
@@ -94,7 +96,13 @@ namespace pxsim {
                             camera.setSize(size.width, size.height);
 
                             this.reference.render(scene3d, camera);
+
+                            wasRendered = true;
                         }
+                    }
+
+                    if (!wasRendered) {
+                         this.reference.clear();
                     }
 
                     this._stats.end();
