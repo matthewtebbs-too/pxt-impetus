@@ -58,6 +58,6 @@
   },
   "scripts": {
     "start": "pxt serve",
-    "package": "pxt staticpkg --githubpages"
+    "package": "pxt staticpkg --githubpages --minify"
   }
 }
