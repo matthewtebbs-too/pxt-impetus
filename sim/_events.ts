@@ -14,6 +14,8 @@ namespace pxsim {
         MouseLeftButton,
         MouseMiddleButton,
         MouseRightButton,
+
+        KeyboardDevice,
     }
 
     export const enum EventId {
@@ -25,6 +27,10 @@ namespace pxsim {
 
         Click,
         DoubleClick,
+
+        Up,
+        Press,
+        Down,
     }
 
     export abstract class EventValue {
@@ -38,6 +44,16 @@ namespace pxsim {
 
         public toActionArgs(): any[] {
             return [this.x, this.y];
+        }
+    }
+
+    export class EventKeyValue extends EventValue {
+        constructor(public key: KeyboardKey) {
+            super();
+        }
+
+        public toActionArgs(): any[] {
+            return [this.key];
         }
     }
 

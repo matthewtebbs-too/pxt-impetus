@@ -8,12 +8,13 @@
 declare const enum MathOp {
     //% block="+"
     Add = 1,
-    //% block="–"
-    Subtract = 2,
-    
-    //% block="x"
-    Multiply = 3,
 
+    //% block="–"
+    Subtract = 2, 
+
+    //% block="x"
+
+    Multiply = 3,
     //% block="÷"
     Divide = 4,
 }
@@ -30,6 +31,44 @@ declare const enum MouseButton {
     Right = 3,
 }
 
+declare const enum KeyboardKey
+{
+    //% block="F1"
+    F1Key = 'F1',  
+
+    //% block="F2"
+    F2Key = 'F2',
+
+    //% block="F3"
+    F3Key = 'F3',
+
+    //% block="F4"
+    F4Key = 'F4', 
+
+    //% block="F5"
+    F5Key = 'F5',
+
+    //% block="F6"
+    F6Key = 'F6',
+
+    //% block="F7"
+    F7Key = 'F7',
+    
+    //% block="F8"
+    F8Key = 'F8',
+
+    //% block="F9"
+    F9Key = 'F9',
+
+    //% block="F0"
+    F10Key = 'F10',
+
+    //% block="F11"
+    F11Key = 'F11',
+
+    //% block="F12"
+    F12Key = 'F12',
+}
 
 //%
 declare const enum SimplePalette {

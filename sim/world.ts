@@ -53,10 +53,15 @@ namespace pxsim {
             this._onWindowResize();
 
             window.addEventListener('resize', this._onWindowResize, false);
+
             document.addEventListener('mouseenter', this._onDocumentMouseEnter, false);
             document.addEventListener('mousemove', this._onDocumentMouseMove, false);
             document.addEventListener('mouseleave', this._onDocumentMouseLeave, false);
             document.addEventListener('click', this._onDocumentMouseClick, false);
+
+            document.addEventListener('keydown', this._onDocumentKeyDown, false);
+            document.addEventListener('keypress', this._onDocumentKeyPress, false);
+            document.addEventListener('keyup', this._onDocumentKeyUp, false);
         }
 
         protected _onDispose() {
@@ -64,6 +69,11 @@ namespace pxsim {
             document.removeEventListener('mouseleave', this._onDocumentMouseLeave, false);
             document.removeEventListener('mousemove', this._onDocumentMouseMove, false);
             document.removeEventListener('mouseenter', this._onDocumentMouseEnter, false);
+
+            document.removeEventListener('keyup', this._onDocumentKeyUp, false);
+            document.removeEventListener('keypress', this._onDocumentKeyPress, false);
+            document.removeEventListener('keydown', this._onDocumentKeyDown, false);
+
             window.removeEventListener('resize', this._onWindowResize, false);
 
             const container = document.getElementById(this._renderer.id as string);
@@ -84,9 +94,11 @@ namespace pxsim {
         protected _onDocumentMouseLeave = (event: Event) => this._onDocumentEvent(ScopeId.MouseDevice, EventId.Leave, event);
         protected _onDocumentMouseClick = (event: MouseEvent) => this._onDocumentMouseEvent(World3d._sidFromMouseButtonEvent(event), EventId.Click, event);
 
-        protected _onDocumentEvent = (sid: ScopeId | undefined, evid: EventId, event: Event, value?: EventValue) => {
-            event.preventDefault();
+        protected _onDocumentKeyDown = (event: KeyboardEvent) => this._onDocumentKeyEvent(ScopeId.KeyboardDevice, EventId.Down, event);
+        protected _onDocumentKeyPress = (event: KeyboardEvent) => this._onDocumentKeyEvent(ScopeId.KeyboardDevice, EventId.Press, event);
+        protected _onDocumentKeyUp = (event: KeyboardEvent) => this._onDocumentKeyEvent(ScopeId.KeyboardDevice, EventId.Up, event);
 
+        protected _onDocumentEvent = (sid: ScopeId | undefined, evid: EventId, event: Event, value?: EventValue) => {
             if (!sid) {
                 return;
             }
@@ -99,6 +111,10 @@ namespace pxsim {
             const y = - (event.clientY / window.innerHeight) * 2 + 1;
 
             this._onDocumentEvent(sid, evid, event, new EventCoordValue(x, y));
+        }
+
+        protected _onDocumentKeyEvent = (sid: ScopeId | undefined, evid: EventId, event: KeyboardEvent) => {
+            this._onDocumentEvent(sid, evid, event, new EventKeyValue(KeyboardKey.F1Key));
         }
     }
 }
