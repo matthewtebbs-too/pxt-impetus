@@ -1,12 +1,1 @@
-var impetus;
-(function (impetus) {
-    var defaultToolboxXml = "";
-    function initExtensionsAsync(opts) {
-        var result = {
-            toolboxOptions: {},
-        };
-        return Promise.resolve(result);
-    }
-    impetus.initExtensionsAsync = initExtensionsAsync;
-})(impetus || (impetus = {}));
-pxt.editor.initExtensionsAsync = impetus.initExtensionsAsync;
+var impetus;(impetus||(impetus={})).initExtensionsAsync=function(i){return Promise.resolve({toolboxOptions:{}})},pxt.editor.initExtensionsAsync=impetus.initExtensionsAsync;

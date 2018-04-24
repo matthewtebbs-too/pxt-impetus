@@ -4876,7 +4876,7 @@ var pxt;
                 var svgXml = "<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"" + XLINK_NAMESPACE + "\" width=\"" + width + "\" height=\"" + height + "\" viewBox=\"" + x + " " + y + " " + width + " " + height + "\">" + xmlString + "</svg>";
                 var xsg = new DOMParser().parseFromString(svgXml, "image/svg+xml");
                 var cssLink = xsg.createElementNS("http://www.w3.org/1999/xhtml", "style");
-                var customCssHref = document.getElementById("blocklycss").href;
+                var customCssHref = document.getElementById("style-blockly.css").href;
                 return pxt.BrowserUtils.loadAjaxAsync(customCssHref)
                     .then(function (customCss) {
                     var blocklySvg = pxt.Util.toArray(document.head.querySelectorAll("style"))
@@ -6173,9 +6173,9 @@ var pxt;
             // lf("{id:category}More\u2026")
             // update shadow types
             if (tb) {
-                $(tb).find('shadow:empty').each(function (i, shadow) {
+                pxt.Util.toArray(tb.querySelectorAll('shadow:empty')).forEach(function (shadow, i) {
                     var type = shadow.getAttribute('type');
-                    var b = $(tb).find("block[type=\"" + type + "\"]")[0];
+                    var b = tb.querySelectorAll("block[type=\"" + type + "\"]")[0];
                     if (b)
                         shadow.innerHTML = b.innerHTML;
                 });
