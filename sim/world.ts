@@ -22,7 +22,7 @@ namespace pxsim {
             return sid;
         }
 
-        private _container: HTMLElement | null;
+        private _maincanvas: HTMLElement | null;
 
         private _scene3d: Scene3d | null = new Scene3d();
         private _renderer: Renderer;
@@ -38,27 +38,15 @@ namespace pxsim {
         constructor(id?: rt.ObjId) {
             super();
 
-            let strid;
-            if (id) {
-                strid = id.toString();
-            }
-
-            this._container = strid && strid.length > 0 ? document.getElementById(strid) : document.body;
-
             this._renderer = new Renderer(id);
             this._renderer.scene = this._scene3d;
 
-            if (this._container) {
-                this._container.innerHTML = '';
+            this._maincanvas = this._renderer.container;
 
-                if (Detector.webgl) {
-                    this._container.appendChild(this._renderer.domElement);
-                } else {
-                    Detector.addGetWebGLMessage({ parent: this._container });
-                }
-            }
+            this._maincanvas!.onblur = () => this._onContainerFocused(false);
+            this._maincanvas!.onfocus = () => this._onContainerFocused(true);
 
-            document.addEventListener('focus', this._onDocumentFocus, false);
+            this._onContainerFocused(false);
 
             document.addEventListener('mouseenter', this._onDocumentMouseEnter, false);
             document.addEventListener('mousemove', this._onDocumentMouseMove, false);
@@ -80,11 +68,8 @@ namespace pxsim {
             document.removeEventListener('keypress', this._onDocumentKeyPress, false);
             document.removeEventListener('keydown', this._onDocumentKeyDown, false);
 
-            document.removeEventListener('focus', this._onDocumentFocus, false);
-
-            if (this._container) {
-                this._container.innerHTML = '';
-            }
+            // tslint:disable-next-line:no-string-literal
+            (this._maincanvas!['onfocus'] as any) = (this._maincanvas!['onblur'] as any) = null;
 
             Helper.safeObjectDispose(this._renderer);
             Helper.safeObjectDispose(this._scene3d);
@@ -93,33 +78,46 @@ namespace pxsim {
         protected _onDocumentMouseEnter = (event: Event) => this._onDocumentEvent(ScopeId.MouseDevice, EventId.Enter, event);
         protected _onDocumentMouseMove = (event: MouseEvent) => this._onDocumentMouseEvent(ScopeId.MouseDevice, EventId.Move, event);
         protected _onDocumentMouseLeave = (event: Event) => this._onDocumentEvent(ScopeId.MouseDevice, EventId.Leave, event);
-        protected _onDocumentMouseClick = (event: MouseEvent) => this._onDocumentMouseEvent(World3d._sidFromMouseButtonEvent(event), EventId.Click, event);
+        protected _onDocumentMouseClick = (event: MouseEvent) => {
+            const sid = World3d._sidFromMouseButtonEvent(event);
+
+            if (!sid) {
+                return;
+            }
+
+            if (ScopeId.MouseLeftButton) {
+                if (this._maincanvas) {
+                    this._maincanvas!.focus();
+                }
+            }
+
+            this._onDocumentMouseEvent(sid, EventId.Click, event);
+        }
 
         protected _onDocumentKeyDown = (event: KeyboardEvent) => this._onDocumentKeyEvent(ScopeId.KeyboardDevice, EventId.Down, event);
         protected _onDocumentKeyPress = (event: KeyboardEvent) => this._onDocumentKeyEvent(ScopeId.KeyboardDevice, EventId.Press, event);
         protected _onDocumentKeyUp = (event: KeyboardEvent) => this._onDocumentKeyEvent(ScopeId.KeyboardDevice, EventId.Up, event);
 
-        protected _onDocumentFocus = (event: FocusEvent) => {
-            event.preventDefault();
-        }
-
-        protected _onDocumentEvent = (sid: ScopeId | undefined, evid: EventId, event: Event, value?: EventValue) => {
-            if (!sid) {
-                return;
-            }
-
+        protected _onDocumentEvent = (sid: ScopeId, evid: EventId, event: Event, value?: EventValue) => {
             singletonWorldBoard().events!.queue(sid, evid, value);
         }
 
-        protected _onDocumentMouseEvent = (sid: ScopeId | undefined, evid: EventId, event: MouseEvent) => {
+        protected _onDocumentMouseEvent = (sid: ScopeId, evid: EventId, event: MouseEvent) => {
             const x = (event.clientX / window.innerWidth) * 2 - 1;
             const y = - (event.clientY / window.innerHeight) * 2 + 1;
 
             this._onDocumentEvent(sid, evid, event, new EventCoordValue(x, y));
         }
 
-        protected _onDocumentKeyEvent = (sid: ScopeId | undefined, evid: EventId, event: KeyboardEvent) => {
+        protected _onDocumentKeyEvent = (sid: ScopeId, evid: EventId, event: KeyboardEvent) => {
             this._onDocumentEvent(sid, evid, event, new EventKeyValue(KeyboardKey.F1Key));
+        }
+
+        protected _onContainerFocused(focused: boolean) {
+            if (this._maincanvas) {
+                this._maincanvas.classList.toggle('blur', !focused);
+                this._maincanvas.classList.toggle('focus', focused);
+            }
         }
     }
 }

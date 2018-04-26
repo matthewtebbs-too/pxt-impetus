@@ -24,6 +24,7 @@ namespace pxsim {
 
                 webglrenderer.shadowMap.enabled = true;
                 webglrenderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                webglrenderer.setClearColor(Palette.LightGray);
             }
 
             return webglrenderer;
@@ -31,7 +32,7 @@ namespace pxsim {
 
         private _id: rt.ObjId;
 
-        private _domElement: HTMLElement;
+        private _container: HTMLElement | null;
 
         private _scene3d: Scene3d | null = null;
         private _stats: Stats = new Stats();
@@ -44,8 +45,8 @@ namespace pxsim {
             return this._id;
         }
 
-        public get domElement(): HTMLElement {
-            return this._domElement;
+        public get container(): HTMLElement | null {
+            return this._container;
         }
 
         public get scene(): Scene3d | null {
@@ -64,22 +65,27 @@ namespace pxsim {
             this._paused = value;
         }
 
-        constructor(id: rt.ObjId = 'main') {
+        constructor(id: rt.ObjId = 'maincanvas') {
             super(Renderer._instantiateReference(id));
 
             this._id = id;
 
-            this._domElement = document.createElement('div');
-            this._domElement.id = id!.toString();
-            this._domElement.appendChild(this.reference.domElement);
-            this._domElement.appendChild(this._stats.dom);
+            this._container = document.getElementById(id.toString());
+            if (!this._container) {
+                throw new Error(`Canvas container element ${id} not found.`);
+            }
 
-            this.reference.shadowMap.enabled = true;
-            this.reference.shadowMap.type = THREE.PCFSoftShadowMap;
-            this.reference.setClearColor(Palette.LightGray);
+            if (!Detector.webgl) {
+                Detector.addGetWebGLMessage({ parent: this._container });
+                return;
+            }
 
-            window.addEventListener('resize', this._onWindowResize, false);
-            window.setTimeout(() => this._onWindowResize() /* initial */);
+            this._container.innerHTML = '';
+            this._container.appendChild(this.reference.domElement);
+            this._container.appendChild(this._stats.dom);
+
+            window.addEventListener('resize', this._onWindowResize);
+            this._onWindowResize();
 
             this.runRenderLoop();
         }
@@ -125,14 +131,20 @@ namespace pxsim {
         }
 
         protected _onWindowResize = () => {
-            this.reference.setPixelRatio(window.devicePixelRatio);
-            this.reference.setSize(this._domElement.clientWidth, this._domElement.clientHeight, false);
+            if (this._container) {
+                this.reference.setPixelRatio(window.devicePixelRatio);
+                this.reference.setSize(this._container.clientWidth, this._container.clientHeight, false);
+            }
         }
 
         protected _onDispose() {
             this.stopRenderLoop();
 
-            window.removeEventListener('resize', this._onWindowResize, false);
+            if (this._container) {
+                window.removeEventListener('resize', this._onWindowResize);
+
+                this._container.innerHTML = '';
+            }
         }
     }
 }

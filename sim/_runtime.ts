@@ -7,7 +7,7 @@
 type _Map<K, V> = Map<K, V>;
 
 namespace rt {
-    export type ObjId = number | string | null;
+    export type ObjId = number | string;
 
     export interface IObjectWithId {
         readonly id: ObjId;
