@@ -1226,14 +1226,14 @@ Blockly.Events.CommentDelete.prototype.fromJson=function(a){Blockly.Events.Comme
 Blockly.Events.CommentMove=function(a){a&&(Blockly.Events.Move.superClass_.constructor.call(this,a),this.comment_=a,this.oldCoordinate_=a.getXY(),this.newCoordinate_=null)};goog.inherits(Blockly.Events.CommentMove,Blockly.Events.CommentBase);Blockly.Events.CommentMove.prototype.recordNew=function(){if(!this.comment_)throw Error("Tried to record the new position of a comment on the same event twice.");this.newCoordinate_=this.comment_.getXY();this.comment_=null};
 Blockly.Events.CommentMove.prototype.type=Blockly.Events.COMMENT_MOVE;Blockly.Events.CommentMove.prototype.setOldCoordinate=function(a){this.oldCoordinate_=a};Blockly.Events.CommentMove.prototype.toJson=function(){var a=Blockly.Events.CommentMove.superClass_.toJson.call(this);this.newCoordinate_&&(a.newCoordinate=Math.round(this.newCoordinate_.x)+","+Math.round(this.newCoordinate_.y));return a};
 Blockly.Events.CommentMove.prototype.fromJson=function(a){Blockly.Events.CommentMove.superClass_.fromJson.call(this,a);a.newCoordinate&&(a=a.newCoordinate.split(","),this.newCoordinate_=new goog.math.Coordinate(parseFloat(a[0]),parseFloat(a[1])))};Blockly.Events.CommentMove.prototype.isNull=function(){return goog.math.Coordinate.equals(this.oldCoordinate_,this.newCoordinate_)};
-Blockly.Events.CommentMove.prototype.run=function(a){var b=this.getEventWorkspace_().getCommentById(this.commentId);if(b){a=a?this.newCoordinate_:this.oldCoordinate_;var c=b.getXY();b.moveBy(a.x-c.x,a.y-c.y)}else console.warn("Can't move non-existent comment: "+this.commentId)};Blockly.WorkspaceComment=function(a,b,c,d,e){this.id=e&&!a.getCommentById(e)?e:Blockly.utils.genUid();a.addCommentById(this);a.addTopComment(this);this.xy_=new goog.math.Coordinate(0,0);this.height_=c;this.width_=d;this.workspace=a;this.RTL=a.RTL;this.editable_=this.movable_=this.deletable_=!0;this.content_=b;this.isComment=!0;Blockly.WorkspaceComment.fireCreateEvent(this)};
+Blockly.Events.CommentMove.prototype.run=function(a){var b=this.getEventWorkspace_().getCommentById(this.commentId);if(b){a=a?this.newCoordinate_:this.oldCoordinate_;var c=b.getXY();b.moveBy(a.x-c.x,a.y-c.y)}else console.warn("Can't move non-existent comment: "+this.commentId)};Blockly.WorkspaceComment=function(a,b,c,d,e){this.id=e&&!a.getCommentById(e)?e:Blockly.utils.genUid();a.addCommentById(this);a.addTopComment(this);this.xy_=new goog.math.Coordinate(0,0);this.height_=c;this.width_=d;this.workspace=a;this.RTL=a.RTL;this.editable_=this.movable_=this.deletable_=!0;this.content_=b;this.isComment=!0;Blockly.WorkspaceComment.fireCreateEvent(this)};Blockly.WorkspaceComment.prototype.data=null;
 Blockly.WorkspaceComment.prototype.dispose=function(){this.workspace&&(Blockly.Events.isEnabled()&&Blockly.Events.fire(new Blockly.Events.CommentDelete(this)),this.workspace.removeTopComment(this),this.workspace.removeCommentById(this.id),this.workspace=null)};Blockly.WorkspaceComment.prototype.getHeight=function(){return this.height_};Blockly.WorkspaceComment.prototype.setHeight=function(a){this.height_=a};Blockly.WorkspaceComment.prototype.getWidth=function(){return this.width_};
 Blockly.WorkspaceComment.prototype.setWidth=function(a){this.width_=a};Blockly.WorkspaceComment.prototype.getXY=function(){return this.xy_.clone()};Blockly.WorkspaceComment.prototype.moveBy=function(a,b){var c=new Blockly.Events.CommentMove(this);this.xy_.translate(a,b);c.recordNew();Blockly.Events.fire(c)};Blockly.WorkspaceComment.prototype.getHeight=function(){return this.height_};Blockly.WorkspaceComment.prototype.setHeight=function(a){this.height_=a};
 Blockly.WorkspaceComment.prototype.getWidth=function(){return this.width_};Blockly.WorkspaceComment.prototype.setWidth=function(a){this.width_=a};Blockly.WorkspaceComment.prototype.isDeletable=function(){return this.deletable_&&!(this.workspace&&this.workspace.options.readOnly)};Blockly.WorkspaceComment.prototype.setDeletable=function(a){this.deletable_=a};Blockly.WorkspaceComment.prototype.isMovable=function(){return this.movable_&&!(this.workspace&&this.workspace.options.readOnly)};
 Blockly.WorkspaceComment.prototype.setMovable=function(a){this.movable_=a};Blockly.WorkspaceComment.prototype.isEditable=function(){return this.editable_};Blockly.WorkspaceComment.prototype.setEditable=function(a){this.editable_=a};Blockly.WorkspaceComment.prototype.getContent=function(){return this.content_};Blockly.WorkspaceComment.prototype.setContent=function(a){this.content_!=a&&(Blockly.Events.fire(new Blockly.Events.CommentChange(this,this.content_,a)),this.content_=a)};
-Blockly.WorkspaceComment.prototype.getRelativeToSurfaceXY=function(){return this.xy_};Blockly.WorkspaceComment.prototype.toXmlWithXY=function(a){a=this.toXml(a);a.setAttribute("x",Math.round(this.xy_.x));a.setAttribute("y",Math.round(this.xy_.y));a.setAttribute("h",this.height_);a.setAttribute("w",this.width_);return a};Blockly.WorkspaceComment.prototype.toXml=function(a){var b=goog.dom.createDom("comment");a||b.setAttribute("id",this.id);b.textContent=this.getContent();return b};
-Blockly.WorkspaceComment.fireCreateEvent=function(a){if(Blockly.Events.isEnabled()){var b=Blockly.Events.getGroup();b||Blockly.Events.setGroup(!0);try{Blockly.Events.fire(new Blockly.Events.CommentCreate(a))}finally{b||Blockly.Events.setGroup(!1)}}};
-Blockly.WorkspaceComment.fromXml=function(a,b){var c=Blockly.WorkspaceComment.parseAttributes(a);c=new Blockly.WorkspaceComment(b,c.content,c.h,c.w,c.id);var d=parseInt(a.getAttribute("x"),10),e=parseInt(a.getAttribute("y"),10);isNaN(d)||isNaN(e)||c.moveBy(d,e);Blockly.WorkspaceComment.fireCreateEvent(c);return c};
+Blockly.WorkspaceComment.prototype.getRelativeToSurfaceXY=function(){return this.xy_};Blockly.WorkspaceComment.prototype.toXmlWithXY=function(a){a=this.toXml(a);a.setAttribute("x",Math.round(this.xy_.x));a.setAttribute("y",Math.round(this.xy_.y));a.setAttribute("h",this.height_);a.setAttribute("w",this.width_);return a};
+Blockly.WorkspaceComment.prototype.toXml=function(a){var b=goog.dom.createDom("comment");a||b.setAttribute("id",this.id);b.textContent=this.getContent();this.data&&b.setAttribute("data",this.data);return b};Blockly.WorkspaceComment.fireCreateEvent=function(a){if(Blockly.Events.isEnabled()){var b=Blockly.Events.getGroup();b||Blockly.Events.setGroup(!0);try{Blockly.Events.fire(new Blockly.Events.CommentCreate(a))}finally{b||Blockly.Events.setGroup(!1)}}};
+Blockly.WorkspaceComment.fromXml=function(a,b){var c=Blockly.WorkspaceComment.parseAttributes(a);c=new Blockly.WorkspaceComment(b,c.content,c.h,c.w,c.id);c.data=a.getAttribute("data");var d=parseInt(a.getAttribute("x"),10),e=parseInt(a.getAttribute("y"),10);isNaN(d)||isNaN(e)||c.moveBy(d,e);Blockly.WorkspaceComment.fireCreateEvent(c);return c};
 Blockly.WorkspaceComment.parseAttributes=function(a){var b=a.getAttribute("h"),c=a.getAttribute("w");return{id:a.getAttribute("id"),h:b?parseInt(b,10):100,w:c?parseInt(c,10):100,x:parseInt(a.getAttribute("x"),10),y:parseInt(a.getAttribute("y"),10),content:a.textContent}};
 Blockly.Workspace=function(a){this.id=Blockly.utils.genUid();Blockly.Workspace.WorkspaceDB_[this.id]=this;this.options=a||{};this.RTL=!!this.options.RTL;this.horizontalLayout=!!this.options.horizontalLayout;this.toolboxPosition=this.options.toolboxPosition;this.topBlocks_=[];this.topComments_=[];this.commentDB_=Object.create(null);this.listeners_=[];this.tapListeners_=[];this.undoStack_=[];this.redoStack_=[];this.blockDB_=Object.create(null);this.variableMap_=new Blockly.VariableMap(this);this.potentialVariableMap_=
 null};Blockly.Workspace.prototype.rendered=!1;Blockly.Workspace.prototype.MAX_UNDO=1024;Blockly.Workspace.prototype.dispose=function(){this.listeners_.length=0;this.clear();delete Blockly.Workspace.WorkspaceDB_[this.id]};Blockly.Workspace.SCAN_ANGLE=3;Blockly.Workspace.prototype.addTopBlock=function(a){this.topBlocks_.push(a)};Blockly.Workspace.prototype.removeTopBlock=function(a){if(!goog.array.remove(this.topBlocks_,a))throw"Block not present in workspace's list of top-most blocks.";};
@@ -1309,7 +1309,7 @@ Blockly.Connection.prototype.disconnect=function(){var a=this.targetConnection;g
 Blockly.Connection.prototype.disconnectInternal_=function(a,b){var c;Blockly.Events.isEnabled()&&(c=new Blockly.Events.BlockMove(b));this.targetConnection=this.targetConnection.targetConnection=null;b.setParent(null);c&&(c.recordNew(),Blockly.Events.fire(c))};
 Blockly.Connection.prototype.respawnShadow_=function(){var a=this.getSourceBlock(),b=this.getShadowDom();if(a.workspace&&b&&Blockly.Events.recordUndo)if(a=Blockly.Xml.domToBlock(b,a.workspace),a.outputConnection)this.connect(a.outputConnection);else if(a.previousConnection)this.connect(a.previousConnection);else throw"Child block does not have output or previous statement.";};Blockly.Connection.prototype.targetBlock=function(){return this.isConnected()?this.targetConnection.getSourceBlock():null};
 Blockly.Connection.prototype.checkType_=function(a){if(!this.check_||!a.check_)return!0;for(var b=0;b<this.check_.length;b++)if(-1!=a.check_.indexOf(this.check_[b]))return!0;return!1};Blockly.Connection.prototype.onCheckChanged_=function(){this.isConnected()&&!this.checkType_(this.targetConnection)&&(this.isSuperior()?this.targetBlock():this.sourceBlock_).unplug()};
-Blockly.Connection.prototype.setCheck=function(a){a?(goog.isArray(a)||(a=[a]),this.check_=a,this.onCheckChanged_()):this.check_=null;return this};Blockly.Connection.prototype.getOutputShape=function(){return this.check_?-1!==this.check_.indexOf("Boolean")?Blockly.OUTPUT_SHAPE_HEXAGONAL:-1!==this.check_.indexOf("Number")?Blockly.OUTPUT_SHAPE_ROUND:-1!==this.check_.indexOf("String")?Blockly.OUTPUT_SHAPE_SQUARE:Blockly.OUTPUT_SHAPE_ROUND:Blockly.OUTPUT_SHAPE_ROUND};
+Blockly.Connection.prototype.setCheck=function(a){a?(goog.isArray(a)||(a=[a]),this.check_=a,this.onCheckChanged_()):this.check_=null;return this};Blockly.Connection.prototype.getOutputShape=function(){if(!this.check_)return Blockly.OUTPUT_SHAPE_ROUND;if(-1!==this.check_.indexOf("Boolean"))return Blockly.OUTPUT_SHAPE_HEXAGONAL;if(-1!==this.check_.indexOf("Number"))return Blockly.OUTPUT_SHAPE_ROUND;this.check_.indexOf("String");return Blockly.OUTPUT_SHAPE_ROUND};
 Blockly.Connection.prototype.setShadowDom=function(a){this.shadowDom_=a};Blockly.Connection.prototype.getShadowDom=function(){return this.shadowDom_};Blockly.Connection.prototype.neighbours_=function(){return[]};
 Blockly.Connection.prototype.toString=function(){var a=this.sourceBlock_;if(a)if(a.outputConnection==this)var b="Output Connection of ";else if(a.previousConnection==this)b="Previous Connection of ";else if(a.nextConnection==this)b="Next Connection of ";else if(b=goog.array.find(a.inputList,function(a){return a.connection==this},this))b='Input "'+b.name+'" connection on ';else return console.warn("Connection not actually connected to sourceBlock_"),"Orphan Connection";else return"Orphan Connection";
 return b+a.toDevString()};Blockly.ConnectionDB=function(){};Blockly.ConnectionDB.prototype=[];Blockly.ConnectionDB.constructor=Blockly.ConnectionDB;Blockly.ConnectionDB.prototype.addConnection=function(a){if(a.inDB_)throw"Connection already in database.";if(!a.getSourceBlock().isInFlyout){var b=this.findPositionForConnection_(a);this.splice(b,0,a);a.inDB_=!0}};
@@ -1384,7 +1384,7 @@ Blockly.WorkspaceCommentSvg.prototype.getBoundingRectangle=function(){var a=this
 Blockly.WorkspaceCommentSvg.prototype.updateMovable=function(){this.isMovable()?Blockly.utils.addClass(this.svgGroup_,"blocklyDraggable"):Blockly.utils.removeClass(this.svgGroup_,"blocklyDraggable")};Blockly.WorkspaceCommentSvg.prototype.setMovable=function(a){Blockly.WorkspaceCommentSvg.superClass_.setMovable.call(this,a);this.updateMovable()};
 Blockly.WorkspaceCommentSvg.prototype.setDragging=function(a){a?(a=this.getSvgRoot(),a.translate_="",a.skew_="",Blockly.utils.addClass(this.svgGroup_,"blocklyDragging")):Blockly.utils.removeClass(this.svgGroup_,"blocklyDragging")};Blockly.WorkspaceCommentSvg.prototype.getSvgRoot=function(){return this.svgGroup_};Blockly.WorkspaceCommentSvg.prototype.getContent=function(){return this.textarea_?this.textarea_.value:this.content_};
 Blockly.WorkspaceCommentSvg.prototype.setContent=function(a){Blockly.WorkspaceCommentSvg.superClass_.setContent.call(this,a);this.textarea_&&(this.textarea_.value=a)};Blockly.WorkspaceCommentSvg.prototype.setDeleteStyle=function(a){a?Blockly.utils.addClass(this.svgGroup_,"blocklyDraggingDelete"):Blockly.utils.removeClass(this.svgGroup_,"blocklyDraggingDelete")};Blockly.WorkspaceCommentSvg.prototype.setAutoLayout=function(){};
-Blockly.WorkspaceCommentSvg.fromXml=function(a,b,c){Blockly.Events.disable();try{var d=Blockly.WorkspaceComment.parseAttributes(a),e=new Blockly.WorkspaceCommentSvg(b,d.content,d.h,d.w,d.id);b.rendered&&(e.initSvg(),e.render(!1));if(!isNaN(d.x)&&!isNaN(d.y))if(b.RTL){var f=c||b.getWidth();e.moveBy(f-d.x,d.y)}else e.moveBy(d.x,d.y)}finally{Blockly.Events.enable()}Blockly.WorkspaceComment.fireCreateEvent(e);return e};
+Blockly.WorkspaceCommentSvg.fromXml=function(a,b,c){Blockly.Events.disable();try{var d=Blockly.WorkspaceComment.parseAttributes(a),e=new Blockly.WorkspaceCommentSvg(b,d.content,d.h,d.w,d.id);e.data=a.getAttribute("data");b.rendered&&(e.initSvg(),e.render(!1));if(!isNaN(d.x)&&!isNaN(d.y))if(b.RTL){var f=c||b.getWidth();e.moveBy(f-d.x,d.y)}else e.moveBy(d.x,d.y)}finally{Blockly.Events.enable()}Blockly.WorkspaceComment.fireCreateEvent(e);return e};
 Blockly.WorkspaceCommentSvg.prototype.toXmlWithXY=function(a){var b;this.workspace.RTL&&(b=this.workspace.getWidth());a=this.toXml(a);var c=this.getRelativeToSurfaceXY();a.setAttribute("x",Math.round(this.workspace.RTL?b-c.x:c.x));a.setAttribute("y",Math.round(c.y));a.setAttribute("h",this.getHeight());a.setAttribute("w",this.getWidth());return a};Blockly.BubbleDragger=function(a,b){this.draggingBubble_=a;this.workspace_=b;this.deleteArea_=null;this.wouldDeleteBubble_=!1;this.startXY_=this.draggingBubble_.getRelativeToSurfaceXY();this.dragSurface_=Blockly.utils.is3dSupported()&&b.getBlockDragSurface()?b.getBlockDragSurface():null};Blockly.BubbleDragger.prototype.dispose=function(){this.dragSurface_=this.workspace_=this.draggingBubble_=null};
 Blockly.BubbleDragger.prototype.startBubbleDrag=function(){Blockly.Events.getGroup()||Blockly.Events.setGroup(!0);this.workspace_.setResizesEnabled(!1);this.draggingBubble_.setAutoLayout(!1);this.dragSurface_&&this.moveToDragSurface_();this.draggingBubble_.setDragging&&this.draggingBubble_.setDragging(!0);var a=this.workspace_.getToolbox();if(a){var b=this.draggingBubble_.isDeletable()?"blocklyToolboxDelete":"blocklyToolboxGrab";a.addStyle(b)}};
 Blockly.BubbleDragger.prototype.dragBubble=function(a,b){var c=this.pixelsToWorkspaceUnits_(b);c=goog.math.Coordinate.sum(this.startXY_,c);this.draggingBubble_.moveDuringDrag(this.dragSurface_,c);this.draggingBubble_.isDeletable()&&(this.deleteArea_=this.workspace_.isDeleteArea(a),this.updateCursorDuringBubbleDrag_())};
@@ -1425,11 +1425,12 @@ Blockly.Gesture.prototype.handleBlockStart=function(a,b){goog.asserts.assert(!th
 Blockly.Gesture.prototype.doBubbleClick_=function(){this.startBubble_.setFocus&&this.startBubble_.setFocus();this.startBubble_.select&&this.startBubble_.select()};Blockly.Gesture.prototype.doFieldClick_=function(a){this.startField_.showEditor_(a);this.bringBlockToFront_()};
 Blockly.Gesture.prototype.doBlockClick_=function(){this.flyout_&&this.flyout_.autoClose?this.targetBlock_.disabled||(Blockly.Events.getGroup()||Blockly.Events.setGroup(!0),this.flyout_.createBlock(this.targetBlock_).scheduleSnapAndBump()):Blockly.WidgetDiv.isVisible()||Blockly.DropDownDiv.isVisible()||Blockly.Events.fire(new Blockly.Events.Ui(this.startBlock_,"click",void 0,void 0));this.bringBlockToFront_();Blockly.Events.setGroup(!1)};
 Blockly.Gesture.prototype.doWorkspaceClick_=function(){Blockly.selected&&Blockly.selected.unselect()};Blockly.Gesture.prototype.bringBlockToFront_=function(){this.targetBlock_&&!this.flyout_&&this.targetBlock_.bringToFront()};Blockly.Gesture.prototype.setStartField=function(a){goog.asserts.assert(!this.hasStarted_,"Tried to call gesture.setStartField, but the gesture had already been started.");this.startField_||(this.startField_=a)};
-Blockly.Gesture.prototype.setStartBubble=function(a){this.startBubble_||(this.startBubble_=a)};Blockly.Gesture.prototype.setStartBlock=function(a){this.startBlock_||this.startBubble_||(this.startBlock_=a,this.shouldDuplicateOnDrag_=Blockly.utils.isShadowArgumentReporter(a),a.isInFlyout&&a!=a.getRootBlock()?this.setTargetBlock_(a.getRootBlock()):this.setTargetBlock_(a))};
+Blockly.Gesture.prototype.setStartBubble=function(a){this.startBubble_||(this.startBubble_=a)};Blockly.Gesture.prototype.setStartBlock=function(a){this.startBlock_||this.startBubble_||(this.startBlock_=a,this.shouldDuplicateOnDrag_=!a.disabled&&!a.getInheritedDisabled()&&Blockly.utils.isShadowArgumentReporter(a),a.isInFlyout&&a!=a.getRootBlock()?this.setTargetBlock_(a.getRootBlock()):this.setTargetBlock_(a))};
 Blockly.Gesture.prototype.setTargetBlock_=function(a){a.isShadow()&&!this.shouldDuplicateOnDrag_?this.setTargetBlock_(a.getParent()):this.targetBlock_=a};Blockly.Gesture.prototype.setStartWorkspace_=function(a){this.startWorkspace_||(this.startWorkspace_=a)};Blockly.Gesture.prototype.setStartFlyout_=function(a){this.flyout_||(this.flyout_=a)};Blockly.Gesture.prototype.isBubbleClick_=function(){return!!this.startBubble_&&!this.hasExceededDragRadius_};
 Blockly.Gesture.prototype.isBlockClick_=function(){return!!this.startBlock_&&!this.hasExceededDragRadius_&&!this.isFieldClick_()};Blockly.Gesture.prototype.isFieldClick_=function(){return(this.startField_?this.startField_.isCurrentlyEditable():!1)&&!this.hasExceededDragRadius_&&(!this.flyout_||!this.flyout_.autoClose)};Blockly.Gesture.prototype.isWorkspaceClick_=function(){return!this.startBlock_&&!this.startBubble_&&!this.startField_&&!this.hasExceededDragRadius_};
 Blockly.Gesture.prototype.isDragging=function(){return this.isDraggingWorkspace_||this.isDraggingBlock_||this.isDraggingBubble_};Blockly.Gesture.prototype.hasStarted=function(){return this.hasStarted_};Blockly.Gesture.prototype.forceStartBlockDrag=function(a,b){this.handleBlockStart(a,b);this.handleWsStart(a,b.workspace);this.hasExceededDragRadius_=this.isDraggingBlock_=!0;this.startDraggingBlock_()};
-Blockly.Gesture.prototype.duplicateOnDrag_=function(){var a=null;try{this.startWorkspace_.setResizesEnabled(!1);var b=Blockly.Xml.blockToDom(this.targetBlock_);a=Blockly.Xml.domToBlock(b,this.startWorkspace_);var c=this.targetBlock_.getRelativeToSurfaceXY();a.moveBy(c.x,c.y);a.setShadow(!1)}finally{Blockly.Events.enable()}a?(Blockly.Events.isEnabled()&&Blockly.Events.fire(new Blockly.Events.BlockCreate(a)),a.select(),this.targetBlock_=a):console.error("Something went wrong while duplicating a block.")};/*
+Blockly.Gesture.prototype.duplicateOnDrag_=function(){var a=null;Blockly.Events.disable();try{this.startWorkspace_.setResizesEnabled(!1);var b=Blockly.Xml.blockToDom(this.targetBlock_);if("variables_get_reporter"==b.getAttribute("type")){var c=b.firstChild;if(!c)throw"unable to create a variable_get block from a variables_get_reporter block, block has no VAR field";var d=document.createElement("block");d.setAttribute("type","variables_get");var e=document.createElement("field");e.setAttribute("name",
+c.getAttribute("name"));e.setAttribute("id",c.getAttribute("id"));e.textContent=c.textContent;d.appendChild(e);b=d}a=Blockly.Xml.domToBlock(b,this.startWorkspace_);var f=this.targetBlock_.getRelativeToSurfaceXY();a.moveBy(f.x,f.y);a.setShadow(!1)}finally{Blockly.Events.enable()}a?(Blockly.Events.isEnabled()&&Blockly.Events.fire(new Blockly.Events.BlockCreate(a)),a.select(),this.targetBlock_=a):console.error("Something went wrong while duplicating a block.")};/*
 
  PXT Blockly
 
@@ -1465,7 +1466,7 @@ Blockly.utils.measureText=function(a,b,c,d){var e=document.createElement("canvas
 Blockly.utils.is3dSupported=function(){if(void 0!==Blockly.utils.is3dSupported.cached_)return Blockly.utils.is3dSupported.cached_;if(!goog.global.getComputedStyle)return!1;var a=document.createElement("p"),b="none",c={webkitTransform:"-webkit-transform",OTransform:"-o-transform",msTransform:"-ms-transform",MozTransform:"-moz-transform",transform:"transform"};document.body.insertBefore(a,null);for(var d in c)if(void 0!==a.style[d]){a.style[d]="translate3d(1px,1px,1px)";b=goog.global.getComputedStyle(a);
 if(!b)return document.body.removeChild(a),!1;b=b.getPropertyValue(c[d])}document.body.removeChild(a);Blockly.utils.is3dSupported.cached_="none"!==b;return Blockly.utils.is3dSupported.cached_};Blockly.utils.insertAfter_=function(a,b){var c=b.nextSibling,d=b.parentNode;if(!d)throw"Reference node has no parent.";c?d.insertBefore(a,c):d.appendChild(a)};
 Blockly.utils.runAfterPageLoad=function(a){if("object"!=typeof document)throw Error("Blockly.utils.runAfterPageLoad() requires browser document.");if("complete"===document.readyState)a();else var b=setInterval(function(){"complete"===document.readyState&&(clearInterval(b),a())},10)};Blockly.utils.setCssTransform=function(a,b){a.style.transform=b;a.style["-webkit-transform"]=b};
-Blockly.utils.changeObscuredShadowIds=function(a){a=a.getDescendants();for(var b=a.length-1;0<=b;b--)for(var c=a[b],d=0;d<c.inputList.length;d++){var e=c.inputList[d].connection;if(e){var f=e.getShadowDom();f&&(f.setAttribute("id",Blockly.utils.genUid()),e.setShadowDom(f))}}};Blockly.utils.isShadowArgumentReporter=function(a){return a.isShadow()&&("argument_reporter_boolean"==a.type||"argument_reporter_string_number"==a.type)};
+Blockly.utils.changeObscuredShadowIds=function(a){a=a.getDescendants();for(var b=a.length-1;0<=b;b--)for(var c=a[b],d=0;d<c.inputList.length;d++){var e=c.inputList[d].connection;if(e){var f=e.getShadowDom();f&&(f.setAttribute("id",Blockly.utils.genUid()),e.setShadowDom(f))}}};Blockly.utils.isShadowArgumentReporter=function(a){return"variables_get_reporter"==a.type};
 Blockly.utils.getViewportBBox=function(){var a=goog.dom.getViewportSize(),b=goog.style.getViewportPageOffset(document);return{right:a.width+b.x,bottom:a.height+b.y,top:b.y,left:b.x}};Blockly.Grid=function(a,b){this.gridPattern_=a;this.spacing_=b.spacing;this.length_=b.length;this.line2_=(this.line1_=a.firstChild)&&this.line1_.nextSibling;this.snapToGrid_=b.snap};Blockly.Grid.prototype.scale_=1;Blockly.Grid.prototype.dispose=function(){this.gridPattern_=null};Blockly.Grid.prototype.shouldSnap=function(){return this.snapToGrid_};Blockly.Grid.prototype.getSpacing=function(){return this.spacing_};Blockly.Grid.prototype.getPatternId=function(){return this.gridPattern_.id};
 Blockly.Grid.prototype.update=function(a){this.scale_=a;var b=this.spacing_*a||100;this.gridPattern_.setAttribute("width",b);this.gridPattern_.setAttribute("height",b);b=Math.floor(this.spacing_/2)+.5;var c=b-this.length_/2,d=b+this.length_/2;b*=a;c*=a;d*=a;this.setLineAttributes_(this.line1_,a,c,d,b,b);this.setLineAttributes_(this.line2_,a,b,b,c,d)};
 Blockly.Grid.prototype.setLineAttributes_=function(a,b,c,d,e,f){a&&(a.setAttribute("stroke-width",b),a.setAttribute("x1",c),a.setAttribute("y1",e),a.setAttribute("x2",d),a.setAttribute("y2",f))};Blockly.Grid.prototype.moveTo=function(a,b){this.gridPattern_.setAttribute("x",a);this.gridPattern_.setAttribute("y",b);(goog.userAgent.IE||goog.userAgent.EDGE)&&this.update(this.scale_)};
@@ -1537,7 +1538,7 @@ b);this.SVG_.style.display="none";goog.asserts.assert(0==this.SVG_.childNodes.le
 Blockly.WorkspaceDragSurfaceSvg.prototype.setContentsAndShow=function(a,b,c,d,e,f){goog.asserts.assert(0==this.SVG_.childNodes.length,"Already dragging a block.");this.previousSibling_=c;a.setAttribute("transform","translate(0, 0) scale("+f+")");b.setAttribute("transform","translate(0, 0) scale("+f+")");this.SVG_.setAttribute("width",d);this.SVG_.setAttribute("height",e);this.SVG_.appendChild(a);this.SVG_.appendChild(b);this.SVG_.style.display="block"};Blockly.Xml={};Blockly.Xml.workspaceToDom=function(a,b){var c=goog.dom.createDom("xml");c.appendChild(Blockly.Xml.variablesToDom(Blockly.Variables.allUsedVarModels(a)));for(var d=a.getTopComments(!0),e=0,f;f=d[e];e++)c.appendChild(f.toXmlWithXY(b));d=a.getTopBlocks(!0);for(e=0;f=d[e];e++)c.appendChild(Blockly.Xml.blockToDomWithXY(f,b));return c};
 Blockly.Xml.variablesToDom=function(a){for(var b=goog.dom.createDom("variables"),c=0,d;d=a[c];c++){var e=goog.dom.createDom("variable",null,d.name);e.setAttribute("type",d.type);e.setAttribute("id",d.getId());b.appendChild(e)}return b};Blockly.Xml.blockToDomWithXY=function(a,b){var c;a.workspace.RTL&&(c=a.workspace.getWidth());var d=Blockly.Xml.blockToDom(a,b),e=a.getRelativeToSurfaceXY();d.setAttribute("x",Math.round(a.workspace.RTL?c-e.x:e.x));d.setAttribute("y",Math.round(e.y));return d};
 Blockly.Xml.fieldToDomVariable_=function(a){null==a.getValue()&&(a.initModel(),a.getValue());var b=a.getVariable();if(!b)throw Error("Tried to serialize a variable field with no variable.");var c=goog.dom.createDom("field",null,b.name);c.setAttribute("name",a.name);c.setAttribute("id",b.getId());c.setAttribute("variabletype",b.type);return c};
-Blockly.Xml.fieldToDom_=function(a){if(a.name&&a.EDITABLE){if(a instanceof Blockly.FieldVariable)return Blockly.Xml.fieldToDomVariable_(a);var b=goog.dom.createDom("field",null,a.getValue());b.setAttribute("name",a.name);return b}return null};Blockly.Xml.allFieldsToDom_=function(a,b){for(var c=0,d;d=a.inputList[c];c++)for(var e=0,f;f=d.fieldRow[e];e++)(f=Blockly.Xml.fieldToDom_(f))&&b.appendChild(f)};
+Blockly.Xml.fieldToDom_=function(a){if(a.name){if(a instanceof Blockly.FieldVariable||a instanceof Blockly.FieldVariableGetter)return Blockly.Xml.fieldToDomVariable_(a);var b=goog.dom.createDom("field",null,a.getValue());b.setAttribute("name",a.name);return b}return null};Blockly.Xml.allFieldsToDom_=function(a,b){for(var c=0,d;d=a.inputList[c];c++)for(var e=0,f;f=d.fieldRow[e];e++)(f=Blockly.Xml.fieldToDom_(f))&&b.appendChild(f)};
 Blockly.Xml.blockToDom=function(a,b){var c=goog.dom.createDom(a.isShadow()?"shadow":"block");c.setAttribute("type",a.type);b||c.setAttribute("id",a.id);if(a.mutationToDom){var d=a.mutationToDom();d&&(d.hasChildNodes()||d.hasAttributes())&&c.appendChild(d)}Blockly.Xml.allFieldsToDom_(a,c);if(d=a.getCommentText()){d=goog.dom.createDom("comment",null,d);if("object"==typeof a.comment){d.setAttribute("pinned",a.comment.isVisible());var e=a.comment.getBubbleSize();d.setAttribute("h",e.height);d.setAttribute("w",
 e.width)}c.appendChild(d)}a.data&&(d=goog.dom.createDom("data",null,a.data),c.appendChild(d));e=0;for(var f;f=a.inputList[e];e++){var g,h=!0;if(f.type!=Blockly.DUMMY_INPUT){var k=f.connection.targetBlock();f.type==Blockly.INPUT_VALUE?g=goog.dom.createDom("value"):f.type==Blockly.NEXT_STATEMENT&&(g=goog.dom.createDom("statement"));d=f.connection.getShadowDom();!d||k&&k.isShadow()||g.appendChild(Blockly.Xml.cloneShadow_(d));k&&(g.appendChild(Blockly.Xml.blockToDom(k,b)),h=!1);g.setAttribute("name",
 f.name);h||c.appendChild(g)}}a.inputsInlineDefault!=a.inputsInline&&c.setAttribute("inline",a.inputsInline);a.isCollapsed()&&c.setAttribute("collapsed",!0);a.disabled&&c.setAttribute("disabled",!0);a.isDeletable()||a.isShadow()||c.setAttribute("deletable",!1);a.isMovable()||a.isShadow()||c.setAttribute("movable",!1);a.isEditable()||c.setAttribute("editable",!1);if(e=a.getNextBlock())g=goog.dom.createDom("next",null,Blockly.Xml.blockToDom(e,b)),c.appendChild(g);d=a.nextConnection&&a.nextConnection.getShadowDom();
@@ -1556,9 +1557,9 @@ Blockly.Xml.domToBlockHeadless_=function(a,b){var c=null,d=a.getAttribute("type"
 c.initSvg&&c.initSvg());break;case "comment":c.setCommentText(e.textContent);var l=e.getAttribute("pinned");l&&!c.isInFlyout&&setTimeout(function(){c.comment&&c.comment.setVisible&&c.comment.setVisible("true"==l)},1);f=parseInt(e.getAttribute("w"),10);e=parseInt(e.getAttribute("h"),10);!isNaN(f)&&!isNaN(e)&&c.comment&&c.comment.setVisible&&c.comment.setBubbleSize(f,e);break;case "data":c.data=e.textContent;break;case "title":case "field":Blockly.Xml.domToField_(c,h,e);break;case "value":case "statement":e=
 c.getInput(h);if(!e)break;g&&e.connection.setShadowDom(g);f&&(f=Blockly.Xml.domToBlockHeadless_(f,b),f.outputConnection?e.connection.connect(f.outputConnection):f.previousConnection?e.connection.connect(f.previousConnection):goog.asserts.fail("Child block does not have output or previous statement."));break;case "next":g&&c.nextConnection&&c.nextConnection.setShadowDom(g);f&&(goog.asserts.assert(c.nextConnection,"Next statement does not exist."),goog.asserts.assert(!c.nextConnection.isConnected(),
 "Next statement is already connected."),f=Blockly.Xml.domToBlockHeadless_(f,b),goog.asserts.assert(f.previousConnection,"Next block does not have previous statement."),c.nextConnection.connect(f.previousConnection));break;default:console.warn("Ignoring unknown tag: "+e.nodeName)}}(d=a.getAttribute("inline"))&&c.setInputsInline("true"==d);(d=a.getAttribute("disabled"))&&c.setDisabled("true"==d||"disabled"==d);(d=a.getAttribute("deletable"))&&c.setDeletable("true"==d);(d=a.getAttribute("movable"))&&
-c.setMovable("true"==d);(d=a.getAttribute("editable"))&&c.setEditable("true"==d);(d=a.getAttribute("collapsed"))&&c.setCollapsed("true"==d);if("shadow"==a.nodeName.toLowerCase()){e=c.getChildren(!1);for(d=0;f=e[d];d++)goog.asserts.assert(f.isShadow(),"Shadow block not allowed non-shadow child.");goog.asserts.assert(0==c.getVarModels().length,"Shadow blocks cannot have variable references.");c.setShadow(!0)}return c};
+c.setMovable("true"==d);(d=a.getAttribute("editable"))&&c.setEditable("true"==d);(d=a.getAttribute("collapsed"))&&c.setCollapsed("true"==d);if("shadow"==a.nodeName.toLowerCase()){e=c.getChildren(!1);for(d=0;f=e[d];d++)goog.asserts.assert(f.isShadow(),"Shadow block not allowed non-shadow child.");c.setShadow(!0)}return c};
 Blockly.Xml.domToFieldVariable_=function(a,b,c,d){var e=b.getAttribute("variabletype")||"";"''"==e&&(e="");a=Blockly.Variables.getOrCreateVariablePackage(a,b.id,c,e);if(null!=e&&e!==a.type)throw Error("Serialized variable type with id '"+a.getId()+"' had type "+a.type+", and does not match variable field that references it: "+Blockly.Xml.domToText(b)+".");d.setValue(a.getId())};
-Blockly.Xml.domToField_=function(a,b,c){if(b=a.getField(b)){a=a.workspace;var d=c.textContent;b instanceof Blockly.FieldVariable?Blockly.Xml.domToFieldVariable_(a,c,d,b):b.setValue(d)}};Blockly.Xml.deleteNext=function(a){for(var b=0,c;c=a.childNodes[b];b++)if("next"==c.nodeName.toLowerCase()){a.removeChild(c);break}};goog.global.Blockly||(goog.global.Blockly={});goog.global.Blockly.Xml||(goog.global.Blockly.Xml={});goog.global.Blockly.Xml.domToText=Blockly.Xml.domToText;
+Blockly.Xml.domToField_=function(a,b,c){if(b=a.getField(b)){a=a.workspace;var d=c.textContent;b instanceof Blockly.FieldVariable||b instanceof Blockly.FieldVariableGetter?Blockly.Xml.domToFieldVariable_(a,c,d,b):b.setValue(d)}};Blockly.Xml.deleteNext=function(a){for(var b=0,c;c=a.childNodes[b];b++)if("next"==c.nodeName.toLowerCase()){a.removeChild(c);break}};goog.global.Blockly||(goog.global.Blockly={});goog.global.Blockly.Xml||(goog.global.Blockly.Xml={});goog.global.Blockly.Xml.domToText=Blockly.Xml.domToText;
 goog.global.Blockly.Xml.domToWorkspace=Blockly.Xml.domToWorkspace;goog.global.Blockly.Xml.textToDom=Blockly.Xml.textToDom;goog.global.Blockly.Xml.workspaceToDom=Blockly.Xml.workspaceToDom;
 Blockly.ZoomControls=function(a){this.workspace_=a};Blockly.ZoomControls.prototype.WIDTH_=32;Blockly.ZoomControls.prototype.HEIGHT_=110;Blockly.ZoomControls.prototype.MARGIN_BOTTOM_=20;Blockly.ZoomControls.prototype.MARGIN_SIDE_=20;Blockly.ZoomControls.prototype.svgGroup_=null;Blockly.ZoomControls.prototype.left_=0;Blockly.ZoomControls.prototype.top_=0;
 Blockly.ZoomControls.prototype.createDom=function(){var a=this.workspace_;this.svgGroup_=Blockly.utils.createSvgElement("g",{"class":"blocklyZoom"},null);var b=String(Math.random()).substring(2);var c=Blockly.utils.createSvgElement("clipPath",{id:"blocklyZoomoutClipPath"+b},this.svgGroup_);Blockly.utils.createSvgElement("rect",{width:32,height:32,y:77},c);var d=Blockly.utils.createSvgElement("image",{width:Blockly.SPRITE.width,height:Blockly.SPRITE.height,x:-64,y:-15,"clip-path":"url(#blocklyZoomoutClipPath"+
@@ -1679,12 +1680,18 @@ Blockly.Field.prototype.setTooltip=function(a){};Blockly.Field.prototype.getClic
 Blockly.FieldLabel.prototype.init=function(){this.textElement_||(this.textElement_=Blockly.utils.createSvgElement("text",{"class":this.className_,y:Blockly.BlockSvg.FIELD_TOP_PADDING,"text-anchor":"middle","dominant-baseline":"middle",dy:goog.userAgent.EDGE_OR_IE?Blockly.Field.IE_TEXT_OFFSET:"0"},null),this.class_&&Blockly.utils.addClass(this.textElement_,this.class_),this.visible_||(this.textElement_.style.display="none"),this.sourceBlock_.getSvgRoot().appendChild(this.textElement_),this.textElement_.tooltip=
 this.sourceBlock_,Blockly.Tooltip.bindMouseEvents(this.textElement_),this.render_())};Blockly.FieldLabel.prototype.dispose=function(){goog.dom.removeNode(this.textElement_);this.textElement_=null};Blockly.FieldLabel.prototype.getSvgRoot=function(){return this.textElement_};Blockly.FieldLabel.prototype.setTooltip=function(a){this.textElement_.tooltip=a};Blockly.Field.register("field_label",Blockly.FieldLabel);Blockly.FieldLabelSerializable=function(a,b){Blockly.FieldLabelSerializable.superClass_.constructor.call(this,a,b);this.arrowWidth_=0};goog.inherits(Blockly.FieldLabelSerializable,Blockly.FieldLabel);Blockly.FieldLabelSerializable.fromJson=function(a){var b=Blockly.utils.replaceMessageReferences(a.text);return new Blockly.FieldLabelSerializable(b,a["class"])};Blockly.FieldLabelSerializable.prototype.EDITABLE=!1;Blockly.FieldLabelSerializable.prototype.SERIALIZABLE=!0;
 Blockly.FieldLabelSerializable.prototype.updateWidth=function(){this.size_.width=Blockly.Field.getCachedWidth(this.textElement_)};
-Blockly.FieldLabelSerializable.prototype.render_=function(){if(this.visible_&&this.textElement_){goog.dom.removeChildren(this.textElement_);var a=document.createTextNode(this.getDisplayText_());this.textElement_.appendChild(a);this.updateWidth();a=this.size_.width/2;var b=Blockly.BlockSvg.FIELD_WIDTH/2;a=this.sourceBlock_.RTL?Math.min(this.size_.width-b,a):Math.max(b,a);this.textElement_.setAttribute("x",a)}};Blockly.Field.register("field_label_serializable",Blockly.FieldLabelSerializable);Blockly.Input=function(a,b,c,d){if(a!=Blockly.DUMMY_INPUT&&!b)throw"Value inputs and statement inputs must have non-empty name.";this.type=a;this.name=b;this.sourceBlock_=c;this.connection=d;this.fieldRow=[];this.outlinePath=null};Blockly.Input.prototype.align=Blockly.ALIGN_LEFT;Blockly.Input.prototype.visible_=!0;Blockly.Input.prototype.appendField=function(a,b){this.insertFieldAt(this.fieldRow.length,a,b);return this};
+Blockly.FieldLabelSerializable.prototype.render_=function(){if(this.visible_&&this.textElement_){goog.dom.removeChildren(this.textElement_);var a=document.createTextNode(this.getDisplayText_());this.textElement_.appendChild(a);this.updateWidth();a=this.size_.width/2;var b=Blockly.BlockSvg.FIELD_WIDTH/2;a=this.sourceBlock_.RTL?Math.min(this.size_.width-b,a):Math.max(b,a);this.textElement_.setAttribute("x",a)}};Blockly.Field.register("field_label_serializable",Blockly.FieldLabelSerializable);Blockly.FieldVariableGetter=function(a,b,c){this.size_=new goog.math.Size(Blockly.BlockSvg.FIELD_WIDTH,Blockly.BlockSvg.FIELD_HEIGHT);this.setValidator(b);this.defaultVariableName=a||"";this.defaultType_=c&&1==c.length?c[0]:"";this.variableTypes=c;this.maxDisplayLength=Blockly.BlockSvg.MAX_DISPLAY_LENGTH;this.value_=null};goog.inherits(Blockly.FieldVariableGetter,Blockly.Field);
+Blockly.FieldVariableGetter.fromJson=function(a){var b=Blockly.utils.replaceMessageReferences(a.variable);return new Blockly.FieldVariableGetter(b,null,a.variableTypes)};Blockly.FieldVariableGetter.prototype.EDITABLE=!1;Blockly.FieldVariableGetter.prototype.SERIALIZABLE=!0;Blockly.FieldVariableGetter.prototype.init=function(){this.fieldGroup_||(Blockly.FieldVariableGetter.superClass_.init.call(this),this.initModel())};
+Blockly.FieldVariableGetter.prototype.initModel=function(){if(!this.variable_){this.workspace_=this.sourceBlock_.workspace;var a=Blockly.Variables.getOrCreateVariablePackage(this.workspace_,null,this.defaultVariableName,this.defaultType_);Blockly.Events.disable();try{this.setValue(a.getId())}finally{Blockly.Events.enable()}}};Blockly.FieldVariableGetter.dispose=function(){Blockly.FieldVariableGetter.superClass_.dispose.call(this);this.variableMap_=this.workspace_=null};
+Blockly.FieldVariableGetter.prototype.setSourceBlock=function(a){goog.asserts.assert(!a.isShadow(),"Variable fields are not allowed to exist on shadow blocks.");Blockly.FieldVariableGetter.superClass_.setSourceBlock.call(this,a)};Blockly.FieldVariableGetter.prototype.getValue=function(){return this.variable_?this.variable_.getId():null};Blockly.FieldVariableGetter.prototype.getText=function(){return this.variable_?this.variable_.name:""};Blockly.FieldVariableGetter.prototype.getVariable=function(){return this.variable_};
+Blockly.FieldVariableGetter.prototype.setValue=function(a){var b=Blockly.Variables.getVariable(this.sourceBlock_.workspace,a);if(!b)throw Error("Variable id doesn't point to a real variable!  ID was "+a);var c=b.type;if(!this.typeIsAllowed_(c))throw Error("Variable type doesn't match this field!  Type was "+c);this.sourceBlock_&&Blockly.Events.isEnabled()&&(c=this.variable_?this.variable_.getId():null,Blockly.Events.fire(new Blockly.Events.BlockChange(this.sourceBlock_,"field",this.name,c,a)));this.variable_=
+b;this.value_=a;this.setText(b.name)};Blockly.FieldVariableGetter.prototype.typeIsAllowed_=function(a){var b=this.getVariableTypes_();if(!b)return!0;for(var c=0;c<b.length;c++)if(a==b[c])return!0;return!1};Blockly.FieldVariableGetter.prototype.getVariableTypes_=function(){var a=this.variableTypes;if(null===a&&this.sourceBlock_)return this.sourceBlock_.workspace.getVariableTypes();a=a||[""];if(0==a.length)throw a=this.getText(),Error("'variableTypes' of field variable "+a+" was an empty list");return a};
+Blockly.FieldVariableGetter.prototype.showEditor_=function(){};Blockly.FieldVariableGetter.prototype.updateEditable=function(){};Blockly.Field.register("field_variable_getter",Blockly.FieldVariableGetter);Blockly.Input=function(a,b,c,d){if(a!=Blockly.DUMMY_INPUT&&!b)throw"Value inputs and statement inputs must have non-empty name.";this.type=a;this.name=b;this.sourceBlock_=c;this.connection=d;this.fieldRow=[];this.outlinePath=null};Blockly.Input.prototype.align=Blockly.ALIGN_LEFT;Blockly.Input.prototype.visible_=!0;Blockly.Input.prototype.appendField=function(a,b){this.insertFieldAt(this.fieldRow.length,a,b);return this};
 Blockly.Input.prototype.insertFieldAt=function(a,b,c){if(0>a||a>this.fieldRow.length)throw Error("index "+a+" out of bounds.");if(!b&&!c)return a;goog.isString(b)&&(b=new Blockly.FieldLabel(b));b.setSourceBlock(this.sourceBlock_);this.sourceBlock_.rendered&&b.init();b.name=c;b.prefixField&&(a=this.insertFieldAt(a,b.prefixField));this.fieldRow.splice(a,0,b);++a;b.suffixField&&(a=this.insertFieldAt(a,b.suffixField));this.sourceBlock_.rendered&&(this.sourceBlock_.render(),this.sourceBlock_.bumpNeighbours_());
 return a};Blockly.Input.prototype.removeField=function(a){for(var b=0,c;c=this.fieldRow[b];b++)if(c.name===a){c.dispose();this.fieldRow.splice(b,1);this.sourceBlock_.rendered&&(this.sourceBlock_.render(),this.sourceBlock_.bumpNeighbours_());return}goog.asserts.fail('Field "%s" not found.',a)};Blockly.Input.prototype.isVisible=function(){return this.visible_};
 Blockly.Input.prototype.setVisible=function(a){var b=[];if(this.visible_==a)return b;this.visible_=a;!a&&this.outlinePath&&this.outlinePath.setAttribute("style","visibility: hidden");for(var c=a?"block":"none",d=0,e;e=this.fieldRow[d];d++)e.setVisible(a);this.connection&&(a?b=this.connection.unhideAll():this.connection.hideAll(),d=this.connection.targetBlock())&&(d.getSvgRoot().style.display=c,a||(d.rendered=!1));return b};
 Blockly.Input.prototype.setCheck=function(a){if(!this.connection)throw"This input does not have a connection.";this.connection.setCheck(a);return this};Blockly.Input.prototype.setAlign=function(a){this.align=a;this.sourceBlock_.rendered&&this.sourceBlock_.render();return this};Blockly.Input.prototype.init=function(){if(this.sourceBlock_.workspace.rendered)for(var a=0;a<this.fieldRow.length;a++)this.fieldRow[a].init(this.sourceBlock_)};
-Blockly.Input.prototype.dispose=function(){this.outlinePath&&goog.dom.removeNode(this.outlinePath);for(var a=0,b;b=this.fieldRow[a];a++)b.dispose();this.connection&&this.connection.dispose();this.sourceBlock_=null};Blockly.Input.prototype.initOutlinePath=function(a){this.type==Blockly.INPUT_VALUE&&(this.outlinePath=Blockly.utils.createSvgElement("path",{"class":"blocklyPath",style:"visibility: hidden",d:""},a))};Blockly.Warning=function(a){Blockly.Warning.superClass_.constructor.call(this,a);this.createIcon();this.text_={}};goog.inherits(Blockly.Warning,Blockly.Icon);Blockly.Warning.prototype.collapseHidden=!1;
+Blockly.Input.prototype.dispose=function(){this.outlinePath&&goog.dom.removeNode(this.outlinePath);for(var a=0,b;b=this.fieldRow[a];a++)b.dispose();this.connection&&this.connection.dispose();this.sourceBlock_=null};Blockly.Input.prototype.initOutlinePath=function(a){this.sourceBlock_.workspace.rendered&&!this.outlinePath&&this.type==Blockly.INPUT_VALUE&&(this.outlinePath=Blockly.utils.createSvgElement("path",{"class":"blocklyPath",style:"visibility: hidden",d:""},a))};Blockly.Warning=function(a){Blockly.Warning.superClass_.constructor.call(this,a);this.createIcon();this.text_={}};goog.inherits(Blockly.Warning,Blockly.Icon);Blockly.Warning.prototype.collapseHidden=!1;
 Blockly.Warning.prototype.drawIcon_=function(a){Blockly.utils.createSvgElement("path",{"class":"blocklyIconShape",d:"M2,15Q-1,15 0.5,12L6.5,1.7Q8,-1 9.5,1.7L15.5,12Q17,15 14,15z"},a);Blockly.utils.createSvgElement("path",{"class":"blocklyIconSymbol",d:"m7,4.8v3.16l0.27,2.27h1.46l0.27,-2.27v-3.16z"},a);Blockly.utils.createSvgElement("rect",{"class":"blocklyIconSymbol",x:"7",y:"11",height:"2",width:"2"},a)};
 Blockly.Warning.textToDom_=function(a){var b=Blockly.utils.createSvgElement("text",{"class":"blocklyText blocklyBubbleText",y:Blockly.Bubble.BORDER_WIDTH},null);a=a.split("\n");for(var c=0;c<a.length;c++){var d=Blockly.utils.createSvgElement("tspan",{dy:"1em",x:Blockly.Bubble.BORDER_WIDTH},b),e=document.createTextNode(a[c]);d.appendChild(e)}return b};
 Blockly.Warning.prototype.setVisible=function(a){if(a!=this.isVisible())if(Blockly.Events.fire(new Blockly.Events.Ui(this.block_,"warningOpen",!a,a)),a){a=Blockly.Warning.textToDom_(this.getText());this.bubble_=new Blockly.Bubble(this.block_.workspace,a,this.block_.svgPath_,this.iconXY_,null,null);this.bubble_.setSvgId(this.block_.id);if(this.block_.RTL)for(var b=a.getBBox().width,c=0,d;d=a.childNodes[c];c++)d.setAttribute("text-anchor","end"),d.setAttribute("x",b+Blockly.Bubble.BORDER_WIDTH);this.updateColour();
@@ -1708,12 +1715,12 @@ Blockly.Block.prototype.setInsertionMarker=function(a){this.isInsertionMarker_!=
 Blockly.Block.prototype.setEditable=function(a){this.editable_=a;a=0;for(var b;b=this.inputList[a];a++)for(var c=0,d;d=b.fieldRow[c];c++)d.updateEditable()};
 Blockly.Block.prototype.setConnectionsHidden=function(a){if(!a&&this.isCollapsed()){if(this.outputConnection&&this.outputConnection.setHidden(a),this.previousConnection&&this.previousConnection.setHidden(a),this.nextConnection){this.nextConnection.setHidden(a);var b=this.nextConnection.targetBlock();b&&b.setConnectionsHidden(a)}}else for(var c=this.getConnections_(!0),d=0;b=c[d];d++)b.setHidden(a),b.isSuperior()&&(b=b.targetBlock())&&b.setConnectionsHidden(a)};
 Blockly.Block.prototype.getMatchingConnection=function(a,b){var c=this.getConnections_(!0),d=a.getConnections_(!0);if(c.length!=d.length)throw"Connection lists did not match in length.";for(var e=0;e<d.length;e++)if(d[e]==b)return c[e];return null};Blockly.Block.prototype.setHelpUrl=function(a){this.helpUrl=a};Blockly.Block.prototype.setTooltip=function(a){this.tooltip=a};Blockly.Block.prototype.getColour=function(){return this.colour_};Blockly.Block.prototype.getHue=function(){return this.hue_};
-Blockly.Block.prototype.getColourSecondary=function(){return this.colourSecondary_};Blockly.Block.prototype.getColourTertiary=function(){return this.colourTertiary_};Blockly.Block.prototype.makeColour_=function(a){var b=Number(a);if(isNaN(b)){if(goog.isString(a)&&a.match(/^#[0-9a-fA-F]{6}$/))return a;b='Invalid colour: "'+dereferenced+'"';a!=dereferenced&&(b+=' (from "'+a+'")');throw b;}return Blockly.hueToRgb(b)};
+Blockly.Block.prototype.getColourSecondary=function(){return this.colourSecondary_};Blockly.Block.prototype.getColourTertiary=function(){return this.colourTertiary_};Blockly.Block.prototype.makeColour_=function(a){var b=Number(a);if(isNaN(b)){if(goog.isString(a)&&a.match(/^#[0-9a-fA-F]{6}$/))return a;throw"Invalid colour: "+a;}return Blockly.hueToRgb(b)};
 Blockly.Block.prototype.setColour=function(a,b,c){this.colour_=this.makeColour_(a);this.colourSecondary_=void 0!==b?this.makeColour_(b):goog.color.rgbArrayToHex(goog.color.darken(goog.color.hexToRgb(this.colour_),.1));this.colourTertiary_=void 0!==c?this.makeColour_(c):goog.color.rgbArrayToHex(goog.color.darken(goog.color.hexToRgb(this.colour_),.2));this.rendered&&this.updateColour()};
 Blockly.Block.prototype.setOnChange=function(a){if(a&&!goog.isFunction(a))throw Error("onchange must be a function.");this.onchangeWrapper_&&this.workspace.removeChangeListener(this.onchangeWrapper_);if(this.onchange=a)this.onchangeWrapper_=a.bind(this),this.workspace.addChangeListener(this.onchangeWrapper_)};Blockly.Block.prototype.getField=function(a){for(var b=0,c;c=this.inputList[b];b++)for(var d=0,e;e=c.fieldRow[d];d++)if(e.name===a)return e;return null};
-Blockly.Block.prototype.getVars=function(){for(var a=[],b=0,c;c=this.inputList[b];b++)for(var d=0,e;e=c.fieldRow[d];d++)e instanceof Blockly.FieldVariable&&a.push(e.getValue());return a};Blockly.Block.prototype.getVarModels=function(){for(var a=[],b=0,c;c=this.inputList[b];b++)for(var d=0,e;e=c.fieldRow[d];d++)e instanceof Blockly.FieldVariable&&(e=this.workspace.getVariableById(e.getValue()))&&a.push(e);return a};
-Blockly.Block.prototype.updateVarName=function(a){for(var b=0,c;c=this.inputList[b];b++)for(var d=0,e;e=c.fieldRow[d];d++)e instanceof Blockly.FieldVariable&&a.getId()==e.getValue()&&e.setText(a.name)};Blockly.Block.prototype.renameVarById=function(a,b){for(var c=0,d;d=this.inputList[c];c++)for(var e=0,f;f=d.fieldRow[e];e++)f instanceof Blockly.FieldVariable&&a==f.getValue()&&f.setValue(b)};Blockly.Block.prototype.getFieldValue=function(a){return(a=this.getField(a))?a.getValue():null};
-Blockly.Block.prototype.setFieldValue=function(a,b){var c=this.getField(b);goog.asserts.assertObject(c,'Field "%s" not found.',b);c.setValue(a)};
+Blockly.Block.prototype.getVars=function(){for(var a=[],b=0,c;c=this.inputList[b];b++)for(var d=0,e;e=c.fieldRow[d];d++)(e instanceof Blockly.FieldVariable||e instanceof Blockly.FieldVariableGetter)&&a.push(e.getValue());return a};Blockly.Block.prototype.getVarModels=function(){for(var a=[],b=0,c;c=this.inputList[b];b++)for(var d=0,e;e=c.fieldRow[d];d++)(e instanceof Blockly.FieldVariable||e instanceof Blockly.FieldVariableGetter)&&(e=this.workspace.getVariableById(e.getValue()))&&a.push(e);return a};
+Blockly.Block.prototype.updateVarName=function(a){for(var b=0,c;c=this.inputList[b];b++)for(var d=0,e;e=c.fieldRow[d];d++)(e instanceof Blockly.FieldVariable||e instanceof Blockly.FieldVariableGetter)&&a.getId()==e.getValue()&&e.setText(a.name)};Blockly.Block.prototype.renameVarById=function(a,b){for(var c=0,d;d=this.inputList[c];c++)for(var e=0,f;f=d.fieldRow[e];e++)(f instanceof Blockly.FieldVariable||f instanceof Blockly.FieldVariableGetter)&&a==f.getValue()&&f.setValue(b)};
+Blockly.Block.prototype.getFieldValue=function(a){return(a=this.getField(a))?a.getValue():null};Blockly.Block.prototype.setFieldValue=function(a,b){var c=this.getField(b);goog.asserts.assertObject(c,'Field "%s" not found.',b);c.setValue(a)};
 Blockly.Block.prototype.setPreviousStatement=function(a,b){a?(void 0===b&&(b=null),this.previousConnection||(goog.asserts.assert(!this.outputConnection,"Remove output connection prior to adding previous connection."),this.previousConnection=this.makeConnection_(Blockly.PREVIOUS_STATEMENT)),this.previousConnection.setCheck(b)):this.previousConnection&&(goog.asserts.assert(!this.previousConnection.isConnected(),"Must disconnect previous statement before removing connection."),this.previousConnection.dispose(),
 this.previousConnection=null)};Blockly.Block.prototype.setNextStatement=function(a,b){a?(void 0===b&&(b=null),this.nextConnection||(this.nextConnection=this.makeConnection_(Blockly.NEXT_STATEMENT)),this.nextConnection.setCheck(b)):this.nextConnection&&(goog.asserts.assert(!this.nextConnection.isConnected(),"Must disconnect next statement before removing connection."),this.nextConnection.dispose(),this.nextConnection=null)};
 Blockly.Block.prototype.setOutput=function(a,b){a?(void 0===b&&(b=null),this.outputConnection||(goog.asserts.assert(!this.previousConnection,"Remove previous connection prior to adding output connection."),this.outputConnection=this.makeConnection_(Blockly.OUTPUT_VALUE)),this.outputConnection.setCheck(b)):this.outputConnection&&(goog.asserts.assert(!this.outputConnection.isConnected(),"Must disconnect output value before removing connection."),this.outputConnection.dispose(),this.outputConnection=
@@ -1800,7 +1807,7 @@ Blockly.BlockSvg.prototype.makeConnection_=function(a){return new Blockly.Render
 Blockly.BlockSvg.prototype.bumpNeighbours_=function(){if(this.workspace&&!this.workspace.isDragging()){var a=this.getRootBlock();if(!a.isInFlyout)for(var b=this.getConnections_(!1),c=0,d;d=b[c];c++){d.isConnected()&&d.isSuperior()&&d.targetBlock().bumpNeighbours_();for(var e=d.neighbours_(Blockly.SNAP_RADIUS),f=0,g;g=e[f];f++)d.isConnected()&&g.isConnected()||g.getSourceBlock().getRootBlock()!=a&&(d.isSuperior()?g.bumpAwayFrom_(d):d.bumpAwayFrom_(g))}}};
 Blockly.BlockSvg.prototype.scheduleSnapAndBump=function(){var a=this,b=Blockly.Events.getGroup();setTimeout(function(){Blockly.Events.setGroup(b);a.snapToGrid();Blockly.Events.setGroup(!1)},Blockly.BUMP_DELAY/2);setTimeout(function(){Blockly.Events.setGroup(b);a.bumpNeighbours_();Blockly.Events.setGroup(!1)},Blockly.BUMP_DELAY)};Blockly.BlockSvg.render={};Blockly.BlockSvg.GRID_UNIT=4;Blockly.BlockSvg.TAB_WIDTH=8;Blockly.BlockSvg.SEP_SPACE_X=2*Blockly.BlockSvg.GRID_UNIT;Blockly.BlockSvg.SEP_SPACE_Y=2*Blockly.BlockSvg.GRID_UNIT;Blockly.BlockSvg.MIN_BLOCK_X=16*Blockly.BlockSvg.GRID_UNIT;Blockly.BlockSvg.MIN_BLOCK_X_OUTPUT=12*Blockly.BlockSvg.GRID_UNIT;Blockly.BlockSvg.MIN_BLOCK_X_SHADOW_OUTPUT=10*Blockly.BlockSvg.GRID_UNIT;Blockly.BlockSvg.MIN_BLOCK_Y=12*Blockly.BlockSvg.GRID_UNIT;Blockly.BlockSvg.EXTRA_STATEMENT_ROW_Y=8*Blockly.BlockSvg.GRID_UNIT;
 Blockly.BlockSvg.MIN_BLOCK_X_WITH_STATEMENT=40*Blockly.BlockSvg.GRID_UNIT;Blockly.BlockSvg.MIN_BLOCK_Y_SINGLE_FIELD_OUTPUT=8*Blockly.BlockSvg.GRID_UNIT;Blockly.BlockSvg.MIN_BLOCK_Y_REPORTER=10*Blockly.BlockSvg.GRID_UNIT;Blockly.BlockSvg.MIN_STATEMENT_INPUT_HEIGHT=6*Blockly.BlockSvg.GRID_UNIT;Blockly.BlockSvg.NOTCH_WIDTH=8*Blockly.BlockSvg.GRID_UNIT;Blockly.BlockSvg.NOTCH_HEIGHT=2*Blockly.BlockSvg.GRID_UNIT;Blockly.BlockSvg.CORNER_RADIUS=1*Blockly.BlockSvg.GRID_UNIT;
-Blockly.BlockSvg.STATEMENT_INPUT_EDGE_WIDTH=4*Blockly.BlockSvg.GRID_UNIT;Blockly.BlockSvg.STATEMENT_INPUT_INNER_SPACE=2*Blockly.BlockSvg.GRID_UNIT;Blockly.BlockSvg.START_HAT=!1;Blockly.BlockSvg.START_HAT_HEIGHT=16;Blockly.BlockSvg.START_HAT_PATH="c 25,-22 71,-22 96,0";Blockly.BlockSvg.NOTCH_PATH_LEFT="c 2,0 3,1 4,2 l 4,4 c 1,1 2,2 4,2 h 12 c 2,0 3,-1 4,-2 l 4,-4 c 1,-1 2,-2 4,-2";Blockly.BlockSvg.NOTCH_PATH_RIGHT="c -2,0 -3,1 -4,2 l -4,4 c -1,1 -2,2 -4,2 h -12 c -2,0 -3,-1 -4,-2 l -4,-4 c -1,-1 -2,-2 -4,-2";
+Blockly.BlockSvg.STATEMENT_INPUT_EDGE_WIDTH=4*Blockly.BlockSvg.GRID_UNIT;Blockly.BlockSvg.STATEMENT_INPUT_INNER_SPACE=2*Blockly.BlockSvg.GRID_UNIT;Blockly.BlockSvg.START_HAT=!1;Blockly.BlockSvg.START_HAT_HEIGHT=16;Blockly.BlockSvg.ICON_SEPARATOR_HEIGHT=10*Blockly.BlockSvg.GRID_UNIT;Blockly.BlockSvg.START_HAT_PATH="c 25,-22 71,-22 96,0";Blockly.BlockSvg.NOTCH_PATH_LEFT="c 2,0 3,1 4,2 l 4,4 c 1,1 2,2 4,2 h 12 c 2,0 3,-1 4,-2 l 4,-4 c 1,-1 2,-2 4,-2";Blockly.BlockSvg.NOTCH_PATH_RIGHT="c -2,0 -3,1 -4,2 l -4,4 c -1,1 -2,2 -4,2 h -12 c -2,0 -3,-1 -4,-2 l -4,-4 c -1,-1 -2,-2 -4,-2";
 Blockly.BlockSvg.NOTCH_START_PADDING=3*Blockly.BlockSvg.GRID_UNIT;Blockly.BlockSvg.TOP_LEFT_CORNER_START="m 0,"+Blockly.BlockSvg.CORNER_RADIUS;Blockly.BlockSvg.TOP_LEFT_CORNER="A "+Blockly.BlockSvg.CORNER_RADIUS+","+Blockly.BlockSvg.CORNER_RADIUS+" 0 0,1 "+Blockly.BlockSvg.CORNER_RADIUS+",0";Blockly.BlockSvg.TOP_RIGHT_CORNER="a "+Blockly.BlockSvg.CORNER_RADIUS+","+Blockly.BlockSvg.CORNER_RADIUS+" 0 0,1 "+Blockly.BlockSvg.CORNER_RADIUS+","+Blockly.BlockSvg.CORNER_RADIUS;
 Blockly.BlockSvg.BOTTOM_RIGHT_CORNER=" a "+Blockly.BlockSvg.CORNER_RADIUS+","+Blockly.BlockSvg.CORNER_RADIUS+" 0 0,1 -"+Blockly.BlockSvg.CORNER_RADIUS+","+Blockly.BlockSvg.CORNER_RADIUS;Blockly.BlockSvg.BOTTOM_LEFT_CORNER="a "+Blockly.BlockSvg.CORNER_RADIUS+","+Blockly.BlockSvg.CORNER_RADIUS+" 0 0,1 -"+Blockly.BlockSvg.CORNER_RADIUS+",-"+Blockly.BlockSvg.CORNER_RADIUS;
 Blockly.BlockSvg.INNER_TOP_LEFT_CORNER=" a "+Blockly.BlockSvg.CORNER_RADIUS+","+Blockly.BlockSvg.CORNER_RADIUS+" 0 0,0 -"+Blockly.BlockSvg.CORNER_RADIUS+","+Blockly.BlockSvg.CORNER_RADIUS;Blockly.BlockSvg.INNER_BOTTOM_LEFT_CORNER="a "+Blockly.BlockSvg.CORNER_RADIUS+","+Blockly.BlockSvg.CORNER_RADIUS+" 0 0,0 "+Blockly.BlockSvg.CORNER_RADIUS+","+Blockly.BlockSvg.CORNER_RADIUS;
@@ -1824,7 +1831,7 @@ Blockly.NEXT_STATEMENT&&(l=m.connection.targetBlock())&&!l.lastConnectionInStack
 q)}p.height=Math.max(p.height,m.renderHeight);m.fieldWidth=0;1==c.length&&(m.fieldWidth+=this.RTL?-a:a);l=!1;q=0;for(var r;r=m.fieldRow[q];q++){0!=q&&(m.fieldWidth+=Blockly.BlockSvg.SEP_SPACE_X);var t=r.getSize();r.renderWidth=t.width;r.renderSep=l&&r.EDITABLE?Blockly.BlockSvg.SEP_SPACE_X:0;m.fieldWidth+=r.renderWidth+r.renderSep;p.height=Math.max(p.height,t.height);l=r.EDITABLE}p.type!=Blockly.BlockSvg.INLINE&&(p.type==Blockly.NEXT_STATEMENT?(f=!0,d=Math.max(d,m.fieldWidth)):p.type==Blockly.INPUT_VALUE?
 e=!0:p.type==Blockly.DUMMY_INPUT&&(g=!0));l=p}for(n=0;n<c.length;n++)c.bottomEdge+=c[n].height;this.computeOutputPadding_(c);c.statementEdge=Blockly.BlockSvg.STATEMENT_INPUT_EDGE_WIDTH+d;c.rightEdge=this.computeRightEdge_(c.rightEdge,f);c.hasValue=e;c.hasStatement=f;c.hasDummy=g;return c};
 Blockly.BlockSvg.prototype.computeInputWidth_=function(a){if(a.type!=Blockly.INPUT_VALUE||a.connection&&a.connection.isConnected())return 0;switch(a.connection.getOutputShape()){case Blockly.OUTPUT_SHAPE_SQUARE:return Blockly.BlockSvg.INPUT_SHAPE_SQUARE_WIDTH;case Blockly.OUTPUT_SHAPE_ROUND:return Blockly.BlockSvg.INPUT_SHAPE_ROUND_WIDTH;case Blockly.OUTPUT_SHAPE_HEXAGONAL:return Blockly.BlockSvg.INPUT_SHAPE_HEXAGONAL_WIDTH;default:return 0}};
-Blockly.BlockSvg.prototype.computeInputHeight_=function(a,b,c){return 1===this.inputList.length&&this.outputConnection&&this.isShadow()&&!Blockly.utils.isShadowArgumentReporter(this)?Blockly.BlockSvg.MIN_BLOCK_Y_SINGLE_FIELD_OUTPUT:this.outputConnection?Blockly.BlockSvg.MIN_BLOCK_Y_REPORTER:b.type==Blockly.NEXT_STATEMENT?Blockly.BlockSvg.MIN_STATEMENT_INPUT_HEIGHT:c&&c.type==Blockly.NEXT_STATEMENT?Blockly.BlockSvg.EXTRA_STATEMENT_ROW_Y:Blockly.BlockSvg.MIN_BLOCK_Y};
+Blockly.BlockSvg.prototype.computeInputHeight_=function(a,b,c){return 1===this.inputList.length&&this.outputConnection&&this.isShadow()?Blockly.BlockSvg.MIN_BLOCK_Y_SINGLE_FIELD_OUTPUT:this.outputConnection?Blockly.BlockSvg.MIN_BLOCK_Y_REPORTER:b.type==Blockly.NEXT_STATEMENT?Blockly.BlockSvg.MIN_STATEMENT_INPUT_HEIGHT:c&&c.type==Blockly.NEXT_STATEMENT?Blockly.BlockSvg.EXTRA_STATEMENT_ROW_Y:Blockly.BlockSvg.MIN_BLOCK_Y};
 Blockly.BlockSvg.prototype.createRowForInput_=function(a,b){var c=[];c.type=b&&a.type==Blockly.NEXT_STATEMENT?a.type:Blockly.BlockSvg.INLINE;c.height=0;c.paddingStart=Blockly.BlockSvg.SEP_SPACE_X;c.paddingEnd=Blockly.BlockSvg.SEP_SPACE_X;return c};
 Blockly.BlockSvg.prototype.computeRightEdge_=function(a,b){var c=a;this.previousConnection||this.nextConnection?c=Math.max(c,Blockly.BlockSvg.MIN_BLOCK_X):this.outputConnection&&(c=this.isShadow()&&!Blockly.utils.isShadowArgumentReporter(this)?Math.max(c,Blockly.BlockSvg.MIN_BLOCK_X_SHADOW_OUTPUT):Math.max(c,Blockly.BlockSvg.MIN_BLOCK_X_OUTPUT));b&&(c=Math.max(c,Blockly.BlockSvg.MIN_BLOCK_X_WITH_STATEMENT));0<this.insertionMarkerMinWidth_&&(c=Math.max(c,this.insertionMarkerMinWidth_));return c};
 Blockly.BlockSvg.prototype.computeOutputPadding_=function(a){if(this.getOutputShape()&&this.outputConnection&&(!this.isShadow()||Blockly.utils.isShadowArgumentReporter(this)))for(var b=this.getOutputShape(),c=0,d;d=a[c];c++){d.paddingStart=0;d.paddingEnd=0;var e=d[0];if(e.fieldRow[0])var f=0;else f=e.connection,f=f.targetConnection?f.targetConnection.getSourceBlock().getOutputShape():f.getOutputShape(),b==Blockly.OUTPUT_SHAPE_HEXAGONAL&&f!=Blockly.OUTPUT_SHAPE_HEXAGONAL&&(e=e.renderHeight-Blockly.BlockSvg.MIN_BLOCK_Y_REPORTER,
@@ -1976,16 +1983,37 @@ Blockly.FieldNumber.numPadEraseButtonTouch=function(a){var b=Blockly.FieldTextIn
 Blockly.FieldNumber.updateDisplay_=function(a){Blockly.FieldTextInput.htmlInput_.value=a;Blockly.FieldNumber.superClass_.resizeEditor_.call(Blockly.FieldNumber.activeField_);Blockly.FieldTextInput.htmlInput_.setSelectionRange(a.length,a.length);Blockly.FieldTextInput.htmlInput_.scrollLeft=Blockly.FieldTextInput.htmlInput_.scrollWidth;Blockly.FieldNumber.activeField_.validate_()};Blockly.FieldNumber.prototype.onHide_=function(){Blockly.DropDownDiv.content_.removeAttribute("role");Blockly.DropDownDiv.content_.removeAttribute("aria-haspopup")};
 Blockly.FieldNumber.prototype.classValidator=function(a){if(null===a)return null;a=String(a);a=a.replace(/O/ig,"0");"-"===a&&(a="-1");a=a.replace(/,/g,"");a=parseFloat(a||0);return isNaN(a)?null:String(a)};Blockly.Field.register("field_number",Blockly.FieldNumber);Blockly.FieldNumberDropdown=function(a,b,c,d,e,f){this.setConstraints_=Blockly.FieldNumber.prototype.setConstraints_;c=Blockly.FieldNumber.prototype.getNumRestrictor.call(this,c,d,e);Blockly.FieldNumberDropdown.superClass_.constructor.call(this,a,b,f,c);this.addArgType("numberdropdown")};goog.inherits(Blockly.FieldNumberDropdown,Blockly.FieldTextDropdown);Blockly.FieldNumberDropdown.fromJson=function(a){return new Blockly.FieldNumberDropdown(element.value,element.options,element.min,element.max,element.precision)};
 Blockly.FieldNumberDropdown.prototype.classValidator=Blockly.FieldNumber.prototype.classValidator;Blockly.Field.register("field_numberdropdown",Blockly.FieldNumberDropdown);Blockly.FieldVariable=function(a,b,c){this.menuGenerator_=Blockly.FieldVariable.dropdownCreate;this.size_=new goog.math.Size(Blockly.BlockSvg.FIELD_WIDTH,Blockly.BlockSvg.FIELD_HEIGHT);this.setValidator(b);this.defaultVariableName=a||"";this.defaultType_=c&&1==c.length?c[0]:"";this.variableTypes=c;this.value_=null};goog.inherits(Blockly.FieldVariable,Blockly.FieldDropdown);
-Blockly.FieldVariable.fromJson=function(a){var b=Blockly.utils.replaceMessageReferences(a.variable);return new Blockly.FieldVariable(b,null,a.variableTypes,a.defaultType)};Blockly.FieldVariable.prototype.init=function(){this.fieldGroup_||(Blockly.FieldVariable.superClass_.init.call(this),this.initModel())};
-Blockly.FieldVariable.prototype.initModel=function(){if(!this.variable_){this.workspace_=this.sourceBlock_.workspace;var a=this.initFlyoutBroadcast_(this.workspace_);a||(a=Blockly.Variables.getOrCreateVariablePackage(this.workspace_,null,this.defaultVariableName,this.defaultType_));Blockly.Events.disable();try{this.setValue(a.getId())}finally{Blockly.Events.enable()}}};
-Blockly.FieldVariable.prototype.initFlyoutBroadcast_=function(a){var b=Blockly.BROADCAST_MESSAGE_VARIABLE_TYPE,c=a.getVariablesOfType(b);if(a.isFlyout&&this.defaultType_==b&&0!=c.length)return c.sort(Blockly.VariableModel.compareByName),c[0]};Blockly.FieldVariable.dispose=function(){Blockly.FieldVariable.superClass_.dispose.call(this);this.variableMap_=this.workspace_=null};
+Blockly.FieldVariable.fromJson=function(a){var b=Blockly.utils.replaceMessageReferences(a.variable);return new Blockly.FieldVariable(b,null,a.variableTypes)};Blockly.FieldVariable.prototype.init=function(){this.fieldGroup_||(Blockly.FieldVariable.superClass_.init.call(this),this.initModel())};
+Blockly.FieldVariable.prototype.initModel=function(){if(!this.variable_){this.workspace_=this.sourceBlock_.workspace;var a=Blockly.Variables.getOrCreateVariablePackage(this.workspace_,null,this.defaultVariableName,this.defaultType_);Blockly.Events.disable();try{this.setValue(a.getId())}finally{Blockly.Events.enable()}}};Blockly.FieldVariable.dispose=function(){Blockly.FieldVariable.superClass_.dispose.call(this);this.variableMap_=this.workspace_=null};
 Blockly.FieldVariable.prototype.setSourceBlock=function(a){goog.asserts.assert(!a.isShadow(),"Variable fields are not allowed to exist on shadow blocks.");Blockly.FieldVariable.superClass_.setSourceBlock.call(this,a)};Blockly.FieldVariable.prototype.getValue=function(){return this.variable_?this.variable_.getId():null};Blockly.FieldVariable.prototype.getText=function(){return this.variable_?this.variable_.name:""};Blockly.FieldVariable.prototype.getVariable=function(){return this.variable_};
 Blockly.FieldVariable.prototype.setValue=function(a){var b=Blockly.Variables.getVariable(this.sourceBlock_.workspace,a);if(!b)throw Error("Variable id doesn't point to a real variable!  ID was "+a);var c=b.type;if(!this.typeIsAllowed_(c))throw Error("Variable type doesn't match this field!  Type was "+c);this.sourceBlock_&&Blockly.Events.isEnabled()&&(c=this.variable_?this.variable_.getId():null,Blockly.Events.fire(new Blockly.Events.BlockChange(this.sourceBlock_,"field",this.name,c,a)));this.variable_=
 b;this.value_=a;this.setText(b.name)};Blockly.FieldVariable.prototype.typeIsAllowed_=function(a){var b=this.getVariableTypes_();if(!b)return!0;for(var c=0;c<b.length;c++)if(a==b[c])return!0;return!1};Blockly.FieldVariable.prototype.getVariableTypes_=function(){var a=this.variableTypes;if(null===a&&this.sourceBlock_)return this.sourceBlock_.workspace.getVariableTypes();a=a||[""];if(0==a.length)throw a=this.getText(),Error("'variableTypes' of field variable "+a+" was an empty list");return a};
 Blockly.FieldVariable.dropdownCreate=function(){if(!this.variable_)throw Error("Tried to call dropdownCreate on a variable field with no variable selected.");var a=[],b=this.getText(),c=null;this.sourceBlock_&&(c=this.sourceBlock_.workspace);if(c){var d=this.getVariableTypes_();a=[];for(var e=0;e<d.length;e++){var f=d[e],g=c.getVariablesOfType(f);a=a.concat(g);if(g=c.getPotentialVariableMap())f=g.getVariablesOfType(f),a=a.concat(f)}}a.sort(Blockly.VariableModel.compareByName);c=[];for(e=0;e<a.length;e++)c[e]=
-[a[e].name,a[e].getId()];this.defaultType_==Blockly.BROADCAST_MESSAGE_VARIABLE_TYPE?c.push([Blockly.Msg.NEW_BROADCAST_MESSAGE,Blockly.NEW_BROADCAST_MESSAGE_ID]):(c.push([Blockly.Msg.RENAME_VARIABLE,Blockly.RENAME_VARIABLE_ID]),Blockly.Msg.DELETE_VARIABLE&&c.push([Blockly.Msg.DELETE_VARIABLE.replace("%1",b),Blockly.DELETE_VARIABLE_ID]));return c};
-Blockly.FieldVariable.prototype.onItemSelected=function(a,b){var c=b.getValue();if(this.sourceBlock_&&this.sourceBlock_.workspace){var d=this.sourceBlock_.workspace;if(c==Blockly.RENAME_VARIABLE_ID){Blockly.Variables.renameVariable(d,this.variable_);return}if(c==Blockly.DELETE_VARIABLE_ID){d.deleteVariableById(this.variable_.getId());return}if(c==Blockly.NEW_BROADCAST_MESSAGE_ID){var e=this;Blockly.Variables.createVariable(d,function(a){a&&e.setValue(a)},Blockly.BROADCAST_MESSAGE_VARIABLE_TYPE);return}}this.setValue(c)};
-Blockly.FieldVariable.prototype.shouldShowRect_=function(){return!this.sourceBlock_.isShadow()&&"variables_get"!=this.sourceBlock_.type};Blockly.Field.register("field_variable",Blockly.FieldVariable);Blockly.FieldSlider=function(a,b,c,d,e,f,g){Blockly.FieldSlider.superClass_.constructor.call(this,a,g);this.min_=parseFloat(b);this.max_=parseFloat(c);this.step_=parseFloat(e);this.labelText_=f;this.precision_=parseFloat(d)};goog.inherits(Blockly.FieldSlider,Blockly.FieldNumber);Blockly.FieldSlider.fromJson=function(a){return new Blockly.FieldSlider(a.value,a.min,a.max,a.precision,a.step,a.labelText)};
+[a[e].name,a[e].getId()];c.push([Blockly.Msg.RENAME_VARIABLE,Blockly.RENAME_VARIABLE_ID]);Blockly.Msg.DELETE_VARIABLE&&c.push([Blockly.Msg.DELETE_VARIABLE.replace("%1",b),Blockly.DELETE_VARIABLE_ID]);return c};
+Blockly.FieldVariable.prototype.onItemSelected=function(a,b){var c=b.getValue();if(this.sourceBlock_&&this.sourceBlock_.workspace){var d=this.sourceBlock_.workspace;if(c==Blockly.RENAME_VARIABLE_ID){Blockly.Variables.renameVariable(d,this.variable_);return}if(c==Blockly.DELETE_VARIABLE_ID){d.deleteVariableById(this.variable_.getId());return}}this.setValue(c)};
+Blockly.FieldVariable.prototype.shouldShowRect_=function(){return!this.sourceBlock_.isShadow()&&"variables_get"!=this.sourceBlock_.type&&"variables_get_reporter"!=this.sourceBlock_.type};Blockly.Field.register("field_variable",Blockly.FieldVariable);/*
+
+ Visual Blocks Editor
+
+ Copyright 2017 Massachusetts Institute of Technology
+ https://developers.google.com/blockly/
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+Blockly.FieldVerticalSeparator=function(){this.sourceBlock_=null;this.width_=1;this.height_=Blockly.BlockSvg.ICON_SEPARATOR_HEIGHT;this.size_=new goog.math.Size(this.width_,this.height_)};goog.inherits(Blockly.FieldVerticalSeparator,Blockly.Field);Blockly.FieldVerticalSeparator.fromJson=function(a){return new Blockly.FieldVerticalSeparator};Blockly.FieldVerticalSeparator.prototype.EDITABLE=!1;
+Blockly.FieldVerticalSeparator.prototype.init=function(){this.fieldGroup_||(this.fieldGroup_=Blockly.utils.createSvgElement("g",{},null),this.visible_||(this.fieldGroup_.style.display="none"),this.lineElement_=Blockly.utils.createSvgElement("line",{stroke:this.sourceBlock_.getColourSecondary(),"stroke-linecap":"round",x1:0,y1:0,x2:0,y2:this.height_},this.fieldGroup_),this.sourceBlock_.getSvgRoot().appendChild(this.fieldGroup_))};
+Blockly.FieldVerticalSeparator.prototype.setLineHeight=function(a){this.lineElement_.setAttribute("y2",a)};Blockly.FieldVerticalSeparator.prototype.dispose=function(){goog.dom.removeNode(this.fieldGroup_);this.lineElement_=this.fieldGroup_=null};Blockly.FieldVerticalSeparator.prototype.getValue=function(){return null};Blockly.FieldVerticalSeparator.prototype.setValue=function(a){};Blockly.FieldVerticalSeparator.prototype.setText=function(a){};Blockly.FieldVerticalSeparator.prototype.render_=function(){};
+Blockly.FieldVerticalSeparator.prototype.updateWidth=function(){};Blockly.Field.register("field_vertical_separator",Blockly.FieldVerticalSeparator);Blockly.FieldSlider=function(a,b,c,d,e,f,g){Blockly.FieldSlider.superClass_.constructor.call(this,a,g);this.min_=parseFloat(b);this.max_=parseFloat(c);this.step_=parseFloat(e);this.labelText_=f;this.precision_=parseFloat(d)};goog.inherits(Blockly.FieldSlider,Blockly.FieldNumber);Blockly.FieldSlider.fromJson=function(a){return new Blockly.FieldSlider(a.value,a.min,a.max,a.precision,a.step,a.labelText)};
 Blockly.FieldSlider.prototype.setMinMax=function(a,b,c){this.min_=parseFloat(a);this.max_=parseFloat(b);this.step_=parseFloat(c)||void 0};Blockly.FieldSlider.prototype.setLabel=function(a){void 0!=a&&(this.labelText_=a)};Blockly.FieldSlider.prototype.setColor=function(a){void 0!=a&&(this.sliderColor_=a)};Blockly.FieldSlider.prototype.init=function(){Blockly.FieldTextInput.superClass_.init.call(this);this.setValue(this.getValue())};
 Blockly.FieldSlider.prototype.showEditor_=function(a){Blockly.FieldSlider.superClass_.showEditor_.call(this,a,!1);Infinity!=this.max_&&-Infinity!=this.min_&&(this.showSlider_(),this.setValue(this.getValue()))};
 Blockly.FieldSlider.prototype.showSlider_=function(){Blockly.DropDownDiv.hideWithoutAnimation();Blockly.DropDownDiv.clearContent();var a=Blockly.DropDownDiv.getContentDiv();a.setAttribute("role","menu");a.setAttribute("aria-haspopup","true");this.addSlider_(a);Blockly.DropDownDiv.setColour("#ffffff","#dddddd");Blockly.DropDownDiv.showPositionedByBlock(this,this.sourceBlock_);this.slider_&&this.slider_.setVisible(!0)};
@@ -2026,9 +2054,9 @@ null;this.icon_=c.getAttribute("web-icon")||null;this.iconClass_=c.getAttribute(
 Blockly.FlyoutButton.prototype.createDom=function(){var a=this.isLabel_?"blocklyFlyoutLabel":"blocklyFlyoutButton";this.cssClass_&&(a+=" "+this.cssClass_);this.svgGroup_=Blockly.utils.createSvgElement("g",{"class":a},this.workspace_.getCanvas());if(!this.isLabel_)var b=Blockly.utils.createSvgElement("rect",{"class":"blocklyFlyoutButtonShadow",rx:4,ry:4,x:1,y:1},this.svgGroup_);a=Blockly.utils.createSvgElement("rect",{"class":this.isLabel_?"blocklyFlyoutLabelBackground":"blocklyFlyoutButtonBackground",
 rx:4,ry:4},this.svgGroup_);var c=Blockly.utils.createSvgElement("text",{"class":this.isLabel_?"blocklyFlyoutLabelText":"blocklyText",x:0,y:0,"text-anchor":"middle"},this.svgGroup_);c.textContent=this.text_;this.width=Blockly.Field.getCachedWidth(c);if(this.icon_||this.iconClass_){var d=Blockly.utils.createSvgElement("text",{"class":this.iconClass_?"blocklyFlyoutLabelIcon "+this.iconClass_:"blocklyFlyoutLabelIcon",x:0,y:0,"text-anchor":"middle"},this.svgGroup_);this.icon_&&(d.textContent=this.icon_);
 this.iconColor_&&d.setAttribute("style","fill: "+this.iconColor_);this.width+=d.getComputedTextLength()+2*Blockly.FlyoutButton.MARGIN;d.setAttribute("text-anchor","end");d.setAttribute("alignment-baseline","central");d.setAttribute("x",this.targetWorkspace_.RTL?this.width:Blockly.FlyoutButton.MARGIN);d.setAttribute("y",this.height/2)}this.line_&&(d=Blockly.utils.createSvgElement("line",{"class":"blocklyFlyoutLine","stroke-dasharray":this.line_,"text-anchor":"middle"},this.svgGroup_),d.setAttribute("x1",
-0),d.setAttribute("x2",null!=this.lineWidth_?this.lineWidth_:this.width),d.setAttribute("y1",this.height),d.setAttribute("y2",this.height));this.isLabel_||(this.width+=2*Blockly.FlyoutButton.MARGIN,b.setAttribute("width",this.width),b.setAttribute("height",this.height));a.setAttribute("width",this.width);a.setAttribute("height",this.height);c.setAttribute("text-anchor","middle");c.setAttribute("alignment-baseline","central");c.setAttribute("x",this.width/2);c.setAttribute("y",this.height/2);this.mouseUpWrapper_=
-Blockly.bindEventWithChecks_(this.svgGroup_,"mouseup",this,this.onMouseUp_);return this.svgGroup_};Blockly.FlyoutButton.prototype.show=function(){this.updateTransform_();this.svgGroup_.setAttribute("display","block")};Blockly.FlyoutButton.prototype.updateTransform_=function(){this.svgGroup_.setAttribute("transform","translate("+this.position_.x+","+this.position_.y+")")};Blockly.FlyoutButton.prototype.moveTo=function(a,b){this.position_.x=a;this.position_.y=b;this.updateTransform_()};
-Blockly.FlyoutButton.prototype.getPosition=function(){return this.position_};Blockly.FlyoutButton.prototype.getTargetWorkspace=function(){return this.targetWorkspace_};Blockly.FlyoutButton.prototype.getText=function(){return this.text_};Blockly.FlyoutButton.prototype.getPosition=function(){return this.position_};
+0),d.setAttribute("x2",null!=this.lineWidth_?this.lineWidth_:this.width),d.setAttribute("y1",this.height),d.setAttribute("y2",this.height));this.isLabel_||(this.width+=2*Blockly.FlyoutButton.MARGIN,b.setAttribute("width",this.width),b.setAttribute("height",this.height));a.setAttribute("width",this.width);a.setAttribute("height",this.height);c.setAttribute("text-anchor","middle");c.setAttribute("dominant-baseline","central");c.setAttribute("dy",goog.userAgent.EDGE_OR_IE?Blockly.Field.IE_TEXT_OFFSET:
+"0");c.setAttribute("x",this.width/2);c.setAttribute("y",this.height/2);this.mouseUpWrapper_=Blockly.bindEventWithChecks_(this.svgGroup_,"mouseup",this,this.onMouseUp_);return this.svgGroup_};Blockly.FlyoutButton.prototype.show=function(){this.updateTransform_();this.svgGroup_.setAttribute("display","block")};Blockly.FlyoutButton.prototype.updateTransform_=function(){this.svgGroup_.setAttribute("transform","translate("+this.position_.x+","+this.position_.y+")")};
+Blockly.FlyoutButton.prototype.moveTo=function(a,b){this.position_.x=a;this.position_.y=b;this.updateTransform_()};Blockly.FlyoutButton.prototype.getPosition=function(){return this.position_};Blockly.FlyoutButton.prototype.getTargetWorkspace=function(){return this.targetWorkspace_};Blockly.FlyoutButton.prototype.getText=function(){return this.text_};Blockly.FlyoutButton.prototype.getPosition=function(){return this.position_};
 Blockly.FlyoutButton.prototype.dispose=function(){this.onMouseUpWrapper_&&Blockly.unbindEvent_(this.onMouseUpWrapper_);this.svgGroup_&&(goog.dom.removeNode(this.svgGroup_),this.svgGroup_=null);this.targetWorkspace_=this.workspace_=null};Blockly.FlyoutButton.prototype.onMouseUp_=function(a){(a=this.targetWorkspace_.getGesture(a))&&a.cancel();this.callback_&&this.callback_(this)};Blockly.Flyout=function(a){a.getMetrics=this.getMetrics_.bind(this);a.setMetrics=this.setMetrics_.bind(this);this.workspace_=new Blockly.WorkspaceSvg(a);this.workspace_.isFlyout=!0;this.RTL=!!a.RTL;this.toolboxPosition_=a.toolboxPosition;this.eventWrappers_=[];this.mats_=[];this.buttons_=[];this.listeners_=[];this.permanentlyDisabled_=[]};Blockly.Flyout.prototype.autoClose=!0;Blockly.Flyout.prototype.isVisible_=!1;Blockly.Flyout.prototype.containerVisible_=!0;
 Blockly.Flyout.prototype.CORNER_RADIUS=8;Blockly.Flyout.prototype.MARGIN=Blockly.Flyout.prototype.CORNER_RADIUS;Blockly.Flyout.prototype.GAP_X=3*Blockly.Flyout.prototype.MARGIN;Blockly.Flyout.prototype.GAP_Y=3*Blockly.Flyout.prototype.MARGIN;Blockly.Flyout.prototype.SCROLLBAR_PADDING=2;Blockly.Flyout.prototype.width_=0;Blockly.Flyout.prototype.height_=0;Blockly.Flyout.prototype.dragAngleRange_=70;
 Blockly.Flyout.prototype.createDom=function(a){this.svgGroup_=Blockly.utils.createSvgElement(a,{"class":"blocklyFlyout",style:"display: none"},null);this.svgBackground_=Blockly.utils.createSvgElement("path",{"class":"blocklyFlyoutBackground"},this.svgGroup_);this.svgGroup_.appendChild(this.workspace_.createDom());return this.svgGroup_};
@@ -2223,12 +2251,13 @@ Blockly.PXTBlockly.Extensions.registerAll=function(){Blockly.Extensions.register
 Blockly.defineBlocksWithJsonArray([{type:"lists_create_empty",message0:"%{BKY_LISTS_CREATE_EMPTY_TITLE}",output:"Array",outputShape:Blockly.OUTPUT_SHAPE_ROUND,colour:"%{BKY_LISTS_HUE}",tooltip:"%{BKY_LISTS_CREATE_EMPTY_TOOLTIP}",helpUrl:"%{BKY_LISTS_CREATE_EMPTY_HELPURL}"},{type:"lists_repeat",message0:"%{BKY_LISTS_REPEAT_TITLE}",args0:[{type:"input_value",name:"ITEM"},{type:"input_value",name:"NUM",check:"Number"}],output:"Array",outputShape:Blockly.OUTPUT_SHAPE_ROUND,colour:"%{BKY_LISTS_HUE}",tooltip:"%{BKY_LISTS_REPEAT_TOOLTIP}",
 helpUrl:"%{BKY_LISTS_REPEAT_HELPURL}"},{type:"lists_reverse",message0:"%{BKY_LISTS_REVERSE_MESSAGE0}",args0:[{type:"input_value",name:"LIST",check:"Array"}],output:"Array",outputShape:Blockly.OUTPUT_SHAPE_ROUND,inputsInline:!0,colour:"%{BKY_LISTS_HUE}",tooltip:"%{BKY_LISTS_REVERSE_TOOLTIP}",helpUrl:"%{BKY_LISTS_REVERSE_HELPURL}"},{type:"lists_isEmpty",message0:"%{BKY_LISTS_ISEMPTY_TITLE}",args0:[{type:"input_value",name:"VALUE",check:["String","Array"]}],output:"Boolean",outputShape:Blockly.OUTPUT_SHAPE_HEXAGONAL,
 colour:"%{BKY_LISTS_HUE}",tooltip:"%{BKY_LISTS_ISEMPTY_TOOLTIP}",helpUrl:"%{BKY_LISTS_ISEMPTY_HELPURL}"},{type:"lists_length",message0:"%{BKY_LISTS_LENGTH_TITLE}",args0:[{type:"input_value",name:"VALUE",check:["String","Array"]}],output:"Number",outputShape:Blockly.OUTPUT_SHAPE_ROUND,colour:"%{BKY_LISTS_HUE}",tooltip:"%{BKY_LISTS_LENGTH_TOOLTIP}",helpUrl:"%{BKY_LISTS_LENGTH_HELPURL}"}]);
-Blockly.Blocks.lists_create_with={init:function(){Blockly.Extensions.apply("inline-svgs",this,!1);this.setHelpUrl(Blockly.Msg.LISTS_CREATE_WITH_HELPURL);this.setColour(Blockly.Msg.LISTS_HUE);this.itemCount_=3;this.updateShape_();this.setOutput(!0,"Array");this.setOutputShape(Blockly.OUTPUT_SHAPE_ROUND);this.setInputsInline(!1);this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_TOOLTIP)},mutationToDom:function(){var a=document.createElement("mutation");a.setAttribute("items",this.itemCount_);return a},
-domToMutation:function(a){this.itemCount_=parseInt(a.getAttribute("items"),10);this.updateShape_()},storeConnections_:function(a){this.valueConnections_=[];for(var b=0;b<this.itemCount_;b++)a!=b?this.valueConnections_.push(this.getInput("ADD"+b).connection.targetConnection):this.getInput("ADD"+b).connection.targetConnection&&this.getInput("ADD"+b).connection.disconnect()},restoreConnections_:function(){for(var a=0;a<this.itemCount_;a++)Blockly.Mutator.reconnect(this.valueConnections_[a],this,"ADD"+
-a)},addItem_:function(){this.storeConnections_();this.update_(function(){this.itemCount_++});this.restoreConnections_()},removeItem_:function(a){this.storeConnections_(a);this.update_(function(){this.itemCount_--});this.restoreConnections_()},update_:function(a){Blockly.Events.setGroup(!0);var b=this,c=b.mutationToDom();c=c&&Blockly.Xml.domToText(c);var d=b.rendered;b.rendered=!1;a&&a.call(this);this.updateShape_();b.rendered=d;b.initSvg();var e=Blockly.Events.getGroup();a=(a=b.mutationToDom())&&
-Blockly.Xml.domToText(a);c!=a&&(Blockly.Events.fire(new Blockly.Events.BlockChange(b,"mutation",null,c,a)),setTimeout(function(){Blockly.Events.setGroup(e);b.bumpNeighbours_();Blockly.Events.setGroup(!1)},Blockly.BUMP_DELAY));b.rendered&&b.render();Blockly.Events.setGroup(!1)},updateShape_:function(){var a=this,b=function(){a.addItem_()};this.itemCount_?(this.getInput("EMPTY")&&this.removeInput("EMPTY"),this.getInput("TITLE")||this.appendDummyInput("TITLE").appendField(Blockly.Msg.LISTS_CREATE_WITH_INPUT_WITH).appendField(new Blockly.FieldImage(this.ADD_IMAGE_DATAURI,
-24,24,!1,"*",b))):(this.getInput("TITLE")&&this.removeInput("TITLE"),this.getInput("EMPTY")||this.appendDummyInput("EMPTY").appendField(Blockly.Msg.LISTS_CREATE_EMPTY_TITLE).appendField(new Blockly.FieldImage(this.ADD_IMAGE_DATAURI,24,24,!1,"*",b)));for(b=0;this.getInput("ADD"+b);)this.removeInput("ADD"+b),b++;for(b=0;b<this.itemCount_;b++)if(!this.getInput("ADD"+b)){var c=this.appendValueInput("ADD"+b),d=function(b){return function(){a.removeItem_(b)}}(b);c.appendField(new Blockly.FieldImage(this.REMOVE_IMAGE_DATAURI,
-24,24,!1,"*",d))}}};Blockly.Blocks.lists_create_with_container={init:function(){this.setColour(Blockly.Msg.LISTS_HUE);this.appendDummyInput().appendField(Blockly.Msg.LISTS_CREATE_WITH_CONTAINER_TITLE_ADD);this.appendStatementInput("STACK");this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_CONTAINER_TOOLTIP);this.contextMenu=!1}};
+Blockly.Blocks.lists_create_with={init:function(){Blockly.Extensions.apply("inline-svgs",this,!1);this.setHelpUrl(Blockly.Msg.LISTS_CREATE_WITH_HELPURL);this.setColour(Blockly.Msg.LISTS_HUE);this.itemCount_=3;this.updateShape_();this.setOutput(!0,"Array");this.setOutputShape(Blockly.OUTPUT_SHAPE_ROUND);this.setInputsInline(!0);this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_TOOLTIP)},mutationToDom:function(){var a=document.createElement("mutation");a.setAttribute("items",this.itemCount_);return a},
+domToMutation:function(a){this.itemCount_=parseInt(a.getAttribute("items"),10);this.updateShape_()},storeConnections_:function(){this.valueConnections_=[];for(var a=0;a<this.itemCount_;a++)this.valueConnections_.push(this.getInput("ADD"+a).connection.targetConnection)},restoreConnections_:function(){for(var a=0;a<this.itemCount_;a++)Blockly.Mutator.reconnect(this.valueConnections_[a],this,"ADD"+a)},addItem_:function(){this.storeConnections_();this.update_(function(){this.itemCount_++});this.restoreConnections_();
+if(1<this.itemCount_){var a=this.getInput("ADD0");if(a&&a.connection.targetConnection){var b=this.getInput("ADD"+(this.itemCount_-1)),c=a.connection.getShadowDom();a=document.createElement("shadow");c=c.getAttribute("type");a.setAttribute("type",c);c=document.createElement("field");c.setAttribute("name","NUM");a.appendChild(c);a&&(a.setAttribute("id",Blockly.utils.genUid()),b.connection.setShadowDom(a),b.connection.respawnShadow_())}}},removeItem_:function(){this.storeConnections_();this.update_(function(){this.itemCount_--});
+this.restoreConnections_()},update_:function(a){Blockly.Events.setGroup(!0);var b=this,c=b.mutationToDom();c=c&&Blockly.Xml.domToText(c);var d=b.rendered;b.rendered=!1;a&&a.call(this);this.updateShape_();b.rendered=d;b.initSvg();var e=Blockly.Events.getGroup();a=(a=b.mutationToDom())&&Blockly.Xml.domToText(a);c!=a&&(Blockly.Events.fire(new Blockly.Events.BlockChange(b,"mutation",null,c,a)),setTimeout(function(){Blockly.Events.setGroup(e);b.bumpNeighbours_();Blockly.Events.setGroup(!1)},Blockly.BUMP_DELAY));
+b.rendered&&b.render();Blockly.Events.setGroup(!1)},updateShape_:function(){var a=this,b=function(){a.removeItem_()};this.itemCount_?(this.getInput("EMPTY")&&this.removeInput("EMPTY"),this.getInput("TITLE")||this.appendDummyInput("TITLE").appendField(Blockly.Msg.LISTS_CREATE_WITH_INPUT_WITH)):(this.getInput("TITLE")&&this.removeInput("TITLE"),this.getInput("EMPTY")||this.appendDummyInput("EMPTY").appendField(Blockly.Msg.LISTS_CREATE_EMPTY_TITLE));var c=0;for(c=0;c<this.itemCount_;c++)this.getInput("ADD"+
+c)||this.appendValueInput("ADD"+c);for(;this.getInput("ADD"+c);)this.removeInput("ADD"+c),c++;this.getInput("BUTTONS")&&this.removeInput("BUTTONS");c=this.appendDummyInput("BUTTONS");0<this.itemCount_&&c.appendField(new Blockly.FieldImage(this.REMOVE_IMAGE_DATAURI,24,24,!1,"*",b));c.appendField(new Blockly.FieldImage(this.ADD_IMAGE_DATAURI,24,24,!1,"*",function(){a.addItem_()}));b=5>=this.itemCount_;this.setInputsInline(b);this.setOutputShape(b?Blockly.OUTPUT_SHAPE_ROUND:Blockly.OUTPUT_SHAPE_SQUARE)}};
+Blockly.Blocks.lists_create_with_container={init:function(){this.setColour(Blockly.Msg.LISTS_HUE);this.appendDummyInput().appendField(Blockly.Msg.LISTS_CREATE_WITH_CONTAINER_TITLE_ADD);this.appendStatementInput("STACK");this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_CONTAINER_TOOLTIP);this.contextMenu=!1}};
 Blockly.Blocks.lists_create_with_item={init:function(){this.setColour(Blockly.Msg.LISTS_HUE);this.appendDummyInput().appendField(Blockly.Msg.LISTS_CREATE_WITH_ITEM_TITLE);this.setPreviousStatement(!0);this.setNextStatement(!0);this.setTooltip(Blockly.Msg.LISTS_CREATE_WITH_ITEM_TOOLTIP);this.contextMenu=!1}};
 Blockly.Blocks.lists_indexOf={init:function(){var a=[[Blockly.Msg.LISTS_INDEX_OF_FIRST,"FIRST"],[Blockly.Msg.LISTS_INDEX_OF_LAST,"LAST"]];this.setHelpUrl(Blockly.Msg.LISTS_INDEX_OF_HELPURL);this.setColour(Blockly.Msg.LISTS_HUE);this.setOutput(!0,"Number");this.setOutputShape(Blockly.OUTPUT_SHAPE_ROUND);this.appendValueInput("VALUE").setCheck("Array").appendField(Blockly.Msg.LISTS_INDEX_OF_INPUT_IN_LIST);this.appendValueInput("FIND").appendField(new Blockly.FieldDropdown(a),"END");this.setInputsInline(!0);
 var b=this;this.setTooltip(function(){return Blockly.Msg.LISTS_INDEX_OF_TOOLTIP.replace("%1",b.workspace.options.oneBasedIndex?"0":"-1")})}};
@@ -2284,11 +2313,11 @@ Blockly.Constants.Logic.LOGIC_TERNARY_ONCHANGE_MIXIN={prevParentConnection_:null
 d}};Blockly.Extensions.registerMixin("logic_ternary",Blockly.Constants.Logic.LOGIC_TERNARY_ONCHANGE_MIXIN);Blockly.Constants.Loops={};Blockly.Constants.Loops.HUE=120;
 Blockly.defineBlocksWithJsonArray([{type:"controls_repeat_ext",message0:"%{BKY_CONTROLS_REPEAT_TITLE}",args0:[{type:"input_value",name:"TIMES",check:"Number"}],message1:"%{BKY_CONTROLS_REPEAT_INPUT_DO} %1",args1:[{type:"input_statement",name:"DO"}],previousStatement:null,nextStatement:null,colour:"%{BKY_LOOPS_HUE}",tooltip:"%{BKY_CONTROLS_REPEAT_TOOLTIP}",helpUrl:"%{BKY_CONTROLS_REPEAT_HELPURL}"},{type:"controls_repeat",message0:"%{BKY_CONTROLS_REPEAT_TITLE}",args0:[{type:"field_number",name:"TIMES",
 value:10,min:0,precision:1}],message1:"%{BKY_CONTROLS_REPEAT_INPUT_DO} %1",args1:[{type:"input_statement",name:"DO"}],previousStatement:null,nextStatement:null,colour:"%{BKY_LOOPS_HUE}",tooltip:"%{BKY_CONTROLS_REPEAT_TOOLTIP}",helpUrl:"%{BKY_CONTROLS_REPEAT_HELPURL}"},{type:"controls_whileUntil",message0:"%1 %2",args0:[{type:"field_dropdown",name:"MODE",options:[["%{BKY_CONTROLS_WHILEUNTIL_OPERATOR_WHILE}","WHILE"],["%{BKY_CONTROLS_WHILEUNTIL_OPERATOR_UNTIL}","UNTIL"]]},{type:"input_value",name:"BOOL",
-check:"Boolean"}],message1:"%{BKY_CONTROLS_REPEAT_INPUT_DO} %1",args1:[{type:"input_statement",name:"DO"}],previousStatement:null,nextStatement:null,colour:"%{BKY_LOOPS_HUE}",helpUrl:"%{BKY_CONTROLS_WHILEUNTIL_HELPURL}",extensions:["controls_whileUntil_tooltip"]},{type:"controls_for",message0:"%{BKY_CONTROLS_FOR_TITLE}",args0:[{type:"field_variable",name:"VAR",variable:null},{type:"input_value",name:"FROM",check:"Number",align:"LEFT"},{type:"input_value",name:"TO",check:"Number",align:"LEFT"},{type:"input_value",
-name:"BY",check:"Number",align:"LEFT"}],message1:"%{BKY_CONTROLS_REPEAT_INPUT_DO} %1",args1:[{type:"input_statement",name:"DO"}],inputsInline:!0,previousStatement:null,nextStatement:null,colour:"%{BKY_LOOPS_HUE}",helpUrl:"%{BKY_CONTROLS_FOR_HELPURL}",extensions:["contextMenu_newGetVariableBlock","controls_for_tooltip"]},{type:"controls_forEach",message0:"%{BKY_CONTROLS_FOREACH_TITLE}",args0:[{type:"field_variable",name:"VAR",variable:null},{type:"input_value",name:"LIST",check:"Array"}],message1:"%{BKY_CONTROLS_REPEAT_INPUT_DO} %1",
-args1:[{type:"input_statement",name:"DO"}],previousStatement:null,nextStatement:null,colour:"%{BKY_LOOPS_HUE}",helpUrl:"%{BKY_CONTROLS_FOREACH_HELPURL}",extensions:["contextMenu_newGetVariableBlock","controls_forEach_tooltip"]},{type:"controls_flow_statements",message0:"%1",args0:[{type:"field_dropdown",name:"FLOW",options:[["%{BKY_CONTROLS_FLOW_STATEMENTS_OPERATOR_BREAK}","BREAK"],["%{BKY_CONTROLS_FLOW_STATEMENTS_OPERATOR_CONTINUE}","CONTINUE"]]}],previousStatement:null,colour:"%{BKY_LOOPS_HUE}",
-helpUrl:"%{BKY_CONTROLS_FLOW_STATEMENTS_HELPURL}",extensions:["controls_flow_tooltip","controls_flow_in_loop_check"]}]);Blockly.Constants.Loops.WHILE_UNTIL_TOOLTIPS={WHILE:"%{BKY_CONTROLS_WHILEUNTIL_TOOLTIP_WHILE}",UNTIL:"%{BKY_CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL}"};Blockly.Extensions.register("controls_whileUntil_tooltip",Blockly.Extensions.buildTooltipForDropdown("MODE",Blockly.Constants.Loops.WHILE_UNTIL_TOOLTIPS));
-Blockly.Constants.Loops.BREAK_CONTINUE_TOOLTIPS={BREAK:"%{BKY_CONTROLS_FLOW_STATEMENTS_TOOLTIP_BREAK}",CONTINUE:"%{BKY_CONTROLS_FLOW_STATEMENTS_TOOLTIP_CONTINUE}"};Blockly.Extensions.register("controls_flow_tooltip",Blockly.Extensions.buildTooltipForDropdown("FLOW",Blockly.Constants.Loops.BREAK_CONTINUE_TOOLTIPS));
+check:"Boolean"}],message1:"%{BKY_CONTROLS_REPEAT_INPUT_DO} %1",args1:[{type:"input_statement",name:"DO"}],previousStatement:null,nextStatement:null,colour:"%{BKY_LOOPS_HUE}",helpUrl:"%{BKY_CONTROLS_WHILEUNTIL_HELPURL}",extensions:["controls_whileUntil_tooltip"]},{type:"controls_for",message0:"%{BKY_CONTROLS_FOR_TITLE}",args0:[{type:"input_value",name:"VAR",check:"Variable"},{type:"input_value",name:"FROM",check:"Number",align:"LEFT"},{type:"input_value",name:"TO",check:"Number",align:"LEFT"},{type:"input_value",
+name:"BY",check:"Number",align:"LEFT"}],message1:"%{BKY_CONTROLS_REPEAT_INPUT_DO} %1",args1:[{type:"input_statement",name:"DO"}],inputsInline:!0,previousStatement:null,nextStatement:null,colour:"%{BKY_LOOPS_HUE}",helpUrl:"%{BKY_CONTROLS_FOR_HELPURL}",extensions:["controls_for_tooltip"]},{type:"controls_forEach",message0:"%{BKY_CONTROLS_FOREACH_TITLE}",args0:[{type:"input_value",name:"VAR",check:"Variable"},{type:"input_value",name:"LIST",check:"Array"}],message1:"%{BKY_CONTROLS_REPEAT_INPUT_DO} %1",
+args1:[{type:"input_statement",name:"DO"}],previousStatement:null,nextStatement:null,colour:"%{BKY_LOOPS_HUE}",helpUrl:"%{BKY_CONTROLS_FOREACH_HELPURL}",extensions:["controls_forEach_tooltip"]},{type:"controls_flow_statements",message0:"%1",args0:[{type:"field_dropdown",name:"FLOW",options:[["%{BKY_CONTROLS_FLOW_STATEMENTS_OPERATOR_BREAK}","BREAK"],["%{BKY_CONTROLS_FLOW_STATEMENTS_OPERATOR_CONTINUE}","CONTINUE"]]}],previousStatement:null,colour:"%{BKY_LOOPS_HUE}",helpUrl:"%{BKY_CONTROLS_FLOW_STATEMENTS_HELPURL}",
+extensions:["controls_flow_tooltip","controls_flow_in_loop_check"]}]);Blockly.Constants.Loops.WHILE_UNTIL_TOOLTIPS={WHILE:"%{BKY_CONTROLS_WHILEUNTIL_TOOLTIP_WHILE}",UNTIL:"%{BKY_CONTROLS_WHILEUNTIL_TOOLTIP_UNTIL}"};Blockly.Extensions.register("controls_whileUntil_tooltip",Blockly.Extensions.buildTooltipForDropdown("MODE",Blockly.Constants.Loops.WHILE_UNTIL_TOOLTIPS));Blockly.Constants.Loops.BREAK_CONTINUE_TOOLTIPS={BREAK:"%{BKY_CONTROLS_FLOW_STATEMENTS_TOOLTIP_BREAK}",CONTINUE:"%{BKY_CONTROLS_FLOW_STATEMENTS_TOOLTIP_CONTINUE}"};
+Blockly.Extensions.register("controls_flow_tooltip",Blockly.Extensions.buildTooltipForDropdown("FLOW",Blockly.Constants.Loops.BREAK_CONTINUE_TOOLTIPS));
 Blockly.Constants.Loops.CUSTOM_CONTEXT_MENU_CREATE_VARIABLES_GET_MIXIN={customContextMenu:function(a){if(!this.isInFlyout){var b=this.getField("VAR").getVariable(),c=b.name;if(!this.isCollapsed()&&null!=c){var d={enabled:!0};d.text=Blockly.Msg.VARIABLES_SET_CREATE_GET.replace("%1",c);b=Blockly.Variables.generateVariableFieldDom(b);b=goog.dom.createDom("block",null,b);b.setAttribute("type","variables_get");d.callback=Blockly.ContextMenu.callbackFactory(this,b);a.push(d)}}}};
 Blockly.Extensions.registerMixin("contextMenu_newGetVariableBlock",Blockly.Constants.Loops.CUSTOM_CONTEXT_MENU_CREATE_VARIABLES_GET_MIXIN);Blockly.Extensions.register("controls_for_tooltip",Blockly.Extensions.buildTooltipWithFieldText("%{BKY_CONTROLS_FOR_TOOLTIP}","VAR"));Blockly.Extensions.register("controls_forEach_tooltip",Blockly.Extensions.buildTooltipWithFieldText("%{BKY_CONTROLS_FOREACH_TOOLTIP}","VAR"));
 Blockly.Constants.Loops.CONTROL_FLOW_IN_LOOP_CHECK_MIXIN={LOOP_TYPES:["controls_repeat","controls_repeat_ext","controls_forEach","controls_for","controls_whileUntil"],onchange:function(){if(this.workspace.isDragging&&!this.workspace.isDragging()){var a=!1,b=this;do{if(-1!=this.LOOP_TYPES.indexOf(b.type)){a=!0;break}b=b.getSurroundParent()}while(b);a?(this.setWarningText(null),this.isInFlyout||this.setDisabled(!1)):(this.setWarningText(Blockly.Msg.CONTROLS_FLOW_STATEMENTS_WARNING),this.isInFlyout||
@@ -2382,10 +2411,11 @@ Blockly.Constants.Text.TEXT_CHARAT_MUTATOR_MIXIN={mutationToDom:function(){var a
 Blockly.Constants.Text.TEXT_CHARAT_EXTENSION=function(){this.getField("WHERE").setValidator(function(a){var b="FROM_START"==a||"FROM_END"==a;if(b!=this.isAt_){var d=this.sourceBlock_;d.updateAt_(b);d.setFieldValue(a,"WHERE");return null}});this.updateAt_(!0);var a=this;this.setTooltip(function(){var b=a.getFieldValue("WHERE"),c=Blockly.Msg.TEXT_CHARAT_TOOLTIP;("FROM_START"==b||"FROM_END"==b)&&(b="FROM_START"==b?Blockly.Msg.LISTS_INDEX_FROM_START_TOOLTIP:Blockly.Msg.LISTS_INDEX_FROM_END_TOOLTIP)&&
 (c+="  "+b.replace("%1",a.workspace.options.oneBasedIndex?"#1":"#0"));return c})};Blockly.Extensions.register("text_indexOf_tooltip",Blockly.Constants.Text.TEXT_INDEXOF_TOOLTIP_EXTENSION);Blockly.Extensions.register("text_quotes",Blockly.Constants.Text.TEXT_QUOTES_EXTENSION);Blockly.Extensions.registerMutator("text_join_mutator",Blockly.Constants.Text.TEXT_JOIN_MUTATOR_MIXIN,Blockly.Constants.Text.TEXT_JOIN_EXTENSION);
 Blockly.Extensions.registerMutator("text_charAt_mutator",Blockly.Constants.Text.TEXT_CHARAT_MUTATOR_MIXIN,Blockly.Constants.Text.TEXT_CHARAT_EXTENSION);Blockly.Constants.Variables={};Blockly.Constants.Variables.HUE=330;
-Blockly.defineBlocksWithJsonArray([{type:"variables_get",message0:"%1",args0:[{type:"field_variable",name:"VAR",variable:"%{BKY_VARIABLES_DEFAULT_NAME}"}],output:null,colour:"%{BKY_VARIABLES_HUE}",outputShape:Blockly.OUTPUT_SHAPE_ROUND,helpUrl:"%{BKY_VARIABLES_GET_HELPURL}",tooltip:"%{BKY_VARIABLES_GET_TOOLTIP}",extensions:["contextMenu_variableSetterGetter"]},{type:"variables_set",message0:"%{BKY_VARIABLES_SET}",args0:[{type:"field_variable",name:"VAR",variable:"%{BKY_VARIABLES_DEFAULT_NAME}"},{type:"input_value",
-name:"VALUE"}],previousStatement:null,nextStatement:null,colour:"%{BKY_VARIABLES_HUE}",tooltip:"%{BKY_VARIABLES_SET_TOOLTIP}",helpUrl:"%{BKY_VARIABLES_SET_HELPURL}",extensions:["contextMenu_variableSetterGetter"]}]);
-Blockly.Constants.Variables.CUSTOM_CONTEXT_MENU_VARIABLE_GETTER_SETTER_MIXIN={customContextMenu:function(a){if(!this.isInFlyout){if("variables_get"==this.type)var b="variables_set",c=Blockly.Msg.VARIABLES_GET_CREATE_SET;else b="variables_get",c=Blockly.Msg.VARIABLES_SET_CREATE_GET;var d={enabled:0<this.workspace.remainingCapacity()},e=this.getField("VAR").getText();d.text=c.replace("%1",e);c=goog.dom.createDom("field",null,e);c.setAttribute("name","VAR");c=goog.dom.createDom("block",null,c);c.setAttribute("type",
-b);d.callback=Blockly.ContextMenu.callbackFactory(this,c);a.push(d)}}};Blockly.Extensions.registerMixin("contextMenu_variableSetterGetter",Blockly.Constants.Variables.CUSTOM_CONTEXT_MENU_VARIABLE_GETTER_SETTER_MIXIN);
+Blockly.defineBlocksWithJsonArray([{type:"variables_get",message0:"%1",args0:[{type:"field_variable",name:"VAR",variable:"%{BKY_VARIABLES_DEFAULT_NAME}"}],output:null,colour:"%{BKY_VARIABLES_HUE}",outputShape:Blockly.OUTPUT_SHAPE_ROUND,helpUrl:"%{BKY_VARIABLES_GET_HELPURL}",tooltip:"%{BKY_VARIABLES_GET_TOOLTIP}",extensions:["contextMenu_variableSetterGetter"]},{type:"variables_get_reporter",message0:"%1",args0:[{type:"field_variable_getter",name:"VAR",variable:"%{BKY_VARIABLES_DEFAULT_NAME}"}],output:null,
+colour:"%{BKY_VARIABLES_HUE}",outputShape:Blockly.OUTPUT_SHAPE_ROUND,helpUrl:"%{BKY_VARIABLES_GET_HELPURL}",tooltip:"%{BKY_VARIABLES_GET_TOOLTIP}",extensions:["contextMenu_variableSetterGetter"]},{type:"variables_set",message0:"%{BKY_VARIABLES_SET}",args0:[{type:"field_variable",name:"VAR",variable:"%{BKY_VARIABLES_DEFAULT_NAME}"},{type:"input_value",name:"VALUE"}],previousStatement:null,nextStatement:null,colour:"%{BKY_VARIABLES_HUE}",tooltip:"%{BKY_VARIABLES_SET_TOOLTIP}",helpUrl:"%{BKY_VARIABLES_SET_HELPURL}",
+extensions:["contextMenu_variableSetterGetter"]}]);
+Blockly.Constants.Variables.CUSTOM_CONTEXT_MENU_VARIABLE_GETTER_SETTER_MIXIN={customContextMenu:function(a){if(!this.isInFlyout){if("variables_get"==this.type||"variables_get_reporter"==this.type)var b="variables_set",c=Blockly.Msg.VARIABLES_GET_CREATE_SET;else b="variables_get",c=Blockly.Msg.VARIABLES_SET_CREATE_GET;var d={enabled:0<this.workspace.remainingCapacity()},e=this.getField("VAR").getText();d.text=c.replace("%1",e);c=goog.dom.createDom("field",null,e);c.setAttribute("name","VAR");c=goog.dom.createDom("block",
+null,c);c.setAttribute("type",b);d.callback=Blockly.ContextMenu.callbackFactory(this,c);a.push(d)}}};Blockly.Extensions.registerMixin("contextMenu_variableSetterGetter",Blockly.Constants.Variables.CUSTOM_CONTEXT_MENU_VARIABLE_GETTER_SETTER_MIXIN);
 Blockly.Constants.VariablesDynamic={};Blockly.Constants.VariablesDynamic.HUE=310;
 Blockly.defineBlocksWithJsonArray([{type:"variables_get_dynamic",message0:"%1",args0:[{type:"field_variable",name:"VAR",variable:"%{BKY_VARIABLES_DEFAULT_NAME}"}],output:null,colour:"%{BKY_VARIABLES_DYNAMIC_HUE}",helpUrl:"%{BKY_VARIABLES_GET_HELPURL}",tooltip:"%{BKY_VARIABLES_GET_TOOLTIP}",extensions:["contextMenu_variableDynamicSetterGetter"]},{type:"variables_set_dynamic",message0:"%{BKY_VARIABLES_SET}",args0:[{type:"field_variable",name:"VAR",variable:"%{BKY_VARIABLES_DEFAULT_NAME}"},{type:"input_value",
 name:"VALUE"}],previousStatement:null,nextStatement:null,colour:"%{BKY_VARIABLES_DYNAMIC_HUE}",tooltip:"%{BKY_VARIABLES_SET_TOOLTIP}",helpUrl:"%{BKY_VARIABLES_SET_HELPURL}",extensions:["contextMenu_variableDynamicSetterGetter"]}]);
@@ -2839,11 +2869,11 @@ var iface;
 var pxt;
 (function (pxt) {
     var blocks;
-    (function (blocks) {
+    (function (blocks_1) {
         function workerOpAsync(op, arg) {
             return pxt.worker.getWorker(pxt.webConfig.workerjs).opAsync(op, arg);
         }
-        blocks.workerOpAsync = workerOpAsync;
+        blocks_1.workerOpAsync = workerOpAsync;
         var placeholders = {};
         var MAX_COMMENT_LINE_LENGTH = 50;
         ///////////////////////////////////////////////////////////////////////////////
@@ -2897,7 +2927,7 @@ var pxt;
             }
             return Point;
         }());
-        blocks.Point = Point;
+        blocks_1.Point = Point;
         function find(p) {
             if (p.link)
                 return find(p.link);
@@ -3061,6 +3091,10 @@ var pxt;
                 target.p = mkPoint(null);
             }
         }
+        function getLoopVariableField(b) {
+            return (b.type == "pxt_controls_for" || b.type == "pxt_controls_for_of") ?
+                getInputTargetBlock(b, "VAR") : b;
+        }
         function getInputTargetBlock(b, n) {
             var res = b.getInputTargetBlock(n);
             if (!res) {
@@ -3141,13 +3175,15 @@ var pxt;
                                 for (var i = 0; i <= b.elseifCount_; ++i)
                                     attachPlaceholderIf(e, b, "IF" + i, pBoolean.type);
                                 break;
+                            case "pxt_controls_for":
                             case "controls_simple_for":
                                 unionParam(e, b, "TO", ground(pNumber.type));
                                 break;
+                            case "pxt_controls_for_of":
                             case "controls_for_of":
                                 unionParam(e, b, "LIST", ground("Array"));
                                 var listTp = returnType(e, getInputTargetBlock(b, "LIST"));
-                                var elementTp = lookup(e, escapeVarName(b.getField("VAR").getText(), e)).type;
+                                var elementTp = lookup(e, escapeVarName(getLoopVariableField(b).getField("VAR").getText(), e)).type;
                                 genericLink(listTp, elementTp);
                                 break;
                             case "variables_set":
@@ -3308,10 +3344,10 @@ var pxt;
             }
         }
         function extractTsExpression(e, b, comments) {
-            return blocks.mkText(b.getFieldValue("EXPRESSION").trim());
+            return blocks_1.mkText(b.getFieldValue("EXPRESSION").trim());
         }
         function compileNumber(e, b, comments) {
-            return blocks.H.mkNumberLiteral(extractNumber(b));
+            return blocks_1.H.mkNumberLiteral(extractNumber(b));
         }
         var opToTok = {
             // POWER gets a special treatment because there's no operator for it in
@@ -3338,34 +3374,34 @@ var pxt;
             var t = returnType(e, left).type;
             if (t == pString.type) {
                 if (bOp == "EQ")
-                    return blocks.H.mkSimpleCall("==", args);
+                    return blocks_1.H.mkSimpleCall("==", args);
                 else if (bOp == "NEQ")
-                    return blocks.H.mkSimpleCall("!=", args);
+                    return blocks_1.H.mkSimpleCall("!=", args);
             }
             else if (t == pBoolean.type)
-                return blocks.H.mkSimpleCall(opToTok[bOp], args);
+                return blocks_1.H.mkSimpleCall(opToTok[bOp], args);
             // Compilation of math operators.
             assert(bOp in opToTok);
-            return blocks.H.mkSimpleCall(opToTok[bOp], args);
+            return blocks_1.H.mkSimpleCall(opToTok[bOp], args);
         }
         function compileModulo(e, b, comments) {
             var left = getInputTargetBlock(b, "DIVIDEND");
             var right = getInputTargetBlock(b, "DIVISOR");
             var args = [compileExpression(e, left, comments), compileExpression(e, right, comments)];
-            return blocks.H.mkSimpleCall("%", args);
+            return blocks_1.H.mkSimpleCall("%", args);
         }
         function compileMathOp2(e, b, comments) {
             var op = b.getFieldValue("op");
             var x = compileExpression(e, getInputTargetBlock(b, "x"), comments);
             var y = compileExpression(e, getInputTargetBlock(b, "y"), comments);
-            return blocks.H.mathCall(op, [x, y]);
+            return blocks_1.H.mathCall(op, [x, y]);
         }
         function compileMathOp3(e, b, comments) {
             var x = compileExpression(e, getInputTargetBlock(b, "x"), comments);
-            return blocks.H.mathCall("abs", [x]);
+            return blocks_1.H.mathCall("abs", [x]);
         }
         function compileText(e, b, comments) {
-            return blocks.H.mkStringLiteral(b.getFieldValue("TEXT"));
+            return blocks_1.H.mkStringLiteral(b.getFieldValue("TEXT"));
         }
         function compileTextJoin(e, b, comments) {
             var last;
@@ -3389,36 +3425,36 @@ var pxt;
                     else {
                         // If we don't start with a string, then the TS won't match
                         // the implied semantics of the blocks
-                        last = blocks.H.mkSimpleCall("+", [blocks.H.mkStringLiteral(""), compiled]);
+                        last = blocks_1.H.mkSimpleCall("+", [blocks_1.H.mkStringLiteral(""), compiled]);
                     }
                 }
                 else {
-                    last = blocks.H.mkSimpleCall("+", [last, compiled]);
+                    last = blocks_1.H.mkSimpleCall("+", [last, compiled]);
                 }
             }
             if (!last) {
-                return blocks.H.mkStringLiteral("");
+                return blocks_1.H.mkStringLiteral("");
             }
             return last;
         }
         function compileBoolean(e, b, comments) {
-            return blocks.H.mkBooleanLiteral(b.getFieldValue("BOOL") == "TRUE");
+            return blocks_1.H.mkBooleanLiteral(b.getFieldValue("BOOL") == "TRUE");
         }
         function compileNot(e, b, comments) {
             var expr = compileExpression(e, getInputTargetBlock(b, "BOOL"), comments);
-            return blocks.mkPrefix("!", [blocks.H.mkParenthesizedExpression(expr)]);
+            return blocks_1.mkPrefix("!", [blocks_1.H.mkParenthesizedExpression(expr)]);
         }
         function compileCreateList(e, b, comments) {
             // collect argument
             var args = b.inputList.map(function (input) { return input.connection && input.connection.targetBlock() ? compileExpression(e, input.connection.targetBlock(), comments) : undefined; })
                 .filter(function (e) { return !!e; });
-            return blocks.H.mkArrayLiteral(args);
+            return blocks_1.H.mkArrayLiteral(args);
         }
         function compileListGet(e, b, comments) {
             var listBlock = getInputTargetBlock(b, "LIST");
             var listExpr = compileExpression(e, listBlock, comments);
             var index = compileExpression(e, getInputTargetBlock(b, "INDEX"), comments);
-            var res = blocks.mkGroup([listExpr, blocks.mkText("["), index, blocks.mkText("]")]);
+            var res = blocks_1.mkGroup([listExpr, blocks_1.mkText("["), index, blocks_1.mkText("]")]);
             return res;
         }
         function compileListSet(e, b, comments) {
@@ -3426,7 +3462,7 @@ var pxt;
             var listExpr = compileExpression(e, listBlock, comments);
             var index = compileExpression(e, getInputTargetBlock(b, "INDEX"), comments);
             var value = compileExpression(e, getInputTargetBlock(b, "VALUE"), comments);
-            var res = blocks.mkGroup([listExpr, blocks.mkText("["), index, blocks.mkText("] = "), value]);
+            var res = blocks_1.mkGroup([listExpr, blocks_1.mkText("["), index, blocks_1.mkText("] = "), value]);
             return listBlock.type === "lists_create_with" ? prefixWithSemicolon(res) : res;
         }
         function compileMathJsOp(e, b, comments) {
@@ -3435,23 +3471,23 @@ var pxt;
             if (b.getInput("ARG1")) {
                 args.push(compileExpression(e, getInputTargetBlock(b, "ARG1"), comments));
             }
-            return blocks.H.mathCall(op, args);
+            return blocks_1.H.mathCall(op, args);
         }
         function compileProcedure(e, b, comments) {
             var name = escapeVarName(b.getFieldValue("NAME"), e, true);
             var stmts = getInputTargetBlock(b, "STACK");
             return [
-                blocks.mkText("function " + name + "() "),
+                blocks_1.mkText("function " + name + "() "),
                 compileStatements(e, stmts)
             ];
         }
         function compileProcedureCall(e, b, comments) {
             var name = escapeVarName(b.getFieldValue("NAME"), e, true);
-            return blocks.mkStmt(blocks.mkText(name + "()"));
+            return blocks_1.mkStmt(blocks_1.mkText(name + "()"));
         }
         function compileWorkspaceComment(c) {
             var content = c.getContent();
-            return blocks.Helpers.mkMultiComment(content);
+            return blocks_1.Helpers.mkMultiComment(content.trim());
         }
         function defaultValueForType(t) {
             if (t.type == null) {
@@ -3459,17 +3495,17 @@ var pxt;
                 t = find(t);
             }
             if (isArrayType(t.type)) {
-                return blocks.mkText("[]");
+                return blocks_1.mkText("[]");
             }
             switch (t.type) {
                 case "boolean":
-                    return blocks.H.mkBooleanLiteral(false);
+                    return blocks_1.H.mkBooleanLiteral(false);
                 case "number":
-                    return blocks.H.mkNumberLiteral(0);
+                    return blocks_1.H.mkNumberLiteral(0);
                 case "string":
-                    return blocks.H.mkStringLiteral("");
+                    return blocks_1.H.mkStringLiteral("");
                 default:
-                    return blocks.mkText("null");
+                    return blocks_1.mkText("null");
             }
         }
         // [t] is the expected type; we assume that we never null block children
@@ -3492,7 +3528,7 @@ var pxt;
                         var call = e.stdCallTable[b.parentBlock_.type];
                         isExpression = call && call.isExpression;
                     }
-                    var arrayNode = blocks.mkText("[0]");
+                    var arrayNode = blocks_1.mkText("[0]");
                     expr = isExpression ? arrayNode : prefixWithSemicolon(arrayNode);
                 }
                 else {
@@ -3570,13 +3606,13 @@ var pxt;
             expr.id = b.id;
             return expr;
         }
-        blocks.compileExpression = compileExpression;
+        blocks_1.compileExpression = compileExpression;
         var VarUsage;
         (function (VarUsage) {
             VarUsage[VarUsage["Unknown"] = 0] = "Unknown";
             VarUsage[VarUsage["Read"] = 1] = "Read";
             VarUsage[VarUsage["Assign"] = 2] = "Assign";
-        })(VarUsage = blocks.VarUsage || (blocks.VarUsage = {}));
+        })(VarUsage = blocks_1.VarUsage || (blocks_1.VarUsage = {}));
         function isCompiledAsLocalVariable(b) {
             return b.declaredInLocalScope && !b.mustBeGlobal;
         }
@@ -3628,21 +3664,21 @@ var pxt;
             for (var i = 0; i <= b.elseifCount_; ++i) {
                 var cond = compileExpression(e, getInputTargetBlock(b, "IF" + i), comments);
                 var thenBranch = compileStatements(e, getInputTargetBlock(b, "DO" + i));
-                var startNode = blocks.mkText("if (");
+                var startNode = blocks_1.mkText("if (");
                 if (i > 0) {
-                    startNode = blocks.mkText("else if (");
-                    startNode.glueToBlock = blocks.GlueMode.WithSpace;
+                    startNode = blocks_1.mkText("else if (");
+                    startNode.glueToBlock = blocks_1.GlueMode.WithSpace;
                 }
                 append(stmts, [
                     startNode,
                     cond,
-                    blocks.mkText(")"),
+                    blocks_1.mkText(")"),
                     thenBranch
                 ]);
             }
             if (b.elseCount_) {
-                var elseNode = blocks.mkText("else");
-                elseNode.glueToBlock = blocks.GlueMode.WithSpace;
+                var elseNode = blocks_1.mkText("else");
+                elseNode.glueToBlock = blocks_1.GlueMode.WithSpace;
                 append(stmts, [
                     elseNode,
                     compileStatements(e, getInputTargetBlock(b, "ELSE"))
@@ -3651,7 +3687,7 @@ var pxt;
             return stmts;
         }
         function compileControlsFor(e, b, comments) {
-            var bVar = escapeVarName(b.getField("VAR").getText(), e);
+            var bVar = escapeVarName(getLoopVariableField(b).getField("VAR").getText(), e);
             var bTo = getInputTargetBlock(b, "TO");
             var bDo = getInputTargetBlock(b, "DO");
             var bBy = getInputTargetBlock(b, "BY");
@@ -3660,13 +3696,13 @@ var pxt;
             var binding = lookup(e, bVar);
             assert(binding.declaredInLocalScope > 0);
             return [
-                blocks.mkText("for (let " + bVar + " = "),
-                bFrom ? compileExpression(e, bFrom, comments) : blocks.mkText("0"),
-                blocks.mkText("; "),
-                blocks.mkInfix(blocks.mkText(bVar), "<=", compileExpression(e, bTo, comments)),
-                blocks.mkText("; "),
-                incOne ? blocks.mkText(bVar + "++") : blocks.mkInfix(blocks.mkText(bVar), "+=", compileExpression(e, bBy, comments)),
-                blocks.mkText(")"),
+                blocks_1.mkText("for (let " + bVar + " = "),
+                bFrom ? compileExpression(e, bFrom, comments) : blocks_1.mkText("0"),
+                blocks_1.mkText("; "),
+                blocks_1.mkInfix(blocks_1.mkText(bVar), "<=", compileExpression(e, bTo, comments)),
+                blocks_1.mkText("; "),
+                incOne ? blocks_1.mkText(bVar + "++") : blocks_1.mkInfix(blocks_1.mkText(bVar), "+=", compileExpression(e, bBy, comments)),
+                blocks_1.mkText(")"),
                 compileStatements(e, bDo)
             ];
         }
@@ -3678,9 +3714,9 @@ var pxt;
             for (var i = 0; !valid(name); i++)
                 name = "i" + i;
             return [
-                blocks.mkText("for (let " + name + " = 0; "),
-                blocks.mkInfix(blocks.mkText(name), "<", bound),
-                blocks.mkText("; " + name + "++)"),
+                blocks_1.mkText("for (let " + name + " = 0; "),
+                blocks_1.mkInfix(blocks_1.mkText(name), "<", bound),
+                blocks_1.mkText("; " + name + "++)"),
                 body
             ];
         }
@@ -3688,22 +3724,22 @@ var pxt;
             var cond = compileExpression(e, getInputTargetBlock(b, "COND"), comments);
             var body = compileStatements(e, getInputTargetBlock(b, "DO"));
             return [
-                blocks.mkText("while ("),
+                blocks_1.mkText("while ("),
                 cond,
-                blocks.mkText(")"),
+                blocks_1.mkText(")"),
                 body
             ];
         }
         function compileControlsForOf(e, b, comments) {
-            var bVar = escapeVarName(b.getField("VAR").getText(), e);
+            var bVar = escapeVarName(getLoopVariableField(b).getField("VAR").getText(), e);
             var bOf = getInputTargetBlock(b, "LIST");
             var bDo = getInputTargetBlock(b, "DO");
             var binding = lookup(e, bVar);
             assert(binding.declaredInLocalScope > 0);
             return [
-                blocks.mkText("for (let " + bVar + " of "),
+                blocks_1.mkText("for (let " + bVar + " of "),
                 compileExpression(e, bOf, comments),
-                blocks.mkText(")"),
+                blocks_1.mkText(")"),
                 compileStatements(e, bDo)
             ];
         }
@@ -3742,14 +3778,14 @@ var pxt;
             e.renames.takenNames[n] = true;
             return n;
         }
-        blocks.escapeVarName = escapeVarName;
+        blocks_1.escapeVarName = escapeVarName;
         function compileVariableGet(e, b) {
             var name = escapeVarName(b.getField("VAR").getText(), e);
             var binding = lookup(e, name);
             if (!binding.assigned)
                 binding.assigned = VarUsage.Read;
             assert(binding != null && binding.type != null);
-            return blocks.mkText(name);
+            return blocks_1.mkText(name);
         }
         function compileSet(e, b, comments) {
             var bVar = escapeVarName(b.getField("VAR").getText(), e);
@@ -3766,7 +3802,7 @@ var pxt;
                     isDef = true;
                 }
             var expr = compileExpression(e, bExpr, comments);
-            return blocks.mkStmt(blocks.mkText(isDef ? "let " : ""), blocks.mkText(bVar + " = "), expr);
+            return blocks_1.mkStmt(blocks_1.mkText(isDef ? "let " : ""), blocks_1.mkText(bVar + " = "), expr);
         }
         function compileChange(e, b, comments) {
             var bVar = escapeVarName(b.getField("VAR").getText(), e);
@@ -3775,8 +3811,8 @@ var pxt;
             if (!binding.assigned)
                 binding.assigned = VarUsage.Read;
             var expr = compileExpression(e, bExpr, comments);
-            var ref = blocks.mkText(bVar);
-            return blocks.mkStmt(blocks.mkInfix(ref, "+=", expr));
+            var ref = blocks_1.mkText(bVar);
+            return blocks_1.mkStmt(blocks_1.mkInfix(ref, "+=", expr));
         }
         function eventArgs(call, b) {
             return visibleParams(call, countOptionals(b)).map(function (ar) { return ar.definitionName; }).filter(function (ar) { return !!ar; });
@@ -3784,20 +3820,20 @@ var pxt;
         function compileCall(e, b, comments) {
             var call = e.stdCallTable[b.type];
             if (call.imageLiteral)
-                return blocks.mkStmt(compileImage(e, b, call.imageLiteral, call.namespace, call.f, visibleParams(call, countOptionals(b)).map(function (ar) { return compileArgument(e, b, ar, comments); })));
+                return blocks_1.mkStmt(compileImage(e, b, call.imageLiteral, call.namespace, call.f, visibleParams(call, countOptionals(b)).map(function (ar) { return compileArgument(e, b, ar, comments); })));
             else if (call.hasHandler)
                 return compileEvent(e, b, call, eventArgs(call, b), call.namespace, comments);
             else
-                return blocks.mkStmt(compileStdCall(e, b, call, comments));
+                return blocks_1.mkStmt(compileStdCall(e, b, call, comments));
         }
         function compileArgument(e, b, p, comments, beginningOfStatement) {
             if (beginningOfStatement === void 0) { beginningOfStatement = false; }
             var f = b.getFieldValue(p.definitionName);
             if (f != null) {
                 if (b.getField(p.definitionName) instanceof pxtblockly.FieldTextInput) {
-                    return blocks.H.mkStringLiteral(f);
+                    return blocks_1.H.mkStringLiteral(f);
                 }
-                return blocks.mkText(f);
+                return blocks_1.mkText(f);
             }
             else {
                 attachPlaceholderIf(e, b, p.definitionName);
@@ -3810,14 +3846,14 @@ var pxt;
                     return prefixWithSemicolon(compileExpression(e, target, comments));
                 }
                 if (p.shadowOptions && p.shadowOptions.toString && returnType(e, target) !== pString) {
-                    return blocks.H.mkSimpleCall("+", [blocks.H.mkStringLiteral(""), compileExpression(e, target, comments)]);
+                    return blocks_1.H.mkSimpleCall("+", [blocks_1.H.mkStringLiteral(""), compileExpression(e, target, comments)]);
                 }
                 return compileExpression(e, target, comments);
             }
         }
         function compileStdCall(e, b, func, comments) {
             var args;
-            if (isMutatingBlock(b) && b.mutation.getMutationType() === blocks.MutatorTypes.RestParameterMutator) {
+            if (isMutatingBlock(b) && b.mutation.getMutationType() === blocks_1.MutatorTypes.RestParameterMutator) {
                 args = b.mutation.compileMutation(e, comments).children;
             }
             else {
@@ -3827,58 +3863,58 @@ var pxt;
             if (func.isIdentity)
                 return args[0];
             else if (func.property) {
-                return blocks.H.mkPropertyAccess(func.f, args[0]);
+                return blocks_1.H.mkPropertyAccess(func.f, args[0]);
             }
             else if (func.f == "@get@") {
-                return blocks.H.mkPropertyAccess(args[1].op.replace(/.*\./, ""), args[0]);
+                return blocks_1.H.mkPropertyAccess(args[1].op.replace(/.*\./, ""), args[0]);
             }
             else if (func.f == "@set@") {
-                return blocks.H.mkAssign(blocks.H.mkPropertyAccess(args[1].op.replace(/.*\./, "").replace(/@set/, ""), args[0]), args[2]);
+                return blocks_1.H.mkAssign(blocks_1.H.mkPropertyAccess(args[1].op.replace(/.*\./, "").replace(/@set/, ""), args[0]), args[2]);
             }
             else if (func.f == "@change@") {
-                return blocks.H.mkSimpleCall("+=", [blocks.H.mkPropertyAccess(args[1].op.replace(/.*\./, "").replace(/@set/, ""), args[0]), args[2]]);
+                return blocks_1.H.mkSimpleCall("+=", [blocks_1.H.mkPropertyAccess(args[1].op.replace(/.*\./, "").replace(/@set/, ""), args[0]), args[2]]);
             }
             else if (func.isExtensionMethod) {
                 if (func.attrs.defaultInstance) {
                     var instance = void 0;
-                    if (isMutatingBlock(b) && b.mutation.getMutationType() === blocks.MutatorTypes.DefaultInstanceMutator) {
+                    if (isMutatingBlock(b) && b.mutation.getMutationType() === blocks_1.MutatorTypes.DefaultInstanceMutator) {
                         instance = b.mutation.compileMutation(e, comments);
                     }
                     if (instance) {
                         args.unshift(instance);
                     }
                     else {
-                        args.unshift(blocks.mkText(func.attrs.defaultInstance));
+                        args.unshift(blocks_1.mkText(func.attrs.defaultInstance));
                     }
                 }
-                return blocks.H.extensionCall(func.f, args, externalInputs);
+                return blocks_1.H.extensionCall(func.f, args, externalInputs);
             }
             else if (func.namespace) {
-                return blocks.H.namespaceCall(func.namespace, func.f, args, externalInputs);
+                return blocks_1.H.namespaceCall(func.namespace, func.f, args, externalInputs);
             }
             else {
-                return blocks.H.stdCall(func.f, args, externalInputs);
+                return blocks_1.H.stdCall(func.f, args, externalInputs);
             }
         }
         function compileStdBlock(e, b, f, comments) {
-            return blocks.mkStmt(compileStdCall(e, b, f, comments));
+            return blocks_1.mkStmt(compileStdCall(e, b, f, comments));
         }
         function mkCallWithCallback(e, n, f, args, body, argumentDeclaration, isExtension) {
             if (isExtension === void 0) { isExtension = false; }
             body.noFinalNewline = true;
             var callback;
             if (argumentDeclaration) {
-                callback = blocks.mkGroup([argumentDeclaration, body]);
+                callback = blocks_1.mkGroup([argumentDeclaration, body]);
             }
             else {
-                callback = blocks.mkGroup([blocks.mkText("function ()"), body]);
+                callback = blocks_1.mkGroup([blocks_1.mkText("function ()"), body]);
             }
             if (isExtension)
-                return blocks.mkStmt(blocks.H.extensionCall(f, args.concat([callback]), false));
+                return blocks_1.mkStmt(blocks_1.H.extensionCall(f, args.concat([callback]), false));
             else if (n)
-                return blocks.mkStmt(blocks.H.namespaceCall(n, f, args.concat([callback]), false));
+                return blocks_1.mkStmt(blocks_1.H.namespaceCall(n, f, args.concat([callback]), false));
             else
-                return blocks.mkStmt(blocks.H.mkCall(f, args.concat([callback]), false));
+                return blocks_1.mkStmt(blocks_1.H.mkCall(f, args.concat([callback]), false));
         }
         function compileArg(e, b, arg, comments) {
             // b.getFieldValue may be string, numbers
@@ -3886,14 +3922,14 @@ var pxt;
             if (argb)
                 return compileExpression(e, argb, comments);
             if (b.getField(arg) instanceof pxtblockly.FieldTextInput)
-                return blocks.H.mkStringLiteral(b.getFieldValue(arg));
-            return blocks.mkText(b.getFieldValue(arg));
+                return blocks_1.H.mkStringLiteral(b.getFieldValue(arg));
+            return blocks_1.mkText(b.getFieldValue(arg));
         }
         function compileStartEvent(e, b) {
             var bBody = getInputTargetBlock(b, "HANDLER");
             var body = compileStatements(e, bBody);
             if (pxt.appTarget.compile && pxt.appTarget.compile.onStartText && body && body.children) {
-                body.children.unshift(blocks.mkStmt(blocks.mkText("// " + pxtc.ON_START_COMMENT + "\n")));
+                body.children.unshift(blocks_1.mkStmt(blocks_1.mkText("// " + pxtc.ON_START_COMMENT + "\n")));
             }
             return body;
         }
@@ -3902,10 +3938,10 @@ var pxt;
             var bBody = getInputTargetBlock(b, "HANDLER");
             var body = compileStatements(e, bBody);
             if (pxt.appTarget.compile && pxt.appTarget.compile.emptyEventHandlerComments && body.children.length === 0) {
-                body.children.unshift(blocks.mkStmt(blocks.mkText("// " + pxtc.HANDLER_COMMENT)));
+                body.children.unshift(blocks_1.mkStmt(blocks_1.mkText("// " + pxtc.HANDLER_COMMENT)));
             }
             var argumentDeclaration;
-            if (isMutatingBlock(b) && b.mutation.getMutationType() === blocks.MutatorTypes.ObjectDestructuringMutator) {
+            if (isMutatingBlock(b) && b.mutation.getMutationType() === blocks_1.MutatorTypes.ObjectDestructuringMutator) {
                 argumentDeclaration = b.mutation.compileMutation(e, comments);
             }
             else if (stdfun.comp.handlerArgs.length) {
@@ -3921,7 +3957,7 @@ var pxt;
                         break;
                     }
                 }
-                argumentDeclaration = blocks.mkText("function (" + handlerArgs.join(", ") + ")");
+                argumentDeclaration = blocks_1.mkText("function (" + handlerArgs.join(", ") + ")");
             }
             return mkCallWithCallback(e, ns, stdfun.f, compiledArgs, body, argumentDeclaration, stdfun.isExtensionMethod);
         }
@@ -3941,9 +3977,9 @@ var pxt;
                 }
                 state += '\n';
             }
-            var lit = blocks.H.mkStringLiteral(state);
+            var lit = blocks_1.H.mkStringLiteral(state);
             lit.canIndentInside = true;
-            return blocks.H.namespaceCall(n, f, [lit].concat(args), false);
+            return blocks_1.H.namespaceCall(n, f, [lit].concat(args), false);
         }
         function compileStatementBlock(e, b) {
             var r;
@@ -3954,10 +3990,12 @@ var pxt;
                 case 'controls_if':
                     r = compileControlsIf(e, b, comments);
                     break;
+                case 'pxt_controls_for':
                 case 'controls_for':
                 case 'controls_simple_for':
                     r = compileControlsFor(e, b, comments);
                     break;
+                case 'pxt_controls_for_of':
                 case 'controls_for_of':
                     r = compileControlsForOf(e, b, comments);
                     break;
@@ -3996,7 +4034,7 @@ var pxt;
                     if (call)
                         r = [compileCall(e, b, comments)];
                     else
-                        r = [blocks.mkStmt(compileExpression(e, b, comments))];
+                        r = [blocks_1.mkStmt(compileExpression(e, b, comments))];
                     break;
             }
             var l = r[r.length - 1];
@@ -4006,7 +4044,7 @@ var pxt;
                 addCommentNodes(comments, r);
             }
             r.forEach(function (l) {
-                if (l.type === blocks.NT.Block || l.type === blocks.NT.Prefix && pxt.Util.startsWith(l.op, "//")) {
+                if (l.type === blocks_1.NT.Block || l.type === blocks_1.NT.Prefix && pxt.Util.startsWith(l.op, "//")) {
                     l.id = b.id;
                 }
             });
@@ -4019,7 +4057,7 @@ var pxt;
                     append(stmts, compileStatementBlock(e, b));
                 b = b.getNextBlock();
             }
-            return blocks.mkBlock(stmts);
+            return blocks_1.mkBlock(stmts);
         }
         function compileTypescriptBlock(e, b) {
             var res = [];
@@ -4028,7 +4066,7 @@ var pxt;
                 var value = b.getFieldValue("LINE" + i);
                 i++;
                 if (value !== null) {
-                    res.push(blocks.mkText(value + "\n"));
+                    res.push(blocks_1.mkText(value + "\n"));
                     var declaredVars = b.declaredVariables;
                     if (declaredVars) {
                         var varNames = declaredVars.split(",");
@@ -4059,15 +4097,15 @@ var pxt;
         function compileDebuggeStatementBlock(e, b) {
             if (b.getFieldValue("ON_OFF") == "1") {
                 return [
-                    blocks.mkText("debugger;")
+                    blocks_1.mkText("debugger;")
                 ];
             }
             return [];
         }
         function prefixWithSemicolon(n) {
-            var emptyStatement = blocks.mkStmt(blocks.mkText(";"));
-            emptyStatement.glueToBlock = blocks.GlueMode.NoSpace;
-            return blocks.mkGroup([emptyStatement, n]);
+            var emptyStatement = blocks_1.mkStmt(blocks_1.mkText(";"));
+            emptyStatement.glueToBlock = blocks_1.GlueMode.NoSpace;
+            return blocks_1.mkGroup([emptyStatement, n]);
         }
         function compilePauseUntilBlock(e, b, comments) {
             var options = pxt.appTarget.runtime && pxt.appTarget.runtime.pauseUntilBlock;
@@ -4075,12 +4113,12 @@ var pxt;
             var ns = options.namespace;
             var name = options.callName || "pauseUntil";
             var arg = compileArg(e, b, "PREDICATE", comments);
-            var lambda = [blocks.mkGroup([blocks.mkText("() => "), arg])];
+            var lambda = [blocks_1.mkGroup([blocks_1.mkText("() => "), arg])];
             if (ns) {
-                return [blocks.mkStmt(blocks.H.namespaceCall(ns, name, lambda, false))];
+                return [blocks_1.mkStmt(blocks_1.H.namespaceCall(ns, name, lambda, false))];
             }
             else {
-                return [blocks.mkStmt(blocks.H.mkCall(name, lambda, false, false))];
+                return [blocks_1.mkStmt(blocks_1.H.mkCall(name, lambda, false, false))];
             }
         }
         // This function creates an empty environment where type inference has NOT yet
@@ -4126,11 +4164,12 @@ var pxt;
             }
             if (skipVariables)
                 return e;
+            var loopBlocks = ["controls_for", "controls_simple_for", "controls_for_of", "pxt_controls_for", "pxt_controls_for_of"];
             var variableIsScoped = function (b, name) {
                 if (!b)
                     return false;
-                else if ((b.type == "controls_for" || b.type == "controls_simple_for" || b.type == "controls_for_of")
-                    && escapeVarName(b.getField("VAR").getText(), e) == name)
+                else if (loopBlocks.filter(function (l) { return l == b.type; }).length > 0
+                    && escapeVarName(getLoopVariableField(b).getField("VAR").getText(), e) == name)
                     return true;
                 else if (isMutatingBlock(b) && b.mutation.isDeclaredByMutation(name))
                     return true;
@@ -4166,8 +4205,8 @@ var pxt;
             // collect local variables.
             if (w)
                 w.getAllBlocks().filter(function (b) { return !b.disabled; }).forEach(function (b) {
-                    if (b.type == "controls_for" || b.type == "controls_simple_for" || b.type == "controls_for_of") {
-                        var x = escapeVarName(b.getField("VAR").getText(), e);
+                    if (loopBlocks.filter(function (l) { return l == b.type; }).length > 0) {
+                        var x = escapeVarName(getLoopVariableField(b).getField("VAR").getText(), e);
                         if (b.type == "controls_for_of") {
                             trackLocalDeclaration(x, null);
                         }
@@ -4210,7 +4249,7 @@ var pxt;
                 });
             return e;
         }
-        blocks.mkEnv = mkEnv;
+        blocks_1.mkEnv = mkEnv;
         function compileBlockAsync(b, blockInfo) {
             var w = b.workspace;
             var e = mkEnv(w, blockInfo);
@@ -4219,7 +4258,7 @@ var pxt;
             removeAllPlaceholders();
             return tdASTtoTS(e, compiled);
         }
-        blocks.compileBlockAsync = compileBlockAsync;
+        blocks_1.compileBlockAsync = compileBlockAsync;
         function eventWeight(b, e) {
             if (b.type === ts.pxtc.ON_START_TYPE) {
                 return 0;
@@ -4241,12 +4280,21 @@ var pxt;
                     return eventWeight(a, e) - eventWeight(b, e);
                 });
                 updateDisabledBlocks(e, w.getAllBlocks(), topblocks);
+                // compile workspace comments, add them to the top
+                var topComments = w.getTopComments(true);
+                var commentMap_1 = groupWorkspaceComments(topblocks, topComments);
+                commentMap_1.orphans.forEach(function (comment) { return append(stmtsMain_1, compileWorkspaceComment(comment).children); });
                 topblocks.forEach(function (b) {
+                    if (commentMap_1.idToComments[b.id]) {
+                        commentMap_1.idToComments[b.id].forEach(function (comment) {
+                            append(stmtsMain_1, compileWorkspaceComment(comment).children);
+                        });
+                    }
                     if (b.type == ts.pxtc.ON_START_TYPE)
                         append(stmtsMain_1, compileStartEvent(e, b).children);
                     else {
                         var compiled = compileStatements(e, b);
-                        if (compiled.type == blocks.NT.Block)
+                        if (compiled.type == blocks_1.NT.Block)
                             append(stmtsMain_1, compiled.children);
                         else
                             stmtsMain_1.push(compiled);
@@ -4258,7 +4306,7 @@ var pxt;
                     var t = getConcreteType(b.type);
                     var defl;
                     if (t.type === "Array") {
-                        defl = blocks.mkText("[]");
+                        defl = blocks_1.mkText("[]");
                     }
                     else {
                         defl = defaultValueForType(t);
@@ -4273,20 +4321,13 @@ var pxt;
                         }
                         var tpinfo = blockInfo.apis.byQName[tpname];
                         if (tpinfo && tpinfo.attributes.autoCreate)
-                            defl = blocks.mkText(tpinfo.attributes.autoCreate + "()");
+                            defl = blocks_1.mkText(tpinfo.attributes.autoCreate + "()");
                         else
                             tp = ": " + tpname;
                     }
-                    return blocks.mkStmt(blocks.mkText("let " + b.name + tp + " = "), defl);
+                    return blocks_1.mkStmt(blocks_1.mkText("let " + b.name + tp + " = "), defl);
                 });
-                var allStmts = stmtsVariables.concat(stmtsMain_1);
-                // compile workspace comments, add them to the top
-                var commentStmts_1 = [];
-                var topComments = w.getTopComments(true);
-                topComments.forEach(function (c) {
-                    append(commentStmts_1, compileWorkspaceComment(c).children);
-                });
-                return commentStmts_1.concat(allStmts);
+                return stmtsVariables.concat(stmtsMain_1);
             }
             catch (err) {
                 var be = err.block;
@@ -4316,7 +4357,7 @@ var pxt;
             }
             return undefined;
         }
-        blocks.callKey = callKey;
+        blocks_1.callKey = callKey;
         function updateDisabledBlocks(e, allBlocks, topBlocks) {
             // unset disabled
             allBlocks.forEach(function (b) { return b.setDisabled(false); });
@@ -4373,16 +4414,16 @@ var pxt;
             }
             return undefined;
         }
-        blocks.findBlockId = findBlockId;
+        blocks_1.findBlockId = findBlockId;
         function compileAsync(b, blockInfo) {
             var e = mkEnv(b, blockInfo);
             var nodes = compileWorkspace(e, b, blockInfo);
             var result = tdASTtoTS(e, nodes);
             return result;
         }
-        blocks.compileAsync = compileAsync;
+        blocks_1.compileAsync = compileAsync;
         function tdASTtoTS(env, app) {
-            var res = blocks.flattenNode(app);
+            var res = blocks_1.flattenNode(app);
             // Note: the result of format is not used!
             return workerOpAsync("format", { format: { input: res.output, pos: 1 } }).then(function () {
                 return {
@@ -4422,8 +4463,8 @@ var pxt;
                         currentLine = word;
                     }
                     else if (currentLine.length + word.length > MAX_COMMENT_LINE_LENGTH) {
-                        commentNodes.push(blocks.mkText("// " + currentLine));
-                        commentNodes.push(blocks.mkNewLine());
+                        commentNodes.push(blocks_1.mkText("// " + currentLine));
+                        commentNodes.push(blocks_1.mkNewLine());
                         currentLine = word;
                     }
                     else {
@@ -4431,13 +4472,13 @@ var pxt;
                     }
                 }
                 if (currentLine) {
-                    commentNodes.push(blocks.mkText("// " + currentLine));
-                    commentNodes.push(blocks.mkNewLine());
+                    commentNodes.push(blocks_1.mkText("// " + currentLine));
+                    commentNodes.push(blocks_1.mkNewLine());
                 }
                 // The decompiler expects an empty comment line between paragraphs
                 if (i !== paragraphs.length - 1) {
-                    commentNodes.push(blocks.mkText("//"));
-                    commentNodes.push(blocks.mkNewLine());
+                    commentNodes.push(blocks_1.mkText("//"));
+                    commentNodes.push(blocks_1.mkNewLine());
                 }
             }
             for (var _d = 0, _e = commentNodes.reverse(); _d < _e.length; _d++) {
@@ -4477,6 +4518,65 @@ var pxt;
                 }
             });
             return res;
+        }
+        function groupWorkspaceComments(blocks, comments) {
+            if (!blocks.length || blocks.some(function (b) { return !b.rendered; })) {
+                return {
+                    orphans: comments,
+                    idToComments: {}
+                };
+            }
+            var blockBounds = blocks.map(function (block) {
+                var bounds = block.getBoundingRectangle();
+                var size = block.getHeightWidth();
+                return {
+                    id: block.id,
+                    x: bounds.topLeft.x,
+                    y: bounds.topLeft.y,
+                    width: size.width,
+                    height: size.height
+                };
+            });
+            var map = {
+                orphans: [],
+                idToComments: {}
+            };
+            var radius = 20;
+            for (var _i = 0, comments_2 = comments; _i < comments_2.length; _i++) {
+                var comment = comments_2[_i];
+                var bounds = comment.getBoundingRectangle();
+                var size = comment.getHeightWidth();
+                var x = bounds.topLeft.x;
+                var y = bounds.topLeft.y;
+                var parent_2 = void 0;
+                for (var _a = 0, blockBounds_1 = blockBounds; _a < blockBounds_1.length; _a++) {
+                    var rect = blockBounds_1[_a];
+                    if (doesIntersect(x, y, size.width, size.height, rect)) {
+                        parent_2 = rect;
+                    }
+                    else if (!parent_2 && doesIntersect(x - radius, y - radius, size.width + radius * 2, size.height + radius * 2, rect)) {
+                        parent_2 = rect;
+                    }
+                }
+                if (parent_2) {
+                    if (!map.idToComments[parent_2.id]) {
+                        map.idToComments[parent_2.id] = [];
+                    }
+                    map.idToComments[parent_2.id].push(comment);
+                }
+                else {
+                    map.orphans.push(comment);
+                }
+            }
+            return map;
+        }
+        function doesIntersect(x, y, width, height, other) {
+            var xOverlap = between(x, other.x, other.x + other.width) || between(other.x, x, x + width);
+            var yOverlap = between(y, other.y, other.y + other.height) || between(other.y, y, y + height);
+            return xOverlap && yOverlap;
+            function between(val, lower, upper) {
+                return val >= lower && val <= upper;
+            }
         }
     })(blocks = pxt.blocks || (pxt.blocks = {}));
 })(pxt || (pxt = {}));
@@ -4544,13 +4644,13 @@ var pxt;
 var pxt;
 (function (pxt) {
     var blocks;
-    (function (blocks_1) {
+    (function (blocks_2) {
         function saveWorkspaceXml(ws) {
             var xml = Blockly.Xml.workspaceToDom(ws, true);
             var text = Blockly.Xml.domToPrettyText(xml);
             return text;
         }
-        blocks_1.saveWorkspaceXml = saveWorkspaceXml;
+        blocks_2.saveWorkspaceXml = saveWorkspaceXml;
         function getDirectChildren(parent, tag) {
             var res = [];
             for (var i = 0; i < parent.childNodes.length; i++) {
@@ -4561,20 +4661,20 @@ var pxt;
             }
             return res;
         }
-        blocks_1.getDirectChildren = getDirectChildren;
+        blocks_2.getDirectChildren = getDirectChildren;
         function getBlocksWithType(parent, type) {
             return getChildrenWithAttr(parent, "block", "type", type);
         }
-        blocks_1.getBlocksWithType = getBlocksWithType;
+        blocks_2.getBlocksWithType = getBlocksWithType;
         function getChildrenWithAttr(parent, tag, attr, value) {
             return pxt.Util.toArray(parent.getElementsByTagName(tag)).filter(function (b) { return b.getAttribute(attr) === value; });
         }
-        blocks_1.getChildrenWithAttr = getChildrenWithAttr;
+        blocks_2.getChildrenWithAttr = getChildrenWithAttr;
         function getFirstChildWithAttr(parent, tag, attr, value) {
             var res = getChildrenWithAttr(parent, tag, attr, value);
             return res.length ? res[0] : undefined;
         }
-        blocks_1.getFirstChildWithAttr = getFirstChildWithAttr;
+        blocks_2.getFirstChildWithAttr = getFirstChildWithAttr;
         /**
          * Loads the xml into a off-screen workspace (not suitable for size computations)
          */
@@ -4592,7 +4692,7 @@ var pxt;
                 return null;
             }
         }
-        blocks_1.loadWorkspaceXml = loadWorkspaceXml;
+        blocks_2.loadWorkspaceXml = loadWorkspaceXml;
         function patchFloatingBlocks(dom, info) {
             var onstarts = getBlocksWithType(dom, ts.pxtc.ON_START_TYPE);
             var onstart = onstarts.length ? onstarts[0] : undefined;
@@ -4612,7 +4712,7 @@ var pxt;
                 var nodeType = node.getAttribute("type");
                 if (!node.getAttribute("disabled") && !node.getElementsByTagName("statement").length
                     && (pxt.blocks.buildinBlockStatements[nodeType] ||
-                        (blocks[nodeType] && blocks[nodeType].retType == "void" && !blocks_1.hasArrowFunction(blocks[nodeType])))) {
+                        (blocks[nodeType] && blocks[nodeType].retType == "void" && !blocks_2.hasArrowFunction(blocks[nodeType])))) {
                     // old block, needs to be wrapped in onstart
                     if (!insertNode) {
                         insertNode = dom.ownerDocument.createElement("statement");
@@ -4681,9 +4781,9 @@ var pxt;
                             = api.namespace + '.' + api.name;
                 }
                 // walk through blocks and patch enums
-                var blocks_2 = doc_1.getElementsByTagName("block");
-                for (var i = 0; i < blocks_2.length; ++i)
-                    patchBlock(info, enums, blocks_2[i]);
+                var blocks_3 = doc_1.getElementsByTagName("block");
+                for (var i = 0; i < blocks_3.length; ++i)
+                    patchBlock(info, enums, blocks_3[i]);
                 // patch floating blocks
                 patchFloatingBlocks(doc_1.documentElement, info);
                 // serialize and return
@@ -4695,14 +4795,14 @@ var pxt;
                 return xml;
             }
         }
-        blocks_1.importXml = importXml;
+        blocks_2.importXml = importXml;
         function patchBlock(info, enums, block) {
             var type = block.getAttribute("type");
             var b = Blockly.Blocks[type];
-            var symbol = blocks_1.blockSymbol(type);
+            var symbol = blocks_2.blockSymbol(type);
             if (!symbol || !b)
                 return;
-            var comp = blocks_1.compileInfo(symbol);
+            var comp = blocks_2.compileInfo(symbol);
             symbol.parameters.forEach(function (p, i) {
                 var ptype = info.apis.byQName[p.type];
                 if (ptype && ptype.kind == pxtc.SymbolKind.Enum) {
@@ -4725,7 +4825,7 @@ var pxt;
 var pxt;
 (function (pxt) {
     var blocks;
-    (function (blocks_3) {
+    (function (blocks_4) {
         var layout;
         (function (layout) {
             function patchBlocksFromOldWorkspace(blockInfo, oldWs, newXml) {
@@ -4934,53 +5034,137 @@ var pxt;
             }
             function flowBlocks(comments, blocks, ratio, maxWidth) {
                 if (ratio === void 0) { ratio = 1.62; }
-                var gap = 16;
+                // Margin between blocks and their comments
+                var innerGroupMargin = 13;
+                // Margin between groups of blocks and comments
+                var outerGroupMargin = 45;
+                // Workspace margins
                 var marginx = 20;
                 var marginy = 20;
+                var groups = [];
+                var commentMap = {};
+                comments.forEach(function (comment) {
+                    var ref = comment.data;
+                    if (ref != undefined) {
+                        commentMap[ref] = comment;
+                    }
+                    else {
+                        groups.push(formattable(comment));
+                    }
+                });
+                var onStart;
+                blocks.forEach(function (block) {
+                    var commentRefs = block.data;
+                    if (commentRefs) {
+                        var refs = commentRefs.split(";");
+                        var children = [];
+                        for (var i = 0; i < refs.length; i++) {
+                            var comment = commentMap[refs[i]];
+                            if (comment) {
+                                children.push(formattable(comment));
+                                delete commentMap[refs[i]];
+                            }
+                        }
+                        if (children.length) {
+                            groups.push({ value: block, width: -1, height: -1, children: children });
+                            return;
+                        }
+                    }
+                    var f = formattable(block);
+                    if (block.type === pxtc.ON_START_TYPE) {
+                        onStart = f;
+                    }
+                    else {
+                        groups.push(f);
+                    }
+                });
+                if (onStart) {
+                    groups.unshift(onStart);
+                }
+                // Collect the comments that were not linked to a top-level block
+                // and puth them in on start (if it exists)
+                Object.keys(commentMap).sort(function (a, b) {
+                    // These are strings of integers (eg "0", "17", etc.) with no duplicates
+                    if (a.length === b.length) {
+                        return a > b ? -1 : 1;
+                    }
+                    else {
+                        return a.length > b.length ? -1 : 1;
+                    }
+                }).forEach(function (key) {
+                    if (commentMap[key]) {
+                        if (onStart) {
+                            if (!onStart.children) {
+                                onStart.children = [];
+                            }
+                            onStart.children.push(formattable(commentMap[key]));
+                        }
+                        else {
+                            // Stick the comments in the front so that they show up in the top left
+                            groups.unshift(formattable(commentMap[key]));
+                        }
+                    }
+                });
+                var surfaceArea = 0;
+                for (var i = 0; i < groups.length; i++) {
+                    var group = groups[i];
+                    if (group.children) {
+                        var valueDimensions = group.value.getHeightWidth();
+                        group.x = 0;
+                        group.y = 0;
+                        var x = valueDimensions.width + innerGroupMargin;
+                        var y = 0;
+                        // Lay comments out to the right of the parent node
+                        for (var j = 0; j < group.children.length; j++) {
+                            var child = group.children[j];
+                            child.x = x;
+                            child.y = y;
+                            y += child.height + innerGroupMargin;
+                            group.width = Math.max(group.width, x + child.width);
+                        }
+                        group.height = Math.max(y - innerGroupMargin, valueDimensions.height);
+                    }
+                    surfaceArea += (group.height + innerGroupMargin) * (group.width + innerGroupMargin);
+                }
                 var maxx;
                 if (maxWidth > marginx) {
                     maxx = maxWidth - marginx;
                 }
                 else {
-                    // compute total block surface and infer width
-                    var commentSurface = 0;
-                    var blockSurface = 0;
-                    for (var _i = 0, comments_2 = comments; _i < comments_2.length; _i++) {
-                        var comment = comments_2[_i];
-                        var s = comment.getHeightWidth();
-                        commentSurface += s.width * s.height;
-                    }
-                    for (var _a = 0, blocks_4 = blocks; _a < blocks_4.length; _a++) {
-                        var block = blocks_4[_a];
-                        var s = block.getHeightWidth();
-                        blockSurface += s.width * s.height;
-                    }
-                    maxx = Math.sqrt(Math.max(commentSurface, blockSurface)) * ratio;
+                    maxx = Math.sqrt(surfaceArea) * ratio;
                 }
                 var insertx = marginx;
                 var inserty = marginy;
-                var endy = 0;
-                function flowBlocksInternal(blocks) {
-                    for (var _i = 0, blocks_5 = blocks; _i < blocks_5.length; _i++) {
-                        var block = blocks_5[_i];
-                        var r = block.getBoundingRectangle();
-                        var s = block.getHeightWidth();
-                        // move block to insertion point
-                        block.moveBy(insertx - r.topLeft.x, inserty - r.topLeft.y);
-                        insertx += s.width + gap;
-                        endy = Math.max(endy, inserty + s.height + gap);
-                        if (insertx > maxx) {
-                            insertx = marginx;
-                            inserty = endy;
+                var rowBottom = 0;
+                for (var i = 0; i < groups.length; i++) {
+                    var group = groups[i];
+                    if (group.children) {
+                        moveFormattable(group, insertx + group.x, inserty + group.y);
+                        for (var j = 0; j < group.children.length; j++) {
+                            var child = group.children[j];
+                            moveFormattable(child, insertx + child.x, inserty + child.y);
                         }
                     }
+                    else {
+                        moveFormattable(group, insertx, inserty);
+                    }
+                    insertx += group.width + outerGroupMargin;
+                    rowBottom = Math.max(rowBottom, group.height + outerGroupMargin);
+                    if (insertx > maxx) {
+                        insertx = marginx;
+                        inserty = rowBottom;
+                    }
                 }
-                flowBlocksInternal(comments);
-                insertx = marginx;
-                inserty = endy || marginy;
-                flowBlocksInternal(blocks);
+                function moveFormattable(f, x, y) {
+                    var bounds = f.value.getBoundingRectangle();
+                    f.value.moveBy(x - bounds.topLeft.x, y - bounds.topLeft.y);
+                }
             }
-        })(layout = blocks_3.layout || (blocks_3.layout = {}));
+            function formattable(entity) {
+                var hw = entity.getHeightWidth();
+                return { value: entity, height: hw.height, width: hw.width };
+            }
+        })(layout = blocks_4.layout || (blocks_4.layout = {}));
     })(blocks = pxt.blocks || (pxt.blocks = {}));
 })(pxt || (pxt = {}));
 /// <reference path="../localtypings/blockly.d.ts" />
@@ -4988,7 +5172,7 @@ var pxt;
 var pxt;
 (function (pxt) {
     var blocks;
-    (function (blocks_6) {
+    (function (blocks_5) {
         var typeDefaults = {
             "string": {
                 field: "TEXT",
@@ -5100,14 +5284,14 @@ var pxt;
             return ImageConverter;
         }());
         // Add numbers before input names to prevent clashes with the ones added by BlocklyLoader
-        blocks_6.optionalDummyInputPrefix = "0_optional_dummy";
-        blocks_6.optionalInputWithFieldPrefix = "0_optional_field";
+        blocks_5.optionalDummyInputPrefix = "0_optional_dummy";
+        blocks_5.optionalInputWithFieldPrefix = "0_optional_field";
         // Matches arrays and tuple types
         var arrayTypeRegex = /^(?:Array<.+>)|(?:.+\[\])|(?:\[.+\])$/;
         function isArrayType(type) {
             return arrayTypeRegex.test(type);
         }
-        blocks_6.isArrayType = isArrayType;
+        blocks_5.isArrayType = isArrayType;
         var usedBlocks = {}; // Maps a block ID to its translated category name, or to true if not in category mode
         var updateUsedBlocks = false;
         // list of built-in blocks, should be touched.
@@ -5120,12 +5304,15 @@ var pxt;
             }
             return _builtinBlocks;
         }
-        blocks_6.builtinBlocks = builtinBlocks;
-        blocks_6.buildinBlockStatements = {
+        blocks_5.builtinBlocks = builtinBlocks;
+        blocks_5.buildinBlockStatements = {
             "controls_if": true,
             "controls_for": true,
+            "pxt_controls_for": true,
             "controls_simple_for": true,
             "controls_repeat_ext": true,
+            "pxt_controls_for_of": true,
+            "controls_for_of": true,
             "variables_set": true,
             "variables_change": true,
             "device_while": true
@@ -5136,7 +5323,7 @@ var pxt;
             var b = cachedBlocks[type];
             return b ? b.fn : undefined;
         }
-        blocks_6.blockSymbol = blockSymbol;
+        blocks_5.blockSymbol = blockSymbol;
         function createShadowValue(info, p, shadowId, defaultV) {
             defaultV = defaultV || p.defaultValue;
             shadowId = shadowId || p.shadowBlockId;
@@ -5382,7 +5569,7 @@ var pxt;
                     var mutationValues = fn.attributes.mutateDefaults.split(";");
                     mutationValues.forEach(function (mutation) {
                         var mutatedBlock = block.cloneNode(true);
-                        blocks_6.mutateToolboxBlock(mutatedBlock, fn.attributes.mutate, mutation);
+                        blocks_5.mutateToolboxBlock(mutatedBlock, fn.attributes.mutate, mutation);
                         if (showCategories !== pxt.toolbox.CategoryMode.None) {
                             insertBlock(mutatedBlock, category_1, fn.attributes.weight);
                         }
@@ -5399,7 +5586,7 @@ var pxt;
                         // By default if the API author does not put any value for blockSetVariable
                         // then our comment parser will fill in the string "true". This gets caught
                         // by isReservedWord() so no need to do a separate check.
-                        if (!rawName || blocks_6.isReservedWord(rawName)) {
+                        if (!rawName || blocks_5.isReservedWord(rawName)) {
                             varName = pxt.Util.htmlEscape(fn.retType.toLowerCase());
                         }
                         else {
@@ -5490,7 +5677,7 @@ var pxt;
                 tb.appendChild(category);
         }
         function getOrAddSubcategoryByWeight(parent, name, nameid, weight, colour, iconClass) {
-            var existing = blocks_6.getFirstChildWithAttr(parent, "category", "nameid", nameid.toLowerCase());
+            var existing = blocks_5.getFirstChildWithAttr(parent, "category", "nameid", nameid.toLowerCase());
             if (existing) {
                 return existing;
             }
@@ -5509,7 +5696,7 @@ var pxt;
             return newCategory;
         }
         function getOrAddSubcategoryByName(parent, name, nameid, colour, iconClass) {
-            var existing = blocks_6.getFirstChildWithAttr(parent, "category", "nameid", nameid.toLowerCase());
+            var existing = blocks_5.getFirstChildWithAttr(parent, "category", "nameid", nameid.toLowerCase());
             if (existing) {
                 return existing;
             }
@@ -5645,19 +5832,19 @@ var pxt;
             buildBlockFromDef(fn.attributes._def);
             var hasHandler = false;
             if (fn.attributes.mutate) {
-                blocks_6.addMutation(block, fn, fn.attributes.mutate);
+                blocks_5.addMutation(block, fn, fn.attributes.mutate);
             }
             else if (fn.attributes.defaultInstance) {
-                blocks_6.addMutation(block, fn, blocks_6.MutatorTypes.DefaultInstanceMutator);
+                blocks_5.addMutation(block, fn, blocks_5.MutatorTypes.DefaultInstanceMutator);
             }
             else if (fn.attributes._expandedDef && fn.attributes.expandableArgumentMode !== "disabled") {
                 var shouldToggle = fn.attributes.expandableArgumentMode === "toggle";
-                blocks_6.initExpandableBlock(block, fn.attributes._expandedDef, comp, shouldToggle, function () { return buildBlockFromDef(fn.attributes._expandedDef, true); });
+                blocks_5.initExpandableBlock(block, fn.attributes._expandedDef, comp, shouldToggle, function () { return buildBlockFromDef(fn.attributes._expandedDef, true); });
             }
             else if (comp.handlerArgs.length) {
                 hasHandler = true;
                 if (fn.attributes.optionalVariableArgs) {
-                    blocks_6.initVariableArgsBlock(block, comp.handlerArgs);
+                    blocks_5.initVariableArgsBlock(block, comp.handlerArgs);
                 }
                 else {
                     var i_2 = block.appendDummyInput();
@@ -5667,7 +5854,7 @@ var pxt;
                 }
             }
             // Add mutation to save and restore custom field settings
-            blocks_6.appendMutation(block, {
+            blocks_5.appendMutation(block, {
                 mutationToDom: function (el) {
                     block.inputList.forEach(function (input) {
                         input.fieldRow.forEach(function (fieldRow) {
@@ -5847,7 +6034,7 @@ var pxt;
                                         type: fieldType
                                     };
                                     pxt.Util.jsonMergeFrom(options_2, fn.attributes.paramFieldEditorOptions && fn.attributes.paramFieldEditorOptions[actName] || {});
-                                    fields.push(namedField(blocks_6.createFieldEditor(customField, defl, options_2), defName));
+                                    fields.push(namedField(blocks_5.createFieldEditor(customField, defl, options_2), defName));
                                 }
                                 else
                                     fields.push(namedField(new Blockly.FieldDropdown(dd), defName));
@@ -5860,7 +6047,7 @@ var pxt;
                                     type: fieldType
                                 };
                                 pxt.Util.jsonMergeFrom(options_3, fn.attributes.paramFieldEditorOptions && fn.attributes.paramFieldEditorOptions[pr_1.actualName] || {});
-                                fields.push(namedField(blocks_6.createFieldEditor(customField, defl, options_3), pr_1.definitionName));
+                                fields.push(namedField(blocks_5.createFieldEditor(customField, defl, options_3), pr_1.definitionName));
                             }
                             else {
                                 inputName = defName;
@@ -5899,7 +6086,7 @@ var pxt;
                         input.setAlign(Blockly.ALIGN_LEFT);
                     }
                     else if (expanded) {
-                        var prefix = hasParameter ? blocks_6.optionalInputWithFieldPrefix : blocks_6.optionalDummyInputPrefix;
+                        var prefix = hasParameter ? blocks_5.optionalInputWithFieldPrefix : blocks_5.optionalDummyInputPrefix;
                         input = block.appendDummyInput(prefix + (anonIndex++));
                     }
                     else {
@@ -5919,7 +6106,7 @@ var pxt;
                 : undefined;
             return !!r;
         }
-        blocks_6.hasArrowFunction = hasArrowFunction;
+        blocks_5.hasArrowFunction = hasArrowFunction;
         function removeCategory(tb, name) {
             var e = categoryElement(tb, name);
             if (e && e.parentNode)
@@ -5930,7 +6117,7 @@ var pxt;
             FilterState[FilterState["Hidden"] = 0] = "Hidden";
             FilterState[FilterState["Visible"] = 1] = "Visible";
             FilterState[FilterState["Disabled"] = 2] = "Disabled";
-        })(FilterState = blocks_6.FilterState || (blocks_6.FilterState = {}));
+        })(FilterState = blocks_5.FilterState || (blocks_5.FilterState = {}));
         function createToolbox(blockInfo, toolbox, showCategories, filters, extensions) {
             if (showCategories === void 0) { showCategories = pxt.toolbox.CategoryMode.Basic; }
             init();
@@ -5959,14 +6146,14 @@ var pxt;
             var dbg = pxt.options.debug;
             // create new toolbox and update block definitions
             blockInfo.blocks
-                .filter(function (fn) { return !tb || !blocks_6.getFirstChildWithAttr(tb, "block", "type", fn.attributes.blockId); })
+                .filter(function (fn) { return !tb || !blocks_5.getFirstChildWithAttr(tb, "block", "type", fn.attributes.blockId); })
                 .forEach(function (fn) {
                 if (fn.attributes.blockBuiltin) {
                     pxt.Util.assert(!!builtinBlocks()[fn.attributes.blockId]);
                     builtinBlocks()[fn.attributes.blockId].symbol = fn;
                 }
                 else {
-                    var comp = blocks_6.compileInfo(fn);
+                    var comp = blocks_5.compileInfo(fn);
                     var block = createToolboxBlock(blockInfo, fn, comp);
                     if (injectBlockDefinition(blockInfo, fn, comp, block)) {
                         if (tb && (!fn.attributes.debug || dbg))
@@ -6086,7 +6273,7 @@ var pxt;
                 if (!config.listsBlocks && config.loopsBlocks) {
                     var cat = categoryElement(tb, "Loops");
                     if (cat) {
-                        cat.removeChild(blocks_6.getFirstChildWithAttr(cat, "block", "type", "controls_for_of"));
+                        cat.removeChild(blocks_5.getFirstChildWithAttr(cat, "block", "type", "controls_for_of"));
                     }
                 }
                 // Inject optional builtin blocks into categories
@@ -6102,7 +6289,7 @@ var pxt;
                     pxt.toolbox.appendNamespaceCss(cats[i].getAttribute('name'), cats[i].getAttribute('colour'));
                 }
                 // update category colors and add heading
-                var topCats = blocks_6.getDirectChildren(tb, "category");
+                var topCats = blocks_5.getDirectChildren(tb, "category");
                 for (var i = 0; i < topCats.length; i++) {
                     var nsColor = pxt.toolbox.getNamespaceColor(topCats[i].getAttribute('nameid'));
                     if (nsColor && nsColor != "") {
@@ -6194,9 +6381,9 @@ var pxt;
                 getOrAddSubcategoryByWeight(tb, pxt.toolbox.addPackageTitle(), "Extensions", 1, "#717171", 'blocklyTreeIconaddpackage');
             }
             if (tb) {
-                var blocks_7 = tb.getElementsByTagName("block");
-                for (var i = 0; i < blocks_7.length; i++) {
-                    var b = blocks_7.item(i);
+                var blocks_6 = tb.getElementsByTagName("block");
+                for (var i = 0; i < blocks_6.length; i++) {
+                    var b = blocks_6.item(i);
                     var bId = b.getAttribute("type");
                     var bCategoryId = b.parentElement && b.parentElement.nodeName === "category" ? b.parentElement.getAttribute("nameid") : undefined;
                     var bTranslatedCat = bCategoryId ? b.parentElement.getAttribute("name") : undefined;
@@ -6249,10 +6436,10 @@ var pxt;
                             continue;
                         }
                         var categoryState = filters.namespaces && filters.namespaces[catName] != undefined ? filters.namespaces[catName] : filters.defaultState;
-                        var blocks_8 = cat.getElementsByTagName("block");
+                        var blocks_7 = cat.getElementsByTagName("block");
                         var hasVisibleChildren = (catName == "variables" && filters.blocks)
                             ? filters.blocks["variables_get"] || filters.blocks["variables_set"]
-                            : filterBlocks(blocks_8, categoryState);
+                            : filterBlocks(blocks_7, categoryState);
                         switch (categoryState) {
                             case FilterState.Disabled:
                                 if (!hasVisibleChildren) {
@@ -6290,8 +6477,8 @@ var pxt;
                     }
                 }
                 else {
-                    var blocks_9 = tb.getElementsByTagName("block");
-                    filterBlocks(blocks_9);
+                    var blocks_8 = tb.getElementsByTagName("block");
+                    filterBlocks(blocks_8);
                 }
                 if (showCategories !== pxt.toolbox.CategoryMode.None) {
                     // Go through all categories, hide the ones that have no blocks inside
@@ -6318,7 +6505,7 @@ var pxt;
                     var catName = cat.getAttribute("nameid");
                     if (catName === "advanced")
                         return "continue";
-                    var blocks_10 = blocks_6.getDirectChildren(cat, "block");
+                    var blocks_9 = blocks_5.getDirectChildren(cat, "block");
                     var groups = cat.getAttribute("groups");
                     var groupIcons = cat.getAttribute("groupicons");
                     var labelLineWidth = cat.getAttribute("labellinewidth");
@@ -6336,8 +6523,8 @@ var pxt;
                         }
                     }
                     // Organize the blocks into the different groups
-                    for (var bi = 0; bi < blocks_10.length; ++bi) {
-                        var blk = blocks_10[bi];
+                    for (var bi = 0; bi < blocks_9.length; ++bi) {
+                        var blk = blocks_9[bi];
                         var group = blk.getAttribute("group") || 'other';
                         if (!blockGroups[group])
                             blockGroups[group] = [];
@@ -6415,7 +6602,7 @@ var pxt;
                 }
             }
         }
-        blocks_6.createToolbox = createToolbox;
+        blocks_5.createToolbox = createToolbox;
         function maybeInsertBuiltinBlock(toolbox, block, options) {
             if (!options || !options.category)
                 return;
@@ -6446,7 +6633,7 @@ var pxt;
             }
             return tb;
         }
-        blocks_6.initBlocks = initBlocks;
+        blocks_5.initBlocks = initBlocks;
         function initSearch(workspace, tb, tbAll, searchAsync, updateToolbox) {
             var blocklySearchInputField = document.getElementById('blocklySearchInputField');
             var blocklySearchInput = document.getElementById('blocklySearchInput');
@@ -6547,7 +6734,7 @@ var pxt;
                                 var block = searchElementCache[type];
                                 if (!block) {
                                     // Catches built-in blocks that aren't loaded dynamically
-                                    var existing = blocks_6.getFirstChildWithAttr(pxt.blocks.cachedSearchTbAll, "block", "type", type);
+                                    var existing = blocks_5.getFirstChildWithAttr(pxt.blocks.cachedSearchTbAll, "block", "type", type);
                                     if (existing) {
                                         block = (searchElementCache[type] = existing.cloneNode(true));
                                     }
@@ -6619,23 +6806,23 @@ var pxt;
                 }
             };
         }
-        blocks_6.initSearch = initSearch;
+        blocks_5.initSearch = initSearch;
         function removeSearch() {
             var blocklySearchArea = document.getElementById('blocklySearchArea');
             if (blocklySearchArea) {
                 blocklySearchArea.parentNode.removeChild(blocklySearchArea);
             }
         }
-        blocks_6.removeSearch = removeSearch;
+        blocks_5.removeSearch = removeSearch;
         function categoryElement(tb, nameid) {
-            return tb ? blocks_6.getFirstChildWithAttr(tb, "category", "nameid", nameid.toLowerCase()) : undefined;
+            return tb ? blocks_5.getFirstChildWithAttr(tb, "category", "nameid", nameid.toLowerCase()) : undefined;
         }
         function cleanBlocks() {
             pxt.debug('removing all custom blocks');
             for (var b in cachedBlocks)
                 removeBlock(cachedBlocks[b].fn);
         }
-        blocks_6.cleanBlocks = cleanBlocks;
+        blocks_5.cleanBlocks = cleanBlocks;
         function removeBlock(fn) {
             delete Blockly.Blocks[fn.attributes.blockId];
             delete cachedBlocks[fn.attributes.blockId];
@@ -6652,7 +6839,7 @@ var pxt;
             }
             Blockly.FieldCheckbox.CHECK_CHAR = '■';
             Blockly.BlockSvg.START_HAT = !!pxt.appTarget.appTheme.blockHats;
-            blocks_6.initFieldEditors();
+            blocks_5.initFieldEditors();
             initContextMenu();
             initOnStart();
             initMath();
@@ -6684,7 +6871,7 @@ var pxt;
             if (undeletable)
                 block.setDeletable(false);
             var tb = document.getElementById('blocklyToolboxDefinition');
-            var xml = tb ? blocks_6.getFirstChildWithAttr(tb, "block", "type", id) : undefined;
+            var xml = tb ? blocks_5.getFirstChildWithAttr(tb, "block", "type", id) : undefined;
             block.codeCard = {
                 header: name,
                 name: name,
@@ -6705,7 +6892,7 @@ var pxt;
                 setHelpResources(this, id, name, tooltip, url, colour, colourSecondary, colourTertiary);
             };
         }
-        blocks_6.installHelpResources = installHelpResources;
+        blocks_5.installHelpResources = installHelpResources;
         function initLists() {
             var msg = Blockly.Msg;
             // lists_create_with
@@ -6768,6 +6955,82 @@ var pxt;
                     this.appendStatementInput("DO")
                         .appendField(deviceWhileDef.block["appendField"]);
                     setBuiltinHelpInfo(this, deviceWhileId);
+                }
+            };
+            // pxt_controls_for
+            var pxtControlsForId = "pxt_controls_for";
+            var pxtControlsForDef = pxt.blocks.getBlockDefinition(pxtControlsForId);
+            Blockly.Blocks[pxtControlsForId] = {
+                /**
+                 * Block for 'for' loop.
+                 * @this Blockly.Block
+                 */
+                init: function () {
+                    this.jsonInit({
+                        "message0": pxtControlsForDef.block["message0"],
+                        "args0": [
+                            {
+                                "type": "input_value",
+                                "name": "VAR",
+                                "variable": pxtControlsForDef.block["variable"],
+                                "check": "Variable"
+                            },
+                            {
+                                "type": "input_value",
+                                "name": "TO",
+                                "check": "Number"
+                            }
+                        ],
+                        "previousStatement": null,
+                        "nextStatement": null,
+                        "colour": pxt.toolbox.getNamespaceColor('loops'),
+                        "inputsInline": true
+                    });
+                    this.appendStatementInput('DO')
+                        .appendField(pxtControlsForDef.block["appendField"]);
+                    var thisBlock = this;
+                    setHelpResources(this, pxtControlsForId, pxtControlsForDef.name, function () {
+                        return pxt.U.rlf(pxtControlsForDef.tooltip, thisBlock.getInputTargetBlock('VAR') ? thisBlock.getInputTargetBlock('VAR').getField('VAR').getText() : '');
+                    }, pxtControlsForDef.url, String(pxt.toolbox.getNamespaceColor('loops')));
+                },
+                /**
+                 * Return all variables referenced by this block.
+                 * @return {!Array.<string>} List of variable names.
+                 * @this Blockly.Block
+                 */
+                getVars: function () {
+                    return [this.getField('VAR').getText()];
+                },
+                /**
+                 * Notification that a variable is renaming.
+                 * If the name matches one of this block's variables, rename it.
+                 * @param {string} oldName Previous name of variable.
+                 * @param {string} newName Renamed variable.
+                 * @this Blockly.Block
+                 */
+                renameVar: function (oldName, newName) {
+                    var varField = this.getField('VAR');
+                    if (Blockly.Names.equals(oldName, varField.getText())) {
+                        varField.setText(newName);
+                    }
+                },
+                /**
+                 * Add menu option to create getter block for loop variable.
+                 * @param {!Array} options List of menu options to add to.
+                 * @this Blockly.Block
+                 */
+                customContextMenu: function (options) {
+                    if (!this.isCollapsed()) {
+                        var option = { enabled: true };
+                        var name_1 = this.getInputTargetBlock('VAR').getField('VAR').getText();
+                        option.text = lf("Create 'get {0}'", name_1);
+                        var xmlField = goog.dom.createDom('field', null, name_1);
+                        xmlField.setAttribute('name', 'VAR');
+                        var xmlBlock = goog.dom.createDom('block', null, xmlField);
+                        xmlBlock.setAttribute('type', 'variables_get');
+                        option.callback = Blockly.ContextMenu.callbackFactory(this, xmlBlock);
+                        options.push(option);
+                    }
                 }
             };
             // controls_simple_for
@@ -6838,9 +7101,9 @@ var pxt;
                 customContextMenu: function (options) {
                     if (!this.isCollapsed()) {
                         var option = { enabled: true };
-                        var name_1 = this.getField('VAR').getText();
-                        option.text = lf("Create 'get {0}'", name_1);
-                        var xmlField = goog.dom.createDom('field', null, name_1);
+                        var name_2 = this.getField('VAR').getText();
+                        option.text = lf("Create 'get {0}'", name_2);
+                        var xmlField = goog.dom.createDom('field', null, name_2);
                         xmlField.setAttribute('name', 'VAR');
                         var xmlBlock = goog.dom.createDom('block', null, xmlField);
                         xmlBlock.setAttribute('type', 'variables_get');
@@ -6850,7 +7113,7 @@ var pxt;
                 }
             };
         }
-        blocks_6.onShowContextMenu = undefined;
+        blocks_5.onShowContextMenu = undefined;
         /**
          * The following patch to blockly is to add the Trash icon on top of the toolbox,
          * the trash icon should only show when a user drags a block that is already in the workspace.
@@ -7069,8 +7332,8 @@ var pxt;
                     menuOptions.push(screenshotOption);
                 }
                 // custom options...
-                if (blocks_6.onShowContextMenu)
-                    blocks_6.onShowContextMenu(this, menuOptions);
+                if (blocks_5.onShowContextMenu)
+                    blocks_5.onShowContextMenu(this, menuOptions);
                 Blockly.ContextMenu.show(e, menuOptions, this.RTL);
             };
             // We override Blockly's category mouse event handler so that only one
@@ -7245,6 +7508,39 @@ var pxt;
                     }
                 };
             }
+            // pxt_controls_for_of
+            var pxtControlsForOfId = "pxt_controls_for_of";
+            var pxtControlsForOfDef = pxt.blocks.getBlockDefinition(pxtControlsForOfId);
+            Blockly.Blocks[pxtControlsForOfId] = {
+                init: function () {
+                    this.jsonInit({
+                        "message0": pxtControlsForOfDef.block["message0"],
+                        "args0": [
+                            {
+                                "type": "input_value",
+                                "name": "VAR",
+                                "variable": pxtControlsForOfDef.block["variable"],
+                                "check": "Variable"
+                            },
+                            {
+                                "type": "input_value",
+                                "name": "LIST",
+                                "check": "Array"
+                            }
+                        ],
+                        "previousStatement": null,
+                        "nextStatement": null,
+                        "colour": pxt.toolbox.blockColors['loops'],
+                        "inputsInline": true
+                    });
+                    this.appendStatementInput('DO')
+                        .appendField(pxtControlsForOfDef.block["appendField"]);
+                    var thisBlock = this;
+                    setHelpResources(this, pxtControlsForOfId, pxtControlsForOfDef.name, function () {
+                        return pxt.U.rlf(pxtControlsForOfDef.tooltip, thisBlock.getInputTargetBlock('VAR') ? thisBlock.getInputTargetBlock('VAR').getField('VAR').getText() : '');
+                    }, pxtControlsForOfDef.url, String(pxt.toolbox.getNamespaceColor('loops')));
+                }
+            };
             // controls_for_of
             var controlsForOfId = "controls_for_of";
             var controlsForOfDef = pxt.blocks.getBlockDefinition(controlsForOfId);
@@ -7427,13 +7723,13 @@ var pxt;
             var mathModuloDef = pxt.blocks.getBlockDefinition(mathModuloId);
             msg.MATH_MODULO_TITLE = mathModuloDef.block["MATH_MODULO_TITLE"];
             installBuiltinHelpInfo(mathModuloId);
-            blocks_6.initMathOpBlock();
+            blocks_5.initMathOpBlock();
         }
         function initFlyouts(workspace) {
             workspace.registerToolboxCategoryCallback(Blockly.VARIABLE_CATEGORY_NAME, Blockly.Variables.flyoutCategory);
             workspace.registerToolboxCategoryCallback(Blockly.PROCEDURE_CATEGORY_NAME, Blockly.Procedures.flyoutCategory);
         }
-        blocks_6.initFlyouts = initFlyouts;
+        blocks_5.initFlyouts = initFlyouts;
         function initExtensions(workspace, extensions, callBack) {
             extensions.forEach(function (config) {
                 var name = config.name;
@@ -7442,7 +7738,7 @@ var pxt;
                 });
             });
         }
-        blocks_6.initExtensions = initExtensions;
+        blocks_5.initExtensions = initExtensions;
         function initVariables() {
             var varname = lf("{id:var}item");
             Blockly.Variables.flyoutCategory = function (workspace) {
@@ -7544,6 +7840,8 @@ var pxt;
             var variablesGetDef = pxt.blocks.getBlockDefinition(variablesGetId);
             msg.VARIABLES_GET_CREATE_SET = variablesGetDef.block["VARIABLES_GET_CREATE_SET"];
             installBuiltinHelpInfo(variablesGetId);
+            var variablesReporterGetId = "variables_get_reporter";
+            installBuiltinHelpInfo(variablesReporterGetId);
             // Dropdown menu of variables_get
             msg.RENAME_VARIABLE = lf("Rename variable...");
             msg.DELETE_VARIABLE = lf("Delete the \"%1\" variable");
@@ -7662,8 +7960,8 @@ var pxt;
                         // Look for the case where a procedure call was created (usually through
                         // paste) and there is no matching definition.  In this case, create
                         // an empty definition block with the correct signature.
-                        var name_2 = this.getProcedureCall();
-                        var def = Blockly.Procedures.getDefinition(name_2, this.workspace);
+                        var name_3 = this.getProcedureCall();
+                        var def = Blockly.Procedures.getDefinition(name_3, this.workspace);
                         if (def && (def.type != this.defType_ ||
                             JSON.stringify(def.arguments_) != JSON.stringify(this.arguments_))) {
                             // The signatures don't match.
@@ -7700,8 +7998,8 @@ var pxt;
                         // Look for the case where a procedure definition has been deleted,
                         // leaving this block (a procedure call) orphaned.  In this case, delete
                         // the orphan.
-                        var name_3 = this.getProcedureCall();
-                        var def = Blockly.Procedures.getDefinition(name_3, this.workspace);
+                        var name_4 = this.getProcedureCall();
+                        var def = Blockly.Procedures.getDefinition(name_4, this.workspace);
                         if (!def) {
                             Blockly.Events.setGroup(event.group);
                             this.dispose(true, false);
@@ -7821,7 +8119,7 @@ var pxt;
                 xmlList.push(button);
                 function populateProcedures(procedureList, templateName) {
                     for (var i = 0; i < procedureList.length; i++) {
-                        var name_4 = procedureList[i][0];
+                        var name_5 = procedureList[i][0];
                         var args = procedureList[i][1];
                         // <block type="procedures_callnoreturn" gap="16">
                         //   <field name="NAME">name</field>
@@ -7830,7 +8128,7 @@ var pxt;
                         block.setAttribute('type', templateName);
                         block.setAttribute('gap', '16');
                         block.setAttribute('colour', pxt.toolbox.getNamespaceColor('functions'));
-                        var field = goog.dom.createDom('field', null, name_4);
+                        var field = goog.dom.createDom('field', null, name_5);
                         field.setAttribute('name', 'NAME');
                         block.appendChild(field);
                         xmlList.push(block);
@@ -8145,7 +8443,7 @@ var pxt;
                 varField.getVariable().name = newName;
             }
         }
-        blocks_6.setVarFieldValue = setVarFieldValue;
+        blocks_5.setVarFieldValue = setVarFieldValue;
         function shouldUseBlockInSearch(blockId, namespaceId, filters) {
             if (!filters) {
                 return true;
@@ -8491,10 +8789,10 @@ var pxt;
                 }
                 this.currentlyVisible.forEach(function (param) {
                     if (_this.parameters.indexOf(param) === -1) {
-                        var name_5 = _this.getVarFieldValue(param);
+                        var name_6 = _this.getVarFieldValue(param);
                         // Persist renames
-                        if (name_5 !== param) {
-                            _this.parameterRenames[param] = name_5;
+                        if (name_6 !== param) {
+                            _this.parameterRenames[param] = name_6;
                         }
                         dummyInput.removeField(param);
                     }
@@ -8684,7 +8982,7 @@ var pxt;
 var pxt;
 (function (pxt) {
     var blocks;
-    (function (blocks_11) {
+    (function (blocks_10) {
         var workspace;
         var blocklyDiv;
         function align(ws, emPixels) {
@@ -8702,7 +9000,7 @@ var pxt;
             // Shuffle deprecated
             BlockLayout[BlockLayout["Clean"] = 3] = "Clean";
             BlockLayout[BlockLayout["Flow"] = 4] = "Flow";
-        })(BlockLayout = blocks_11.BlockLayout || (blocks_11.BlockLayout = {}));
+        })(BlockLayout = blocks_10.BlockLayout || (blocks_10.BlockLayout = {}));
         function render(blocksXml, options) {
             if (options === void 0) { options = { emPixels: 14, layout: BlockLayout.Flow }; }
             if (!workspace) {
@@ -8758,7 +9056,7 @@ var pxt;
                 return undefined;
             }
         }
-        blocks_11.render = render;
+        blocks_10.render = render;
         function blocksMetrics(ws) {
             var blocks = ws.getTopBlocks(false);
             if (!blocks.length)
@@ -8780,7 +9078,7 @@ var pxt;
                 height: m.b - m.t
             };
         }
-        blocks_11.blocksMetrics = blocksMetrics;
+        blocks_10.blocksMetrics = blocksMetrics;
     })(blocks = pxt.blocks || (pxt.blocks = {}));
 })(pxt || (pxt = {}));
 var pxt;
@@ -9256,7 +9554,7 @@ var pxt;
 (function (pxt) {
     var blocks;
     (function (blocks) {
-        blocks.defaultToolboxString = "<xml id=\"blocklyToolboxDefinition\" style=\"display: none\">\n    <category name=\"Loops\" nameid=\"loops\" colour=\"#107c10\" category=\"50\" web-icon=\"\uF01E\" iconclass=\"blocklyTreeIconloops\" expandedclass=\"blocklyTreeIconloops\">\n        <block type=\"controls_repeat_ext\">\n            <value name=\"TIMES\">\n                <shadow type=\"math_whole_number\">\n                    <field name=\"NUM\">4</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"device_while\">\n            <value name=\"COND\">\n                <shadow type=\"logic_boolean\"></shadow>\n            </value>\n        </block>\n        <block type=\"controls_simple_for\">\n            <value name=\"TO\">\n                <shadow type=\"math_whole_number\">\n                    <field name=\"NUM\">4</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"controls_for_of\">\n            <value name=\"LIST\">\n                <shadow type=\"variables_get\">\n                    <field name=\"VAR\">list</field>\n                </shadow>\n            </value>\n        </block>\n    </category>\n    <category name=\"Logic\" nameid=\"logic\" colour=\"#006970\" category=\"49\" web-icon=\"\uF074\" iconclass=\"blocklyTreeIconlogic\" expandedclass=\"blocklyTreeIconlogic\">\n        <label text=\"Conditionals\" web-class=\"blocklyFlyoutGroup\" web-line=\"1.5\"/>\n        <block type=\"controls_if\" gap=\"8\">\n            <value name=\"IF0\">\n                <shadow type=\"logic_boolean\">\n                    <field name=\"BOOL\">TRUE</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"controls_if\" gap=\"8\">\n            <mutation else=\"1\"></mutation>\n            <value name=\"IF0\">\n                <shadow type=\"logic_boolean\">\n                    <field name=\"BOOL\">TRUE</field>\n                </shadow>\n            </value>\n        </block>\n        <label text=\"Comparison\" web-class=\"blocklyFlyoutGroup\" web-line=\"1.5\"/>\n        <block type=\"logic_compare\" gap=\"8\">\n            <value name=\"A\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"B\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"logic_compare\">\n            <field name=\"OP\">LT</field>\n            <value name=\"A\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"B\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n        <label text=\"Boolean\" web-class=\"blocklyFlyoutGroup\" web-line=\"1.5\"/>\n        <block type=\"logic_operation\" gap=\"8\"></block>\n        <block type=\"logic_operation\" gap=\"8\">\n            <field name=\"OP\">OR</field>\n        </block>\n        <block type=\"logic_negate\"></block>\n        <block type=\"logic_boolean\" gap=\"8\"></block>\n        <block type=\"logic_boolean\">\n            <field name=\"BOOL\">FALSE</field>\n        </block>\n    </category>\n    <category name=\"Variables\" nameid=\"variables\" colour=\"#A80000\" custom=\"VARIABLE\" category=\"48\" iconclass=\"blocklyTreeIconvariables\" expandedclass=\"blocklyTreeIconvariables\">\n    </category>\n    <category name=\"Math\" nameid=\"math\" colour=\"#712672\" category=\"47\" web-icon=\"\uF1EC\" iconclass=\"blocklyTreeIconmath\" expandedclass=\"blocklyTreeIconmath\">\n        <block type=\"math_arithmetic\" gap=\"8\">\n            <value name=\"A\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"B\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"math_arithmetic\" gap=\"8\">\n            <value name=\"A\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"B\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <field name=\"OP\">MINUS</field>\n        </block>\n        <block type=\"math_arithmetic\" gap=\"8\">\n            <value name=\"A\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"B\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <field name=\"OP\">MULTIPLY</field>\n        </block>\n        <block type=\"math_arithmetic\" gap=\"8\">\n            <value name=\"A\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"B\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <field name=\"OP\">DIVIDE</field>\n        </block>\n        <block type=\"math_number\" gap=\"8\">\n            <field name=\"NUM\">0</field>\n        </block>\n        <block type=\"math_modulo\">\n            <value name=\"DIVIDEND\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"DIVISOR\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">1</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"math_op2\" gap=\"8\">\n            <value name=\"x\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"y\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"math_op2\" gap=\"8\">\n            <value name=\"x\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"y\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <field name=\"op\">max</field>\n        </block>\n        <block type=\"math_op3\">\n            <value name=\"x\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"math_js_op\">\n            <field name=\"OP\">sqrt</field>\n            <value name=\"ARG0\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n    </category>\n    <category name=\"Functions\" nameid=\"functions\" colour=\"#005a9e\" custom=\"PROCEDURE\" category=\"46\" iconclass=\"blocklyTreeIconfunctions\" expandedclass=\"blocklyTreeIconfunctions\" advanced=\"true\">\n    </category>\n    <category colour=\"#66672C\" name=\"Arrays\" nameid=\"arrays\" category=\"45\" web-icon=\"\uF0CB\" iconclass=\"blocklyTreeIconarrays\" expandedclass=\"blocklyTreeIconarrays\" advanced=\"true\">\n        <block type=\"lists_create_with\">\n            <mutation items=\"1\"></mutation>\n            <value name=\"ADD0\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"lists_create_with\">\n            <mutation items=\"2\"></mutation>\n            <value name=\"ADD0\">\n                <shadow type=\"text\">\n                    <field name=\"TEXT\"></field>\n                </shadow>\n            </value>\n            <value name=\"ADD1\">\n                <shadow type=\"text\">\n                    <field name=\"TEXT\"></field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"lists_length\"></block>\n        <block type=\"lists_index_get\">\n            <value name=\"LIST\">\n                <block type=\"variables_get\">\n                    <field name=\"VAR\">" + lf("{id:var}list") + "</field>\n                </block>\n            </value>\n            <value name=\"INDEX\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"lists_index_set\">\n            <value name=\"LIST\">\n                <block type=\"variables_get\">\n                    <field name=\"VAR\">" + lf("{id:var}list") + "</field>\n                </block>\n            </value>\n            <value name=\"INDEX\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n    </category>\n    <category colour=\"#996600\" name=\"Text\" nameid=\"text\" category=\"46\" web-icon=\"\uF035\" iconclass=\"blocklyTreeIcontext\" expandedclass=\"blocklyTreeIcontext\" advanced=\"true\">\n        <block type=\"text\"></block>\n        <block type=\"text_length\">\n            <value name=\"VALUE\">\n                <shadow type=\"text\">\n                    <field name=\"TEXT\">" + lf("Hello") + "</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"text_join\">\n            <mutation items=\"2\"></mutation>\n            <value name=\"ADD0\">\n                <shadow type=\"text\">\n                    <field name=\"TEXT\">" + lf("Hello") + "</field>\n                </shadow>\n            </value>\n            <value name=\"ADD1\">\n                <shadow type=\"text\">\n                    <field name=\"TEXT\">" + lf("World") + "</field>\n                </shadow>\n            </value>\n        </block>\n    </category>\n</xml>";
+        blocks.defaultToolboxString = "<xml id=\"blocklyToolboxDefinition\" style=\"display: none\">\n    <category name=\"Loops\" nameid=\"loops\" colour=\"#107c10\" category=\"50\" web-icon=\"\uF01E\" iconclass=\"blocklyTreeIconloops\" expandedclass=\"blocklyTreeIconloops\">\n        <block type=\"controls_repeat_ext\">\n            <value name=\"TIMES\">\n                <shadow type=\"math_whole_number\">\n                    <field name=\"NUM\">4</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"device_while\">\n            <value name=\"COND\">\n                <shadow type=\"logic_boolean\"></shadow>\n            </value>\n        </block>\n        <block type=\"pxt_controls_for\">\n            <value name=\"VAR\">\n                <shadow type=\"variables_get_reporter\">\n                    <field name=\"VAR\">" + lf("index") + "</field>\n                </shadow>\n            </value>\n            <value name=\"TO\">\n                <shadow type=\"math_whole_number\">\n                    <field name=\"NUM\">4</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"pxt_controls_for_of\">\n            <value name=\"VAR\">\n                <shadow type=\"variables_get_reporter\">\n                    <field name=\"VAR\">" + lf("value") + "</field>\n                </shadow>\n            </value>\n            <value name=\"LIST\">\n                <shadow type=\"variables_get\">\n                    <field name=\"VAR\">list</field>\n                </shadow>\n            </value>\n        </block>\n    </category>\n    <category name=\"Logic\" nameid=\"logic\" colour=\"#006970\" category=\"49\" web-icon=\"\uF074\" iconclass=\"blocklyTreeIconlogic\" expandedclass=\"blocklyTreeIconlogic\">\n        <label text=\"Conditionals\" web-class=\"blocklyFlyoutGroup\" web-line=\"1.5\"/>\n        <block type=\"controls_if\" gap=\"8\">\n            <value name=\"IF0\">\n                <shadow type=\"logic_boolean\">\n                    <field name=\"BOOL\">TRUE</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"controls_if\" gap=\"8\">\n            <mutation else=\"1\"></mutation>\n            <value name=\"IF0\">\n                <shadow type=\"logic_boolean\">\n                    <field name=\"BOOL\">TRUE</field>\n                </shadow>\n            </value>\n        </block>\n        <label text=\"Comparison\" web-class=\"blocklyFlyoutGroup\" web-line=\"1.5\"/>\n        <block type=\"logic_compare\" gap=\"8\">\n            <value name=\"A\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"B\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"logic_compare\">\n            <field name=\"OP\">LT</field>\n            <value name=\"A\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"B\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n        <label text=\"Boolean\" web-class=\"blocklyFlyoutGroup\" web-line=\"1.5\"/>\n        <block type=\"logic_operation\" gap=\"8\"></block>\n        <block type=\"logic_operation\" gap=\"8\">\n            <field name=\"OP\">OR</field>\n        </block>\n        <block type=\"logic_negate\"></block>\n        <block type=\"logic_boolean\" gap=\"8\"></block>\n        <block type=\"logic_boolean\">\n            <field name=\"BOOL\">FALSE</field>\n        </block>\n    </category>\n    <category name=\"Variables\" nameid=\"variables\" colour=\"#A80000\" custom=\"VARIABLE\" category=\"48\" iconclass=\"blocklyTreeIconvariables\" expandedclass=\"blocklyTreeIconvariables\">\n    </category>\n    <category name=\"Math\" nameid=\"math\" colour=\"#712672\" category=\"47\" web-icon=\"\uF1EC\" iconclass=\"blocklyTreeIconmath\" expandedclass=\"blocklyTreeIconmath\">\n        <block type=\"math_arithmetic\" gap=\"8\">\n            <value name=\"A\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"B\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"math_arithmetic\" gap=\"8\">\n            <value name=\"A\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"B\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <field name=\"OP\">MINUS</field>\n        </block>\n        <block type=\"math_arithmetic\" gap=\"8\">\n            <value name=\"A\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"B\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <field name=\"OP\">MULTIPLY</field>\n        </block>\n        <block type=\"math_arithmetic\" gap=\"8\">\n            <value name=\"A\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"B\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <field name=\"OP\">DIVIDE</field>\n        </block>\n        <block type=\"math_number\" gap=\"8\">\n            <field name=\"NUM\">0</field>\n        </block>\n        <block type=\"math_modulo\">\n            <value name=\"DIVIDEND\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"DIVISOR\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">1</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"math_op2\" gap=\"8\">\n            <value name=\"x\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"y\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"math_op2\" gap=\"8\">\n            <value name=\"x\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"y\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <field name=\"op\">max</field>\n        </block>\n        <block type=\"math_op3\">\n            <value name=\"x\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"math_js_op\">\n            <field name=\"OP\">sqrt</field>\n            <value name=\"ARG0\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n    </category>\n    <category name=\"Functions\" nameid=\"functions\" colour=\"#005a9e\" custom=\"PROCEDURE\" category=\"46\" iconclass=\"blocklyTreeIconfunctions\" expandedclass=\"blocklyTreeIconfunctions\" advanced=\"true\">\n    </category>\n    <category colour=\"#66672C\" name=\"Arrays\" nameid=\"arrays\" category=\"45\" web-icon=\"\uF0CB\" iconclass=\"blocklyTreeIconarrays\" expandedclass=\"blocklyTreeIconarrays\" advanced=\"true\">\n        <block type=\"variables_set\" gap=\"8\">\n            <field name=\"VAR\">" + lf("{id:var}list") + "</field>\n            <value name=\"VALUE\">\n                <block type=\"lists_create_with\">\n                    <mutation items=\"2\"></mutation>\n                    <value name=\"ADD0\">\n                        <shadow type=\"math_number\">\n                            <field name=\"NUM\">1</field>\n                        </shadow>\n                    </value>\n                    <value name=\"ADD1\">\n                        <shadow type=\"math_number\">\n                            <field name=\"NUM\">2</field>\n                        </shadow>\n                    </value>\n                </block>\n            </value>\n        </block>\n        <block type=\"variables_set\">\n            <field name=\"VAR\">" + lf("{id:var}text list") + "</field>\n            <value name=\"VALUE\">\n                <block type=\"lists_create_with\">\n                    <mutation items=\"3\"></mutation>\n                    <value name=\"ADD0\">\n                        <shadow type=\"text\">\n                            <field name=\"TEXT\">" + lf("a") + "</field>\n                        </shadow>\n                    </value>\n                    <value name=\"ADD1\">\n                        <shadow type=\"text\">\n                            <field name=\"TEXT\">" + lf("b") + "</field>\n                        </shadow>\n                    </value>\n                    <value name=\"ADD2\">\n                        <shadow type=\"text\">\n                            <field name=\"TEXT\">" + lf("c") + "</field>\n                        </shadow>\n                    </value>\n                </block>\n            </value>\n        </block>\n        <block type=\"lists_length\"></block>\n        <block type=\"lists_index_get\">\n            <value name=\"LIST\">\n                <block type=\"variables_get\">\n                    <field name=\"VAR\">" + lf("{id:var}list") + "</field>\n                </block>\n            </value>\n            <value name=\"INDEX\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"lists_index_set\">\n            <value name=\"LIST\">\n                <block type=\"variables_get\">\n                    <field name=\"VAR\">" + lf("{id:var}list") + "</field>\n                </block>\n            </value>\n            <value name=\"INDEX\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n    </category>\n    <category colour=\"#996600\" name=\"Text\" nameid=\"text\" category=\"46\" web-icon=\"\uF035\" iconclass=\"blocklyTreeIcontext\" expandedclass=\"blocklyTreeIcontext\" advanced=\"true\">\n        <block type=\"text\"></block>\n        <block type=\"text_length\">\n            <value name=\"VALUE\">\n                <shadow type=\"text\">\n                    <field name=\"TEXT\">" + lf("Hello") + "</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"text_join\">\n            <mutation items=\"2\"></mutation>\n            <value name=\"ADD0\">\n                <shadow type=\"text\">\n                    <field name=\"TEXT\">" + lf("Hello") + "</field>\n                </shadow>\n            </value>\n            <value name=\"ADD1\">\n                <shadow type=\"text\">\n                    <field name=\"TEXT\">" + lf("World") + "</field>\n                </shadow>\n            </value>\n        </block>\n    </category>\n</xml>";
         var defaultNoCategoryToolboxString = "<xml id=\"blocklyToolboxDefinition\" style=\"display: none\"></xml>";
         var cachedToolboxDom;
         function getBaseToolboxDom() {
@@ -10763,15 +11061,15 @@ var pxtblockly;
              */
             function createNotesArray() {
                 for (var i = thisField.minNote_; i <= thisField.maxNote_; i++) {
-                    var name_6 = Notes[i].prefixedName;
+                    var name_7 = Notes[i].prefixedName;
                     // special case: one octave
                     if (thisField.nKeys_ < 13) {
-                        name_6 = Notes[i].name;
+                        name_7 = Notes[i].name;
                     }
                     else if (thisField.minNote_ >= 28 && thisField.maxNote_ <= 63) {
-                        name_6 = Notes[i].altPrefixedName || name_6;
+                        name_7 = Notes[i].altPrefixedName || name_7;
                     }
-                    thisField.noteName_.push(name_6);
+                    thisField.noteName_.push(name_7);
                     thisField.noteFreq_.push(Notes[i].freq);
                 }
                 // Do not remove this comment.
