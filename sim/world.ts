@@ -22,6 +22,8 @@ namespace pxsim {
             return sid;
         }
 
+        private _container: HTMLElement | null;
+
         private _scene3d: Scene3d | null = new Scene3d();
         private _renderer: Renderer;
 
@@ -33,26 +35,30 @@ namespace pxsim {
             return this._renderer;
         }
 
-        constructor(id: rt.ObjId = 'container') {
+        constructor(id?: rt.ObjId) {
             super();
+
+            let strid;
+            if (id) {
+                strid = id.toString();
+            }
+
+            this._container = strid && strid.length > 0 ? document.getElementById(strid) : document.body;
 
             this._renderer = new Renderer(id);
             this._renderer.scene = this._scene3d;
 
-            const container = document.getElementById(this._renderer.id as string);
-            if (container) {
-                container.innerHTML = '';
+            if (this._container) {
+                this._container.innerHTML = '';
 
                 if (Detector.webgl) {
-                    container.appendChild(this._renderer.domElement);
+                    this._container.appendChild(this._renderer.domElement);
                 } else {
-                    Detector.addGetWebGLMessage({ parent: container });
+                    Detector.addGetWebGLMessage({ parent: this._container });
                 }
             }
 
-            this._onWindowResize();
-
-            window.addEventListener('resize', this._onWindowResize, false);
+            document.addEventListener('focus', this._onDocumentFocus, false);
 
             document.addEventListener('mouseenter', this._onDocumentMouseEnter, false);
             document.addEventListener('mousemove', this._onDocumentMouseMove, false);
@@ -74,19 +80,14 @@ namespace pxsim {
             document.removeEventListener('keypress', this._onDocumentKeyPress, false);
             document.removeEventListener('keydown', this._onDocumentKeyDown, false);
 
-            window.removeEventListener('resize', this._onWindowResize, false);
+            document.removeEventListener('focus', this._onDocumentFocus, false);
 
-            const container = document.getElementById(this._renderer.id as string);
-            if (container) {
-                container.innerHTML = '';
+            if (this._container) {
+                this._container.innerHTML = '';
             }
 
             Helper.safeObjectDispose(this._renderer);
             Helper.safeObjectDispose(this._scene3d);
-        }
-
-        protected _onWindowResize = () => {
-            this._renderer.resize(window.innerWidth, window.innerHeight, window.devicePixelRatio);
         }
 
         protected _onDocumentMouseEnter = (event: Event) => this._onDocumentEvent(ScopeId.MouseDevice, EventId.Enter, event);
@@ -97,6 +98,10 @@ namespace pxsim {
         protected _onDocumentKeyDown = (event: KeyboardEvent) => this._onDocumentKeyEvent(ScopeId.KeyboardDevice, EventId.Down, event);
         protected _onDocumentKeyPress = (event: KeyboardEvent) => this._onDocumentKeyEvent(ScopeId.KeyboardDevice, EventId.Press, event);
         protected _onDocumentKeyUp = (event: KeyboardEvent) => this._onDocumentKeyEvent(ScopeId.KeyboardDevice, EventId.Up, event);
+
+        protected _onDocumentFocus = (event: FocusEvent) => {
+            event.preventDefault();
+        }
 
         protected _onDocumentEvent = (sid: ScopeId | undefined, evid: EventId, event: Event, value?: EventValue) => {
             if (!sid) {

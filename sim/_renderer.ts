@@ -31,7 +31,7 @@ namespace pxsim {
 
         private _id: rt.ObjId;
 
-        private _domElement: HTMLElement = document.createElement('div');
+        private _domElement: HTMLElement;
 
         private _scene3d: Scene3d | null = null;
         private _stats: Stats = new Stats();
@@ -64,17 +64,22 @@ namespace pxsim {
             this._paused = value;
         }
 
-        constructor(id: rt.ObjId = 'container') {
+        constructor(id: rt.ObjId = 'main') {
             super(Renderer._instantiateReference(id));
 
             this._id = id;
 
+            this._domElement = document.createElement('div');
+            this._domElement.id = id!.toString();
             this._domElement.appendChild(this.reference.domElement);
             this._domElement.appendChild(this._stats.dom);
 
             this.reference.shadowMap.enabled = true;
             this.reference.shadowMap.type = THREE.PCFSoftShadowMap;
             this.reference.setClearColor(Palette.LightGray);
+
+            window.addEventListener('resize', this._onWindowResize, false);
+            window.setTimeout(() => this._onWindowResize() /* initial */);
 
             this.runRenderLoop();
         }
@@ -119,13 +124,15 @@ namespace pxsim {
             }
         }
 
-        public resize(width: number, height: number, devicePixelRatio: number) {
-            this.reference.setPixelRatio(devicePixelRatio);
-            this.reference.setSize(width, height);
+        protected _onWindowResize = () => {
+            this.reference.setPixelRatio(window.devicePixelRatio);
+            this.reference.setSize(this._domElement.clientWidth, this._domElement.clientHeight, false);
         }
 
         protected _onDispose() {
             this.stopRenderLoop();
+
+            window.removeEventListener('resize', this._onWindowResize, false);
         }
     }
 }
