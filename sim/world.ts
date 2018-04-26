@@ -30,6 +30,7 @@ namespace pxsim {
 
             this._renderer.container!.addEventListener('mouseenter', this._onElementMouseEnter);
             this._renderer.container!.addEventListener('mousemove', this._onElementMouseMove);
+            this._renderer.container!.addEventListener('mousedown', this._onElementMouseDown);
             this._renderer.container!.addEventListener('mouseleave', this._onElementMouseLeave);
             this._renderer.container!.addEventListener('click', this._onElementMouseClick);
 
@@ -81,19 +82,18 @@ namespace pxsim {
 
         protected _onElementMouseEnter = (event: Event) => this._onElementEvent(ScopeId.MouseDevice, EventId.Enter, event);
         protected _onElementMouseMove = (event: MouseEvent) => this._onElementMouseEvent(ScopeId.MouseDevice, EventId.Move, event);
+        protected _onElementMouseDown = (event: MouseEvent) => {
+            const sid = sidFromMouseButtonEvent(event);
+            if (sid && sid === ScopeId.MouseLeftButton) {
+                this._renderer.container!.focus();
+            }
+        }
         protected _onElementMouseLeave = (event: Event) => this._onElementEvent(ScopeId.MouseDevice, EventId.Leave, event);
         protected _onElementMouseClick = (event: MouseEvent) => {
             const sid = sidFromMouseButtonEvent(event);
-
-            if (!sid) {
-                return;
+            if (sid) {
+                this._onElementMouseEvent(sid, EventId.Click, event);
             }
-
-            if (ScopeId.MouseLeftButton) {
-                this._renderer.container!.focus();
-            }
-
-            this._onElementMouseEvent(sid, EventId.Click, event);
         }
 
         protected _onElementKeyDown = (event: KeyboardEvent) => this._onElementKeyEvent(ScopeId.KeyboardDevice, EventId.Down, event);
