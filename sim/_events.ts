@@ -18,6 +18,20 @@ namespace pxsim {
         KeyboardDevice,
     }
 
+    export function sidFromMouseButtonEvent(event: MouseEvent): ScopeId | undefined {
+        let sid;
+
+        if (0 === event.button) {
+            sid = ScopeId.MouseLeftButton;
+        } else if (1 === event.button) {
+            sid = ScopeId.MouseMiddleButton;
+        } else if (2 === event.button) {
+            sid = ScopeId.MouseRightButton;
+        }
+
+        return sid;
+    }
+
     export const enum EventId {
         Animate,
 

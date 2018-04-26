@@ -49,6 +49,10 @@ namespace pxsim {
             return this._container;
         }
 
+        public get canvas(): HTMLCanvasElement | null {
+            return this.reference.domElement;
+        }
+
         public get scene(): Scene3d | null {
             return this._scene3d;
         }
