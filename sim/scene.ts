@@ -4,7 +4,9 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path='object.ts'/>
+/// <reference path="../shared/enums.ts"/>
+
+/// <reference path="object.ts"/>
 
 namespace pxsim {
     export type Raycaster = THREE.Raycaster;

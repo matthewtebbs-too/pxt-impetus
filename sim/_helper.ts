@@ -4,7 +4,7 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path="_runtime.ts"/>
+/// <reference path="../shared/ammo.d.ts"/>
 
 namespace pxsim {
     export class Helper {

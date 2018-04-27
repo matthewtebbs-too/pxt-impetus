@@ -4,18 +4,20 @@
   "files": [
     "README.md",
 
-    "pxt-core.d.ts",
-    "pxt-helpers.ts",
-
     "impetus.enums.d.ts",
     "impetus.console.d.ts",
     "impetus.math.d.ts",
     "impetus.api.d.ts",
+
+    "pxt-core.d.ts",
+    "pxt-helpers.ts",
+
+    "enums.ts",
 
     "sims.d.ts"
   ],
   "public": true,
   "dependencies": {},
 
-  "additionalFilePath": "../../localtypings"
+  "additionalFilePath": "../../shared/"
 }

@@ -1,0 +1,19 @@
+{
+  "name": "shared",
+  "description": "Shared files for Impetus target for PXT",
+  "files": [
+    "ammo.d.ts",
+    "ammo.idl",
+
+    "detector.d.ts",
+
+    "impetus.enums.d.ts",
+    "impetus.console.d.ts",
+    "impetus.math.d.ts",
+    "impetus.api.d.ts",
+
+    "enums.ts"
+  ],
+  "public": true,
+  "dependencies": {}
+}

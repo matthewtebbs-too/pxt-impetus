@@ -4,9 +4,6 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path="_physics.ts"/>
-/// <reference path="object.ts"/>
-
 namespace pxsim {
     export function btMotionStateFromObject3d(btmotionstate: Ammo.btMotionState, object3d: Object3d) {
         const bttransform = new Ammo.btTransform();

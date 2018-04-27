@@ -4,6 +4,8 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
+/// <reference path="../shared/enums.ts"/>
+
 /// <reference path="_runtime.ts"/>
 
 namespace pxsim {
@@ -77,7 +79,7 @@ namespace pxsim {
         }
 
         protected _onElementKeyEvent = (sid: ScopeId, evid: EventId, event: KeyboardEvent) => {
-            // this._onElementEvent(sid, evid, event, new EventKeyValue(KeyboardKeyConstructor[event.key]));
+            this._onElementEvent(sid, evid, event, new EventKeyValue(KeyboardKey[event.key]));
         }
 
         protected _onElementMouseEnter = (event: Event) => this._onElementEvent(ScopeId.MouseDevice, EventId.Enter, event);

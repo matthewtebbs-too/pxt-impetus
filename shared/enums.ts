@@ -5,12 +5,12 @@
 */
 
 //%
-declare const enum MathOp {
+const enum MathOp {
     //% block="+"
     Add = 1,
 
     //% block="–"
-    Subtract = 2, 
+    Subtract = 2,
 
     //% block="x"
 
@@ -20,7 +20,7 @@ declare const enum MathOp {
 }
 
 //%
-declare const enum MouseButton {
+const enum MouseButton {
     //% block="left button"
     Left = 1,
 
@@ -32,7 +32,7 @@ declare const enum MouseButton {
 }
 
 //%
-declare const enum KeyboardKey {
+enum KeyboardKey {
     //% block="F1"
     F1,
 
@@ -71,7 +71,7 @@ declare const enum KeyboardKey {
 }
 
 //%
-declare const enum SimplePalette {
+const enum SimplePalette {
     //% block="red"
     Red = 0xff0000,
 
@@ -103,11 +103,11 @@ declare const enum SimplePalette {
     White = 0xffffff,
 
     //% block="black"
-    Black = 0x000000
+    Black = 0x000000,
 }
 
 //%
-declare const enum NaturePalette {
+const enum NaturePalette {
     //% block="sky"
     Ground = 0xffc87f,
 
@@ -116,7 +116,7 @@ declare const enum NaturePalette {
 }
 
 //%
-declare const enum Palette {
+const enum Palette {
     //% block="alice blue"
     AliceBlue = 0xf0f8ff,
 
@@ -540,4 +540,3 @@ declare const enum Palette {
     //% block="yellow green"
     YellowGreen = 0x9acd32,
 }
-

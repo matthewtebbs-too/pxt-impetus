@@ -4,8 +4,6 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path="_runtime.ts"/>
-
 namespace pxsim {
     export type Color = THREE.Color;
 

@@ -6,8 +6,6 @@
 
 /// <reference path="../node_modules/pxt-core/built/pxtsim.d.ts"/>
 
-/// <reference path="_runtime.ts" />
-
 namespace pxsim {
     export class WorldBoard extends BaseBoard {
         private static _board: WorldBoard = new WorldBoard();
