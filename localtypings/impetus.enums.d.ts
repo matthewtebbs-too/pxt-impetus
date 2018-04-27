@@ -31,43 +31,43 @@ declare const enum MouseButton {
     Right = 3,
 }
 
-declare const enum KeyboardKey
-{
+//%
+declare const enum KeyboardKey {
     //% block="F1"
-    F1Key = 'F1',  
+    F1,
 
     //% block="F2"
-    F2Key = 'F2',
+    F2,
 
     //% block="F3"
-    F3Key = 'F3',
+    F3,
 
     //% block="F4"
-    F4Key = 'F4', 
+    F4,
 
     //% block="F5"
-    F5Key = 'F5',
+    F5,
 
     //% block="F6"
-    F6Key = 'F6',
+    F6,
 
     //% block="F7"
-    F7Key = 'F7',
-    
+    F7,
+
     //% block="F8"
-    F8Key = 'F8',
+    F8,
 
     //% block="F9"
-    F9Key = 'F9',
+    F9,
 
     //% block="F0"
-    F10Key = 'F10',
+    F10,
 
     //% block="F11"
-    F11Key = 'F11',
+    F11,
 
     //% block="F12"
-    F12Key = 'F12',
+    F12,
 }
 
 //%

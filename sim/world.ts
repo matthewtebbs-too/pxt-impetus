@@ -77,7 +77,7 @@ namespace pxsim {
         }
 
         protected _onElementKeyEvent = (sid: ScopeId, evid: EventId, event: KeyboardEvent) => {
-            this._onElementEvent(sid, evid, event, new EventKeyValue(KeyboardKey.F1Key));
+            // this._onElementEvent(sid, evid, event, new EventKeyValue(KeyboardKeyConstructor[event.key]));
         }
 
         protected _onElementMouseEnter = (event: Event) => this._onElementEvent(ScopeId.MouseDevice, EventId.Enter, event);

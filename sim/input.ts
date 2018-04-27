@@ -5,6 +5,10 @@
 */
 
 namespace pxsim.input {
+    export function onKeyPress(handler: RefAction) {
+        singletonWorldBoard().events!.listen(ScopeId.KeyboardDevice, EventId.Down, handler);
+    }
+
     export function onMouseEnter(handler: RefAction) {
         singletonWorldBoard().events!.listen(ScopeId.MouseDevice, EventId.Enter, handler);
     }

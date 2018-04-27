@@ -445,6 +445,15 @@ declare namespace world { /* globe icon */
 //% color="#B4009E" icon="\uf192" block="Input" weight=93
 declare namespace input { /* dot-circle icon */
     /**
+     * Code to run when a key press occurs.
+     */
+    //% blockId=input_on_keypress
+    //% block="on key press"
+    //% afterOnStart=true
+    //% shim=input::onKeyPress
+    function onKeyPress(cb: (key: KeyboardKey) => void): void;
+
+    /**
      * Code to run when a mouse enter occurs.
      */
     //% blockId=input_on_mouseenter
