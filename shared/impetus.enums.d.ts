@@ -13,6 +13,9 @@ declare const enum MouseButton {
 declare enum KeyboardKey {
 }
 
+declare const enum KeyEvent {
+}
+
 declare const enum NaturePalette {
 }
 

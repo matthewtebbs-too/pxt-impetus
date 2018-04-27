@@ -71,6 +71,18 @@ enum KeyboardKey {
 }
 
 //%
+const enum KeyEvent {
+    //% block="press"
+    Press,
+
+    //% block="down"
+    Down,
+
+    //% block="up"
+    Up,
+}
+
+//%
 const enum SimplePalette {
     //% block="red"
     Red = 0xff0000,
