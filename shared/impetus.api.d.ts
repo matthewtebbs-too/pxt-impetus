@@ -451,7 +451,7 @@ declare namespace input { /* dot-circle icon */
     //% block="on %key %event"
     //% afterOnStart=true
     //% shim=input::onKeyEvent
-    function onKeyEvent(key: KeyboardKey, cb: (event: KeyEvent) => void): void;
+    function onKeyEvent(key: KeyboardKey, event: KeyEvent, cb: () => void): void;
 
     /**
      * Code to run when a mouse enter occurs.
