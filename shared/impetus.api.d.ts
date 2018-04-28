@@ -447,7 +447,7 @@ declare namespace input { /* dot-circle icon */
     /**
      * Code to run when a key event occurs.
      */
-    //% blockId=input_on_keyevent
+    //% blockId=input_on_key_event
     //% block="on %key %event"
     //% afterOnStart=true
     //% shim=input::onKeyEvent
@@ -456,7 +456,7 @@ declare namespace input { /* dot-circle icon */
     /**
      * Code to run when a mouse enter occurs.
      */
-    //% blockId=input_on_mouseenter
+    //% blockId=input_on_mouse_enter
     //% block="on mouse enter"
     //% afterOnStart=true
     //% shim=input::onMouseEnter
@@ -465,27 +465,27 @@ declare namespace input { /* dot-circle icon */
     /**
      * Code to run when a mouse move occurs.
      */
-    //% blockId=input_on_mousemove
+    //% blockId=input_on_mouse_move
     //% block="on mouse move"
     //% afterOnStart=true
     //% shim=input::onMouseMove
     function onMouseMove(cb: (x: number, y: number) => void): void;
 
     /**
-     * Code to run when a mouse click occurs.
-     */
-    //% blockId=input_on_mouseclick
-    //% block="on mouse %button click"
-    //% afterOnStart=true
-    //% shim=input::onMouseClick
-    function onMouseClick(button: MouseButton, cb: (x: number, y: number) => void): void;
-
-    /**
      * Code to run when a mouse leave occurs.
      */
-    //% blockId=input_on_mouseleave
+    //% blockId=input_on_mouse_leave
     //% block="on mouse leave"
     //% afterOnStart=true
     //% shim=input::onMouseLeave
     function onMouseLeave(cb: () => void): void;
+
+    /**
+     * Code to run when a mouse click occurs.
+     */
+    //% blockId=input_on_mouse_buttonevent
+    //% block="on mouse %button %event"
+    //% afterOnStart=true
+    //% shim=input::onMouseButtonEvent
+    function onMouseButtonEvent(button: MouseButton, event: MouseButtonEvent, cb: (x: number, y: number) => void): void;
 }

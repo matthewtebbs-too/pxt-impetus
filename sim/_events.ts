@@ -8,45 +8,30 @@
 
 namespace pxsim {
     export const enum ScopeId {
-        World,
+        WorldObject = 0x000,
 
-        Scene,
+        SceneObject = 0x100,
 
-        MouseDevice,
-        MouseLeftButton,
-        MouseMiddleButton,
-        MouseRightButton,
+        KeyboardDevice = 0x200,
 
-        KeyboardDevice,
+        MouseDevice = 0x300,
+        MouseDevice_MainButton = MouseDevice + MouseButton.Main,
+        MouseDevice_AuxiliaryButton = MouseDevice + MouseButton.Auxiliary,
+        MouseDevice_SecondaryButton = MouseDevice + MouseButton.Secondary,
+        MouseDevice_FourthButton = MouseDevice + MouseButton.Fourth,
+        MouseDevice_FifthButton = MouseDevice + MouseButton.Fifth,
     }
 
-    export function sidFromMouseButtonEvent(event: MouseEvent): ScopeId | undefined {
-        let sid;
+    export type EventId = number;
 
-        if (0 === event.button) {
-            sid = ScopeId.MouseLeftButton;
-        } else if (1 === event.button) {
-            sid = ScopeId.MouseMiddleButton;
-        } else if (2 === event.button) {
-            sid = ScopeId.MouseRightButton;
-        }
-
-        return sid;
-    }
-
-    export const enum EventId {
+    export const enum SceneEvent_Internal {
         Animate,
+    }
 
+    export const enum MouseEvent_Internal {
         Enter,
         Move,
         Leave,
-
-        Click,
-        DoubleClick,
-
-        Up,
-        Press,
-        Down,
     }
 
     export abstract class EventValue {

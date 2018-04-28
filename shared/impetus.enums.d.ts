@@ -10,6 +10,9 @@ declare const enum MathOp {
 declare const enum MouseButton {
 }
 
+declare const enum MouseButtonEvent {
+}
+
 declare enum KeyboardKey {
 }
 

@@ -181,7 +181,7 @@
   "design.standardColor": "Standard color.",
   "fieldeditors.onOff": "Render a boolean as a on/off toggle.",
   "input.onKeyEvent": "Code to run when a key event occurs.",
-  "input.onMouseClick": "Code to run when a mouse click occurs.",
+  "input.onMouseButtonEvent": "Code to run when a mouse click occurs.",
   "input.onMouseEnter": "Code to run when a mouse enter occurs.",
   "input.onMouseLeave": "Code to run when a mouse leave occurs.",
   "input.onMouseMove": "Code to run when a mouse move occurs.",

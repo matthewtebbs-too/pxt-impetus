@@ -88,7 +88,7 @@ namespace pxsim {
 
             this._physicsworld.animate(timeStep);
 
-            singletonWorldBoard().events!.queue(ScopeId.Scene, EventId.Animate, timeStep);
+            singletonWorldBoard().events!.queue(ScopeId.SceneObject, SceneEvent_Internal.Animate, timeStep);
         }
 
         // tslint:disable-next-line:variable-name
@@ -145,6 +145,6 @@ namespace pxsim.scene {
     }
 
     export function onAnimate(handler: RefAction) {
-        singletonWorldBoard().events!.listen(ScopeId.Scene, EventId.Animate, handler);
+        singletonWorldBoard().events!.listen(ScopeId.SceneObject, SceneEvent_Internal.Animate, handler);
     }
 }

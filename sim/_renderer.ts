@@ -17,7 +17,7 @@ namespace pxsim {
 
 namespace pxsim {
     export class Renderer extends rt.ProxyObject<THREE.WebGLRenderer> {
-        private static _renderers: _Map<rt.ObjId, THREE.WebGLRenderer> = new Map<rt.ObjId, THREE.WebGLRenderer>();
+        private static _renderers = new Map<rt.ObjId, THREE.WebGLRenderer>();
 
         private static _instantiateReference(id: rt.ObjId): THREE.WebGLRenderer {
             let webglrenderer = Renderer._renderers.get(id);
