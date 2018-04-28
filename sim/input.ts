@@ -24,6 +24,6 @@ namespace pxsim.input {
     }
 
     export function onMouseButtonEvent(button: MouseButton, event: MouseButtonEvent, handler: RefAction) {
-        singletonWorldBoard().events!.listen(ScopeId.MouseDevice + button, event, handler);
+        singletonWorldBoard().events!.listen(ScopeId.MouseDeviceButton + button, event, handler);
     }
 }

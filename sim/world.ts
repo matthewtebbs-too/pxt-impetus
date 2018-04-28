@@ -38,9 +38,10 @@ namespace pxsim {
             this._listenerhelper.addEventListener('mousemove', (event: MouseEvent) => this._onElementMouseEvent(ScopeId.MouseDevice, MouseEvent_Internal.Move, event));
             this._listenerhelper.addEventListener('mouseleave', (event: Event) => this._onElementEvent(ScopeId.MouseDevice, MouseEvent_Internal.Leave, event));
 
-            this._listenerhelper.addEventListener('mousedown', (event: MouseEvent) => this._onElementMouseEvent(ScopeId.MouseDevice + event.button, MouseButtonEvent.Down, event));
-            this._listenerhelper.addEventListener('click', (event: MouseEvent) => this._onElementMouseEvent(ScopeId.MouseDevice + event.button, MouseButtonEvent.Click, event));
-            this._listenerhelper.addEventListener('mouseup', (event: MouseEvent) => this._onElementMouseEvent(ScopeId.MouseDevice + event.button, MouseButtonEvent.Up, event));
+            this._listenerhelper.addEventListener('mousedown', (event: MouseEvent) => this._onElementMouseEvent(ScopeId.MouseDeviceButton + event.button, MouseButtonEvent.Down, event));
+            this._listenerhelper.addEventListener('click', (event: MouseEvent) => this._onElementMouseEvent(ScopeId.MouseDeviceButton + event.button, MouseButtonEvent.Click, event));
+            this._listenerhelper.addEventListener('dblclick', (event: MouseEvent) => this._onElementMouseEvent(ScopeId.MouseDeviceButton + event.button, MouseButtonEvent.DoubleClick, event));
+            this._listenerhelper.addEventListener('mouseup', (event: MouseEvent) => this._onElementMouseEvent(ScopeId.MouseDeviceButton + event.button, MouseButtonEvent.Up, event));
 
             this._listenerhelper.addEventListener('keydown', (event: KeyboardEvent) => this._onElementKeyEvent(ScopeId.KeyboardDevice, KeyEvent.Down, event));
             this._listenerhelper.addEventListener('keypress', (event: KeyboardEvent) => this._onElementKeyEvent(ScopeId.KeyboardDevice, KeyEvent.Press, event));
@@ -70,7 +71,7 @@ namespace pxsim {
                 return;
             }
 
-            if (sid === ScopeId.MouseDevice_MainButton && evid === MouseButtonEvent.Down) {
+            if (sid === ScopeId.MouseDeviceButton_Main && evid === MouseButtonEvent.Down) {
                 this._renderer.container!.focus();
             }
 
