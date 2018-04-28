@@ -8,18 +8,21 @@
 
 namespace pxsim {
     export const enum ScopeId {
-        WorldObject = 0x000,
+        WorldObject = 0,
 
-        SceneObject = 0x100,
+        SceneObject = 100,
 
-        KeyboardDevice = 0x200,
+        KeyboardDevice = 200,
 
-        MouseDevice = 0x300,
-        MouseDevice_MainButton = MouseDevice + MouseButton.Main,
-        MouseDevice_AuxiliaryButton = MouseDevice + MouseButton.Auxiliary,
-        MouseDevice_SecondaryButton = MouseDevice + MouseButton.Secondary,
-        MouseDevice_FourthButton = MouseDevice + MouseButton.Fourth,
-        MouseDevice_FifthButton = MouseDevice + MouseButton.Fifth,
+        MouseDevice = 300,
+
+        MouseDeviceButton = 400,
+
+        MouseDeviceButton_Main = MouseDeviceButton + MouseButton.Main,
+        MouseDeviceButton_Auxiliary= MouseDeviceButton + MouseButton.Auxiliary,
+        MouseDeviceButton_Secondary = MouseDeviceButton + MouseButton.Secondary,
+        MouseDeviceButton_Fourth = MouseDeviceButton + MouseButton.Fourth,
+        MouseDeviceButton_Fifth = MouseDeviceButton + MouseButton.Fifth,
     }
 
     export type EventId = number;
