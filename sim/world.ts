@@ -43,9 +43,9 @@ namespace pxsim {
             this._listenerhelper.addEventListener('dblclick', (event: MouseEvent) => this._onElementMouseEvent(ScopeId.MouseDeviceButton + event.button, MouseButtonEvent.DoubleClick, event));
             this._listenerhelper.addEventListener('mouseup', (event: MouseEvent) => this._onElementMouseEvent(ScopeId.MouseDeviceButton + event.button, MouseButtonEvent.Up, event));
 
-            this._listenerhelper.addEventListener('keydown', (event: KeyboardEvent) => this._onElementKeyEvent(ScopeId.KeyboardDevice, KeyEvent.Down, event));
-            this._listenerhelper.addEventListener('keypress', (event: KeyboardEvent) => this._onElementKeyEvent(ScopeId.KeyboardDevice, KeyEvent.Press, event));
-            this._listenerhelper.addEventListener('keyup', (event: KeyboardEvent) => this._onElementKeyEvent(ScopeId.KeyboardDevice, KeyEvent.Up, event));
+            this._listenerhelper.addEventListener('keydown', (event: KeyboardEvent) => this._onElementEvent(ScopeId.KeyboardDevice + KeyboardKey[event.key], KeyEvent.Down, event));
+            this._listenerhelper.addEventListener('keypress', (event: KeyboardEvent) => this._onElementEvent(ScopeId.KeyboardDevice + KeyboardKey[event.key], KeyEvent.Press, event));
+            this._listenerhelper.addEventListener('keyup', (event: KeyboardEvent) => this._onElementEvent(ScopeId.KeyboardDevice + KeyboardKey[event.key], KeyEvent.Up, event));
 
             this._onElementFocused(this._renderer.container!, false);
         }
@@ -81,14 +81,6 @@ namespace pxsim {
             const y = - ((event.clientY - client.top) / client.height) * 2 + 1;
 
             this._onElementEvent(sid, evid, event, new EventCoordValue(x, y));
-        }
-
-        protected _onElementKeyEvent = (sid: ScopeId | undefined, evid: EventId, event: KeyboardEvent) => {
-            if (!sid) {
-                return;
-            }
-
-            this._onElementEvent(sid, evid, event, new EventKeyValue(KeyboardKey[event.key]));
         }
     }
 }

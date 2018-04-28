@@ -7,8 +7,8 @@
 /// <reference path="../shared/enums.ts"/>
 
 namespace pxsim.input {
-    export function onKeyEvent(event: KeyEvent, handler: RefAction) {
-        singletonWorldBoard().events!.listen(ScopeId.KeyboardDevice, event, handler);
+    export function onKeyEvent(key: KeyboardKey, event: KeyEvent, handler: RefAction) {
+        singletonWorldBoard().events!.listen(ScopeId.KeyboardDevice + key, event, handler);
     }
 
     export function onMouseEnter(handler: RefAction) {

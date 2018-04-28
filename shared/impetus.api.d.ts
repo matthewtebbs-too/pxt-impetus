@@ -448,7 +448,7 @@ declare namespace input { /* dot-circle icon */
      * Code to run when a key event occurs.
      */
     //% blockId=input_on_key_event
-    //% block="on %key %event"
+    //% block="on %key key|%event"
     //% afterOnStart=true
     //% shim=input::onKeyEvent
     function onKeyEvent(key: KeyboardKey, event: KeyEvent, cb: () => void): void;
@@ -484,7 +484,7 @@ declare namespace input { /* dot-circle icon */
      * Code to run when a mouse click occurs.
      */
     //% blockId=input_on_mouse_buttonevent
-    //% block="on mouse %button %event"
+    //% block="on mouse %button button|%event"
     //% afterOnStart=true
     //% shim=input::onMouseButtonEvent
     function onMouseButtonEvent(button: MouseButton, event: MouseButtonEvent, cb: (x: number, y: number) => void): void;

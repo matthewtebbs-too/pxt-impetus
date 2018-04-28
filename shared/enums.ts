@@ -19,19 +19,19 @@ const enum MathOp {
 }
 
 const enum MouseButton { /* !! enum values must match MouseEvent.button !! */
-    //% block="main button"
+    //% block="main"
     Main = 0,
 
-    //% block="auxiliary button"
+    //% block="auxiliary"
     Auxiliary = 1,
 
-    //% block="secondary button"
+    //% block="secondary"
     Secondary = 2,
 
-    //% block="fourth button"
+    //% block="fourth"
     Fourth = 3,
 
-    //% block="fifth button"
+    //% block="fifth"
     Fifth = 4,
 }
 
@@ -49,41 +49,44 @@ const enum MouseButtonEvent {
     Up,
 }
 
-enum KeyboardKey { /* !! enum keys must match KeyboardEvent.key !! */
-    //% block="F1 key"
+enum KeyboardKey { /* !! enum keys if non-Unicode must match KeyboardEvent.key !! */
+    //% block="a"
+    a,
+
+    //% block="F1"
     F1,
 
-    //% block="F2 key"
+    //% block="F2"
     F2,
 
-    //% block="F3 key"
+    //% block="F3"
     F3,
 
-    //% block="F4 key"
+    //% block="F4"
     F4,
 
-    //% block="F5 key"
+    //% block="F5"
     F5,
 
-    //% block="F6 key"
+    //% block="F6"
     F6,
 
-    //% block="F7 key"
+    //% block="F7"
     F7,
 
-    //% block="F8 key"
+    //% block="F8"
     F8,
 
-    //% block="F9 key"
+    //% block="F9"
     F9,
 
-    //% block="F0 key"
+    //% block="F10"
     F10,
 
-    //% block="F11 key"
+    //% block="F11"
     F11,
 
-    //% block="F12 key"
+    //% block="F12"
     F12,
 }
 
