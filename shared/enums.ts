@@ -4,7 +4,6 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-//%
 const enum MathOp {
     //% block="+"
     Add = 1,
@@ -19,7 +18,6 @@ const enum MathOp {
     Divide = 4,
 }
 
-//%
 const enum MouseButton { /* !! enum values must match MouseEvent.button !! */
     //% block="main button"
     Main = 0,
@@ -37,7 +35,6 @@ const enum MouseButton { /* !! enum values must match MouseEvent.button !! */
     Fifth = 4,
 }
 
-//%
 const enum MouseButtonEvent {
     //% block="down"
     Down,
@@ -52,7 +49,6 @@ const enum MouseButtonEvent {
     Up,
 }
 
-//%
 enum KeyboardKey { /* !! enum keys must match KeyboardEvent.key !! */
     //% block="F1 key"
     F1,
@@ -91,7 +87,6 @@ enum KeyboardKey { /* !! enum keys must match KeyboardEvent.key !! */
     F12,
 }
 
-//%
 const enum KeyEvent {
     //% block="down"
     Down,
@@ -103,7 +98,6 @@ const enum KeyEvent {
     Up,
 }
 
-//%
 const enum SimplePalette {
     //% block="red"
     Red = 0xff0000,
@@ -139,7 +133,6 @@ const enum SimplePalette {
     Black = 0x000000,
 }
 
-//%
 const enum NaturePalette {
     //% block="sky"
     Ground = 0xffc87f,
@@ -148,7 +141,6 @@ const enum NaturePalette {
     Sky = 0x3284ff,
 }
 
-//%
 const enum Palette {
     //% block="alice blue"
     AliceBlue = 0xf0f8ff,
