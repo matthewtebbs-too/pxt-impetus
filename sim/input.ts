@@ -8,7 +8,7 @@
 
 namespace pxsim.input {
     export function onKeyEvent(key: KeyboardKey, event: KeyEvent, handler: RefAction) {
-        singletonWorldBoard().events!.listen(ScopeId.KeyboardDevice + key, event, handler);
+        singletonWorldBoard().events!.listen(keyboardScopeIdFromKey(key), event, handler);
     }
 
     export function onMouseEnter(handler: RefAction) {
@@ -24,6 +24,6 @@ namespace pxsim.input {
     }
 
     export function onMouseButtonEvent(button: MouseButton, event: MouseButtonEvent, handler: RefAction) {
-        singletonWorldBoard().events!.listen(ScopeId.MouseDeviceButton + button, event, handler);
+        singletonWorldBoard().events!.listen(mouseScopeIdFromButton(button), event, handler);
     }
 }

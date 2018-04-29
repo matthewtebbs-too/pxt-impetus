@@ -18,7 +18,8 @@ const enum MathOp {
     Divide = 4,
 }
 
-const enum MouseButton { /* !! enum values must match MouseEvent.button !! */
+/* !! enum values must match MouseEvent.button !! */
+const enum MouseButton {
     //% block="main"
     Main = 0,
 
@@ -49,44 +50,38 @@ const enum MouseButtonEvent {
     Up,
 }
 
-enum KeyboardKey { /* !! enum keys if non-Unicode must match KeyboardEvent.key !! */
-    //% block="a"
-    a,
+/* !! enum keys if non-Unicode must match KeyboardEvent.key !! */
+/* !! enum values are based on Windows KeyboardEvent.keycodes but just need to be unique !! */
+enum KeyboardKey {
+    //% block="escape"
+    Escape = 27,
 
-    //% block="F1"
-    F1,
+    // %block="space bar"
+    Spacebar = 32,
 
-    //% block="F2"
+    //% block="f1"
+    F1 = 112,
+    //% block="f2"
     F2,
-
-    //% block="F3"
+    //% block="f3"
     F3,
-
-    //% block="F4"
+    //% block="f4"
     F4,
-
-    //% block="F5"
+    //% block="f5"
     F5,
-
-    //% block="F6"
+    //% block="f6"
     F6,
-
-    //% block="F7"
+    //% block="f7"
     F7,
-
-    //% block="F8"
+    //% block="f8"
     F8,
-
-    //% block="F9"
+    //% block="f9"
     F9,
-
-    //% block="F10"
+    //% block="f10"
     F10,
-
-    //% block="F11"
+    //% block="f11"
     F11,
-
-    //% block="F12"
+    //% block="f12"
     F12,
 }
 

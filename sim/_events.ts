@@ -8,13 +8,15 @@
 
 namespace pxsim {
     export const enum ScopeId {
-        Objects = 0x0,
+        Objects = 0,
         WorldObject = Objects + 0,
         SceneObject = Objects + 1,
 
-        Devices = 0x1000,
+        Devices = 100,
         KeyboardDevice = Devices + 0,
-        MouseDevice = Devices + 0x100,
+        MouseDevice = Devices + 100,
+
+        KeyboardDeviceKey = Devices + 1,
 
         MouseDeviceButton = MouseDevice + 1,
         MouseDeviceButton_Main = MouseDeviceButton + MouseButton.Main,
@@ -22,6 +24,25 @@ namespace pxsim {
         MouseDeviceButton_Secondary = MouseDeviceButton + MouseButton.Secondary,
         MouseDeviceButton_Fourth = MouseDeviceButton + MouseButton.Fourth,
         MouseDeviceButton_Fifth = MouseDeviceButton + MouseButton.Fifth,
+    }
+
+    export function keyboardScopeIdFromKey(key: string | number): number {
+        let index: number;
+
+        if (typeof key === 'string') {
+            if (key === ' ') {
+                key = 'Spacebar';
+            }
+            index = KeyboardKey[key];
+        } else {
+            index = key;
+        }
+
+        return ScopeId.KeyboardDeviceKey + index;
+    }
+
+    export function mouseScopeIdFromButton(button: number): number {
+        return ScopeId.MouseDeviceButton + button;
     }
 
     export type EventId = number;
