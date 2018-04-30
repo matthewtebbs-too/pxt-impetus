@@ -11,9 +11,6 @@ namespace impetus {
 
     export function initExtensionsAsync(opts: pxt.editor.ExtensionOptions): Promise<pxt.editor.ExtensionResult> {
         const result: pxt.editor.ExtensionResult = {
-            toolboxOptions: {
-                // blocklyXml: defaultToolboxXml,
-            },
         };
 
         return Promise.resolve(result);
