@@ -53,11 +53,23 @@ const enum MouseButtonEvent {
 /* !! enum keys if non-Unicode must match KeyboardEvent.key !! */
 /* !! enum values are based on Windows KeyboardEvent.keycodes but just need to be unique !! */
 enum KeyboardKey {
+    //% block="delete"
+    Delete = 8,
+
+    //% block="tab"
+    Tab = 9,
+
+    //% block="enter"
+    Enter = 13,
+
     //% block="escape"
     Escape = 27,
 
     // %block="space bar"
     Spacebar = 32,
+
+    /* 0-9, 48-57 */
+    /* a-z, 65-90 */
 
     //% block="f1"
     F1 = 112,
