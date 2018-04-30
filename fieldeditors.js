@@ -1,0 +1,1 @@
+var impetus;(impetus||(impetus={})).initFieldExtensionsAsync=function(i){return Promise.resolve({fieldEditors:[]})},pxt.editor.initFieldExtensionsAsync=impetus.initFieldExtensionsAsync;

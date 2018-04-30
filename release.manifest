@@ -23,7 +23,7 @@ CACHE:
 
 
 /pxt-Impetus/editor.js
-
+/pxt-Impetus/fieldeditors.js
 
 # blockly
 /pxt-Impetus/blockly/media/sprites.png
@@ -55,7 +55,7 @@ https://az416426.vo.msecnd.net/scripts/a/ai.0.js
 /pxt-Impetus/worker.js
 /pxt-Impetus/monacoworker.js
 
-# ver Mon Apr 30 2018 10:37:04 GMT-0700 (PDT)
+# ver Mon Apr 30 2018 11:27:41 GMT-0700 (PDT)
 
 # target
 /pxt-Impetus/docs/static/icons/android-chrome-192x192.png
