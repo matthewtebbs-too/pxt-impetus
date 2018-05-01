@@ -25,7 +25,7 @@ namespace pxsim.color {
     }
 
     export function colorFromRgb(red: number, green: number, blue: number): Color {
-        return new ColorConstructor(red / 255, green / 255, blue / 255);
+        return new ColorConstructor().setRGB(red / 255, green / 255, blue / 255);
     }
 
     export function colorFromHsv(hue: number, sat: number, val: number): Color {
