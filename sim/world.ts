@@ -44,7 +44,7 @@ namespace pxsim {
             this._listenerhelper.addEventListener('mouseup', (event: MouseEvent) => this._onElementMouseEvent(mouseScopeIdFromButton(event.button), MouseButtonEvent.Up, event));
 
             // tslint:disable-next-line
-            this._listenerhelper.addEventListener('keydown', (event: KeyboardEvent) => { console.log(event.keyCode.toString()); this._onElementEvent(keyboardScopeIdFromKey(event.key), KeyEvent.Down, event); } );
+            this._listenerhelper.addEventListener('keydown', (event: KeyboardEvent) => this._onElementEvent(keyboardScopeIdFromKey(event.key), KeyEvent.Down, event));
             this._listenerhelper.addEventListener('keypress', (event: KeyboardEvent) => this._onElementEvent(keyboardScopeIdFromKey(event.key), KeyEvent.Press, event));
             this._listenerhelper.addEventListener('keyup', (event: KeyboardEvent) => this._onElementEvent(keyboardScopeIdFromKey(event.key), KeyEvent.Up, event));
 

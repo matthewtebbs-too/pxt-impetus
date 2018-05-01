@@ -179,7 +179,7 @@
   "design.sphereShape": "Sphere shape.",
   "design.sphereShape|param|radius": "number, eg: 0.5",
   "design.standardColor": "Standard color.",
-  "fieldeditors.onOff": "Render a boolean as a on/off toggle.",
+  "fieldeditors.onOff": "Render a boolean as an on/off toggle.",
   "input.onKeyEvent": "Code to run when a key event occurs.",
   "input.onMouseButtonEvent": "Code to run when a mouse click occurs.",
   "input.onMouseEnter": "Code to run when a mouse enter occurs.",

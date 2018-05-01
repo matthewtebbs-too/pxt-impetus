@@ -7,7 +7,7 @@
 /// <reference path="../shared/enums.ts"/>
 
 namespace pxsim.input {
-    export function onKeyEvent(key: KeyboardKey, event: KeyEvent, handler: RefAction) {
+    export function onKeyEvent(key: KeyboardKey | string, event: KeyEvent, handler: RefAction) {
         singletonWorldBoard().events!.listen(keyboardScopeIdFromKey(key), event, handler);
     }
 
