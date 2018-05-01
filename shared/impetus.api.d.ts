@@ -9,7 +9,7 @@
 
 declare namespace fieldeditors {
     /**
-     * Render a boolean as a on/off toggle.
+     * Render a boolean as an on/off toggle.
      */
     //% blockId=fieldeditors_toggleOnOff
     //% block="%on"
@@ -449,6 +449,7 @@ declare namespace input { /* dot-circle icon */
      */
     //% blockId=input_on_key_event
     //% block="on %key key|%event"
+    //% key.fieldEditor="key"
     //% afterOnStart=true
     //% shim=input::onKeyEvent
     function onKeyEvent(key: KeyboardKey, event: KeyEvent, cb: () => void): void;
