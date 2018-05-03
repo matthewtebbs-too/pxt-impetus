@@ -137,7 +137,7 @@ namespace pxsim {
         protected _onWindowResize = () => {
             if (this._container) {
                 this.reference.setPixelRatio(window.devicePixelRatio);
-                this.reference.setSize(this._container.clientWidth, this._container.clientHeight, false);
+                this.reference.setSize(this._container.clientWidth, this._container.clientHeight);
             }
         }
 
