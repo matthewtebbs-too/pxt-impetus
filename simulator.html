@@ -8,18 +8,29 @@
     <link rel="stylesheet" type="text/css" href="/pxt-Impetus/sim.css">
 
     <script src="/pxt-Impetus/libs/es6-shim.min.js"></script>
+    <script src="/pxt-Impetus/libs/object_hash.min.js"></script>
 
     <script src="/pxt-Impetus/bluebird.min.js"></script>
     <script src="/pxt-Impetus/pxtsim.js"></script>
 
-    <script src="/pxt-Impetus/libs/object_hash.min.js"></script>
-    <script src="/pxt-Impetus/libs/ammo.js"></script>
-    <script>Ammo = Ammo()</script>
+    <script src="/pxt-Impetus/libs/ammojs/ammo.js"></script>
 
-    <script src="/pxt-Impetus/libs/stats.min.js"></script>
-	<script src="/pxt-Impetus/libs/three.min.js"></script>
-    <script src="/pxt-Impetus/libs/Detector.js"></script>
-    <script src="/pxt-Impetus/libs/OrbitControls.js"></script>
+    <script src="/pxt-Impetus/libs/threejs/stats.min.js"></script>
+	<script src="/pxt-Impetus/libs/threejs/three.min.js"></script>
+
+    <script src="/pxt-Impetus/libs/threejs/BufferSubdivisionModifier.js"></script>
+    <script src="/pxt-Impetus/libs/threejs/ColorConverter.js"></script>
+    <script src="/pxt-Impetus/libs/threejs/Detector.js"></script>
+    <script src="/pxt-Impetus/libs/threejs/QuickHull.js"></script>
+    <script src="/pxt-Impetus/libs/threejs/OrbitControls.js"></script>
+    <script src="/pxt-Impetus/libs/threejs/TeapotBufferGeometry.js"></script>
+
+    <script>
+        var Ammo = Ammo();
+
+        var THREEX = THREE;
+        THREEX.Detector = Detector;
+    </script>
 
     <script src="/pxt-Impetus/sim.js"></script>
 </head>
