@@ -8,105 +8,105 @@ export class btVector3 {
     constructor();
     constructor(x: number, y: number, z: number);
 
-    public x(): number;
-    public y(): number;
-    public z(): number;
-    public setX(x: number): void;
-    public setY(y: number): void;
-    public setZ(z: number): void;
+    x(): number;
+    y(): number;
+    z(): number;
+    setX(x: number): void;
+    setY(y: number): void;
+    setZ(z: number): void;
 
-    public setValue(x: number, y: number, z: number, w?: number): void;
+    setValue(x: number, y: number, z: number, w?: number): void;
 
-    public length(): number;
-    public normalize(): void;
+    length(): number;
+    normalize(): void;
 
-    public rotate(axis: btVector3, angle: number): void;
-    public dot(v: btVector3): number;
+    rotate(axis: btVector3, angle: number): void;
+    dot(v: btVector3): number;
 
-    public op_mul(x: number): this;
-    public op_add(v: btVector3): this;
-    public op_sub(v: btVector3): this;
+    op_mul(x: number): this;
+    op_add(v: btVector3): this;
+    op_sub(v: btVector3): this;
 }
 
 export class btVector4 extends btVector3 {
     constructor(x: number, y: number, z: number, w: number);
 
-    public w(): number;
-    public setW(w: number): void;
+    w(): number;
+    setW(w: number): void;
 }
 
 export class btQuadWord {
     constructor();
     constructor(x: number, y: number, z: number, w?: number);
 
-    public x(): number;
-    public y(): number;
-    public z(): number;
-    public w(): number;
-    public setX(x: number): void;
-    public setY(y: number): void;
-    public setZ(z: number): void;
-    public setW(w: number): void;
+    x(): number;
+    y(): number;
+    z(): number;
+    w(): number;
+    setX(x: number): void;
+    setY(y: number): void;
+    setZ(z: number): void;
+    setW(w: number): void;
 
-    public setValue(x: number, y: number, z: number, w: number): void;
+    setValue(x: number, y: number, z: number, w: number): void;
 }
 
 export class btQuaternion extends btQuadWord {
-    public length(): number;
-    public length2(): number;
-    public normalize(): void;
+    length(): number;
+    length2(): number;
+    normalize(): void;
 
-    public dot(q: btQuaternion): number;
+    dot(q: btQuaternion): number;
 
-    public normalized(): btQuaternion;
-    public getAxis(): btVector3;
-    public inverse(): btQuaternion;
+    normalized(): btQuaternion;
+    getAxis(): btVector3;
+    inverse(): btQuaternion;
 
-    public getAngle(): number;
-    public getAngleShortestPath(): number;
-    public angle(q: btQuaternion): number;
-    public angleShortestPath(q: btQuaternion): number;
+    getAngle(): number;
+    getAngleShortestPath(): number;
+    angle(q: btQuaternion): number;
+    angleShortestPath(q: btQuaternion): number;
 
-    public setEulerZYX(z: number, y: number, x: number): void;
-    public setRotation(axis: btVector3, angle: number): void;
+    setEulerZYX(z: number, y: number, x: number): void;
+    setRotation(axis: btVector3, angle: number): void;
 
-    public op_add(q: btQuaternion): this;
-    public op_sub(q: btQuaternion): this;
-    public op_mul(s: number): this;
-    public op_mulq(q: btQuaternion): this;
-    public op_div(s: number): this;
+    op_add(q: btQuaternion): this;
+    op_sub(q: btQuaternion): this;
+    op_mul(s: number): this;
+    op_mulq(q: btQuaternion): this;
+    op_div(s: number): this;
 }
 
 export class btMatrix3x3 {
-    public setEulerZYX(z: number, y: number, x: number): void;
-    public getRotation(q: btQuaternion): void;
-    public getRow(y:number): btVector3;
+    setEulerZYX(z: number, y: number, x: number): void;
+    getRotation(q: btQuaternion): void;
+    getRow(y:number): btVector3;
 }
 
 export class btTransform {
     constructor();
     constructor(q: btQuaternion, v: btVector3);
   
-    public setIdentity(): void;
+    setIdentity(): void;
 
-    public getOrigin(): btVector3;
-    public setOrigin(origin: btVector3): void;
-    public getRotation(): btQuaternion;
-    public setRotation(rotation: btQuaternion): void;
+    getOrigin(): btVector3;
+    setOrigin(origin: btVector3): void;
+    getRotation(): btQuaternion;
+    setRotation(rotation: btQuaternion): void;
 
-    public getBasis(): btMatrix3x3;
-    public setFromOpenGLMatrix(m: number[]): void;
+    getBasis(): btMatrix3x3;
+    setFromOpenGLMatrix(m: number[]): void;
 }
 
 export abstract class btMotionState {
-    public getWorldTransform(worldTrans: btTransform): void;
-    public setWorldTransform(worldTrans: btTransform): void;
+    getWorldTransform(worldTrans: btTransform): void;
+    setWorldTransform(worldTrans: btTransform): void;
 }
 
 export class btDefaultMotionState extends btMotionState {
     constructor(startTrans?: btTransform, centerOfMassOffset?: btTransform);
 
-    public m_graphicsWorldTrans: btTransform;
+    m_graphicsWorldTrans: btTransform;
 }
 
 declare const enum CollisionFlags {
@@ -128,56 +128,56 @@ declare const enum ActivationState {
 }
 
 export abstract class btCollisionObject {
-    public setActivationState(newState: ActivationState): void;
-    public forceActivationState(newState: ActivationState): void;
-    public activate(forceActivation?: boolean): void;
+    setActivationState(newState: ActivationState): void;
+    forceActivationState(newState: ActivationState): void;
+    activate(forceActivation?: boolean): void;
 
-    public isActive(): boolean;
-    public isKinematicObject(): boolean;
-    public isStaticObject(): boolean;
-    public isStaticOrKinematicObject(): boolean;
+    isActive(): boolean;
+    isKinematicObject(): boolean;
+    isStaticObject(): boolean;
+    isStaticOrKinematicObject(): boolean;
 
-    public setAnisotropicFriction(anisotropicFriction: btVector3, frictionMode: number): void;
+    setAnisotropicFriction(anisotropicFriction: btVector3, frictionMode: number): void;
 
-    public getCollisionFlags(): CollisionFlags;
-    public setCollisionFlags(flags: CollisionFlags): void;
-    public getCollisionShape(): btCollisionShape;
-    public setCollisionShape(collisionShape: btCollisionShape): void;
+    getCollisionFlags(): CollisionFlags;
+    setCollisionFlags(flags: CollisionFlags): void;
+    getCollisionShape(): btCollisionShape;
+    setCollisionShape(collisionShape: btCollisionShape): void;
 
-    public setContactProcessingThreshold(contactProcessingThreshold: number): void;
-    public setRestitution(rest: number): void;
-    public setFriction(friction: number): void;
-    public setRollingFriction(friction: number): void;
+    setContactProcessingThreshold(contactProcessingThreshold: number): void;
+    setRestitution(rest: number): void;
+    setFriction(friction: number): void;
+    setRollingFriction(friction: number): void;
 
-    public gtWorldTransform(): btTransform;
-    public setWorldTransform(worldTrans: btTransform): void;
+    gtWorldTransform(): btTransform;
+    setWorldTransform(worldTrans: btTransform): void;
 
-    public setCcdMotionThreshold(ccdMotionThreshold: number): void;
-    public setCcdSweptSphereRadius(radius: number): void;
+    setCcdMotionThreshold(ccdMotionThreshold: number): void;
+    setCcdSweptSphereRadius(radius: number): void;
     
-    public getUserIndex(): number;
-    public setUserIndex(lindex: number): void;
-    public getUserPointer(): any;
-    public setUserPointer(userPointer: any): void;
+    getUserIndex(): number;
+    setUserIndex(lindex: number): void;
+    getUserPointer(): any;
+    setUserPointer(userPointer: any): void;
 }
 
 export abstract class btCollisionShape {
-    public getLocalScaling(): btVector3;
-    public setLocalScaling(scaling: btVector3): void;
-    public getMargin(): number;
-    public setMargin(margin: number): void;
+    getLocalScaling(): btVector3;
+    setLocalScaling(scaling: btVector3): void;
+    getMargin(): number;
+    setMargin(margin: number): void;
 
-    public calculateLocalInertia(mass:number, inertia: btVector3): void;
+    calculateLocalInertia(mass:number, inertia: btVector3): void;
 }
 
 export class btCompoundShape extends btCollisionShape {
     constructor(enableDynamicAabbTree?: boolean);
 
-    public getNumChildShapes(): number;
-    public getChildShape(index:number): btCollisionShape;
+    getNumChildShapes(): number;
+    getChildShape(index:number): btCollisionShape;
 
-    public addChildShape(localTransform: btTransform, shape: btCollisionShape): void;
-    public removeChildShapeByIndex(childShapeindex: number): void;
+    addChildShape(localTransform: btTransform, shape: btCollisionShape): void;
+    removeChildShapeByIndex(childShapeindex: number): void;
 }
 
 export abstract class btConcaveShape extends btCollisionShape {
@@ -197,9 +197,9 @@ export class btBoxShape extends btConvexShape {
 export class btCapsuleShape extends btConvexShape {
     constructor(radius: number, height: number);
 
-    public getUpAxis(): number;
-    public getRadius(): number;
-    public getHalfHeight(): number;
+    getUpAxis(): number;
+    getRadius(): number;
+    getHalfHeight(): number;
 }
 
 export class btCapsuleShapeX extends btCapsuleShape {}
@@ -226,11 +226,18 @@ export class btConeShapeX extends btConeShape {}
 
 export class btConeShapeZ extends btConeShape {}
 
+export class btConvexHullShape extends btConvexShape {
+    addPoint(point: btVector3, recalculateLocalAABB?: boolean): void;
+
+    getMargin(): number;
+    setMargin(margin: number): void;
+}
+
 export abstract class btOverlappingPairCallback {
 }
 
 export abstract class btOverlappingPairCache extends btOverlappingPairCallback {
-    public setInternalGhostPairCallback(ghostPairCallback: btOverlappingPairCallback): void;
+    setInternalGhostPairCallback(ghostPairCallback: btOverlappingPairCallback): void;
 }
 
 export abstract class btBroadphaseInterface {
@@ -250,17 +257,17 @@ export abstract class btDispatcher {
 }
 
 export class btDispatcherInfo {
-    public m_timeStep: number;
-    public m_stepCount: number;
-    public m_dispatchFunc: number;
-    public m_timeOfImpact: number;
-    public m_useContinuous: boolean;
-    public m_enableSatConvex: boolean;
-    public m_enableSPU: boolean;
-    public m_useEpa: boolean;
-    public m_allowedCcdPenetration: number;
-    public m_useConvexConservativeDistanceUtil: boolean;
-    public m_convexConservativeDistanceThreshold: number;
+    m_timeStep: number;
+    m_stepCount: number;
+    m_dispatchFunc: number;
+    m_timeOfImpact: number;
+    m_useContinuous: boolean;
+    m_enableSatConvex: boolean;
+    m_enableSPU: boolean;
+    m_useEpa: boolean;
+    m_allowedCcdPenetration: number;
+    m_useConvexConservativeDistanceUtil: boolean;
+    m_convexConservativeDistanceThreshold: number;
 }
 
 export class btCollisionDispatcher extends btDispatcher {    
@@ -268,13 +275,13 @@ export class btCollisionDispatcher extends btDispatcher {
 }
 
 export abstract class btTypedConstraint {    
-    public getParam(num: number, axis: number): number;
-    public setParam(num: number, value: number, axis: number): void;
+    getParam(num: number, axis: number): number;
+    setParam(num: number, value: number, axis: number): void;
 
-    public enableFeedback(needsFeedback: boolean): void;
+    enableFeedback(needsFeedback: boolean): void;
 
-    public getBreakingImpulseThreshold(): number;
-    public setBreakingImpulseThreshold(threshold: number): void;
+    getBreakingImpulseThreshold(): number;
+    setBreakingImpulseThreshold(threshold: number): void;
 }
 
 export abstract class btConstraintSolver {
@@ -290,38 +297,38 @@ export class btCollisionWorld {
         collisionconfig: btCollisionConfiguration
     );
 
-    public getDispatcher(): btDispatcher;
-    public getBroadphase(): btBroadphaseInterface;
-    public getDispatchInfo(): btDispatcherInfo;
-    public getPairCache(): btOverlappingPairCache;
+    getDispatcher(): btDispatcher;
+    getBroadphase(): btBroadphaseInterface;
+    getDispatchInfo(): btDispatcherInfo;
+    getPairCache(): btOverlappingPairCache;
 
-    public addCollisionObject(colObj: btCollisionObject, collisionFilterGroup?: number, collisionFilterMask?: number): void;
-    public removeCollisionObject(colObj: btCollisionObject): void;
+    addCollisionObject(colObj: btCollisionObject, collisionFilterGroup?: number, collisionFilterMask?: number): void;
+    removeCollisionObject(colObj: btCollisionObject): void;
 
     // TODO$:
-    // public convexSweepTest(castShape: btConvexShape, from: btTransform, to: btTransform, resultCallback: ConvexResultCallback, allowedCcdPenetration: number): void;
-    // public contactPairTest(colObjA: btCollisionObject, colObjB: btCollisionObject, resultCallback: ContactResultCallback): void;
-    // public contactTest(colObj: btCollisionObject, resultCallback: ContactResultCallback): void;
-    // public updateSingleAabb(colObj: btCollisionObject): void;
+    // convexSweepTest(castShape: btConvexShape, from: btTransform, to: btTransform, resultCallback: ConvexResultCallback, allowedCcdPenetration: number): void;
+    // contactPairTest(colObjA: btCollisionObject, colObjB: btCollisionObject, resultCallback: ContactResultCallback): void;
+    // contactTest(colObj: btCollisionObject, resultCallback: ContactResultCallback): void;
+    // updateSingleAabb(colObj: btCollisionObject): void;
 
-    // public rayTest(rayFromWorld: btVector3, rayToWorld: btVector3, resultCallback: RayResultCallback): void;
+    // rayTest(rayFromWorld: btVector3, rayToWorld: btVector3, resultCallback: RayResultCallback): void;
 }
 
 export class btContactSolverInfo {
-    public m_splitImpulse: boolean;
-    public m_splitImpulsePenetrationThreshold: number;
-    public m_numIterations: number;
+    m_splitImpulse: boolean;
+    m_splitImpulsePenetrationThreshold: number;
+    m_numIterations: number;
 }
 
 export abstract class btActionInterface {
-    public updateAction(collisionWorld: btCollisionWorld, deltaTimeStep: number): void;
+    updateAction(collisionWorld: btCollisionWorld, deltaTimeStep: number): void;
 }
 
 export abstract class btDynamicsWorld extends btCollisionWorld {
-    public getSolverInfo(): btContactSolverInfo;
+    getSolverInfo(): btContactSolverInfo;
     
-    public addAction(action: btActionInterface): void;
-    public removeAction(action: btActionInterface): void;
+    addAction(action: btActionInterface): void;
+    removeAction(action: btActionInterface): void;
 }
 
 export class btDiscreteDynamicsWorld extends btDynamicsWorld {
@@ -332,78 +339,78 @@ export class btDiscreteDynamicsWorld extends btDynamicsWorld {
         collisionconfig: btCollisionConfiguration
     );
 
-    public getGravity(): btVector3;
-    public setGravity(gravity: btVector3): void;
+    getGravity(): btVector3;
+    setGravity(gravity: btVector3): void;
 
-    public addRigidBody(body: btRigidBody): void;
-    public addRigidBody(body: btRigidBody, group: number, mask: number): void;
-    public removeRigidBody(body: btRigidBody): void;
+    addRigidBody(body: btRigidBody): void;
+    addRigidBody(body: btRigidBody, group: number, mask: number): void;
+    removeRigidBody(body: btRigidBody): void;
 
-    public addConstraint(constraint: btTypedConstraint, disableCollisionsBetweenLinkedBodies?: boolean): void;
-    public removeConstraint(constraint: btTypedConstraint): void;
+    addConstraint(constraint: btTypedConstraint, disableCollisionsBetweenLinkedBodies?: boolean): void;
+    removeConstraint(constraint: btTypedConstraint): void;
 
-    public stepSimulation(timeStep: number, maxSubSteps?: number, fixedTimeStep?: number): number;
+    stepSimulation(timeStep: number, maxSubSteps?: number, fixedTimeStep?: number): number;
 }
 
 export class btRigidBodyConstructionInfo {
     constructor(mass: number, motionState: btMotionState, collisionShape: btCollisionShape, localInertia?: btVector3);
 
-    public m_motionState: btMotionState;
-    public m_collisionShape: btCollisionShape;
+    m_motionState: btMotionState;
+    m_collisionShape: btCollisionShape;
 
-    public m_linearDamping: number;
-    public m_angularDamping: number;
-    public m_friction: number;
-    public m_rollingFriction: number;
-    public m_restitution: number;
-    public m_linearSleepingThreshold: number;
-    public m_angularSleepingThreshold: number;
-    public m_additionalDamping: boolean;
-    public m_additionalDampingFactor: number;
-    public m_additionalLinearDampingThresholdSqr: number;
-    public m_additionalAngularDampingThresholdSqr: number;
-    public m_additionalAngularDampingFactor: number;
+    m_linearDamping: number;
+    m_angularDamping: number;
+    m_friction: number;
+    m_rollingFriction: number;
+    m_restitution: number;
+    m_linearSleepingThreshold: number;
+    m_angularSleepingThreshold: number;
+    m_additionalDamping: boolean;
+    m_additionalDampingFactor: number;
+    m_additionalLinearDampingThresholdSqr: number;
+    m_additionalAngularDampingThresholdSqr: number;
+    m_additionalAngularDampingFactor: number;
 }
 
 export class btRigidBody extends btCollisionObject {
     constructor(info: btRigidBodyConstructionInfo);
 
-    public getLinearVelocity(): btVector3;
-    public SetLinearVelocity(lin_vel: btVector3): void;
+    getLinearVelocity(): btVector3;
+    SetLinearVelocity(lin_vel: btVector3): void;
 
-    public getAngularVelocity(): btVector3;
-    public setAngularVelocity(ang_vel: btVector3): void;
+    getAngularVelocity(): btVector3;
+    setAngularVelocity(ang_vel: btVector3): void;
 
-    public getCenterOfMassTransform(): btTransform;
-    public setCenterOfMassTransform(xform: btTransform): void;
+    getCenterOfMassTransform(): btTransform;
+    setCenterOfMassTransform(xform: btTransform): void;
 
-    public setSleepingThresholds(linear: number, angular: number): void;
-    public setDamping(lin_damping: number, ang_damping: number): void;
-    public setMassProps(mass: number, inertia: btVector3): void;
-    public setLinearFactor(linearFactor: btVector3): void;
-    public setAngularFactor(angularFactorr: btVector3): void;
+    setSleepingThresholds(linear: number, angular: number): void;
+    setDamping(lin_damping: number, ang_damping: number): void;
+    setMassProps(mass: number, inertia: btVector3): void;
+    setLinearFactor(linearFactor: btVector3): void;
+    setAngularFactor(angularFactorr: btVector3): void;
 
-    public getMotionState(): btMotionState;
-    public setMotionState(motionstate: btMotionState): void;
+    getMotionState(): btMotionState;
+    setMotionState(motionstate: btMotionState): void;
 
-    public getGravity(): btVector3;
-    public setGravity(acceleration: btVector3): void;
+    getGravity(): btVector3;
+    setGravity(acceleration: btVector3): void;
 
-    public applyTorque(torque: btVector3): void;
-    public applyLocalTorque(torque: btVector3): void;
-    public applyForce(force: btVector3, rel_pos: btVector3): void;
-    public applyCentralForce(force: btVector3): void;
-    public applyCentralLocalForce(force: btVector3): void;
-    public applyTorqueImpulse(torque: btVector3): void;
-    public applyImpulse(impulse: btVector3, rel_pos: btVector3): void;
-    public applyCentralImpulse(impulse: btVector3): void;
-    public applyGravity(): void;
+    applyTorque(torque: btVector3): void;
+    applyLocalTorque(torque: btVector3): void;
+    applyForce(force: btVector3, rel_pos: btVector3): void;
+    applyCentralForce(force: btVector3): void;
+    applyCentralLocalForce(force: btVector3): void;
+    applyTorqueImpulse(torque: btVector3): void;
+    applyImpulse(impulse: btVector3, rel_pos: btVector3): void;
+    applyCentralImpulse(impulse: btVector3): void;
+    applyGravity(): void;
 
-    public updateInertiaTensor(): void;
+    updateInertiaTensor(): void;
 
-    public getAabb(aabbMin: btVector3, aabbMax: btVector3): void;
+    getAabb(aabbMin: btVector3, aabbMax: btVector3): void;
 
-    public upcast(colObj: btCollisionObject): btRigidBody;
+    upcast(colObj: btCollisionObject): btRigidBody;
 }
 
 export class btSoftBody {
@@ -412,26 +419,26 @@ export class btSoftBody {
 
 export class btSoftBodyArray {
     publicsize(): number;
-    public at(n: number): btSoftBody;
+    at(n: number): btSoftBody;
 }
 
 export class btSoftBodyWorldInfo {
-    public get_air_density(): number;
-    public set_air_density(value: number): void;
-    public get_m_gravity(): btVector3;
-    public set_m_gravity(value: btVector3): void;
-    public get_m_maxDisplacement(): number;
-    public set_m_maxDisplacement(value: number): void;
-    public get_water_density(): number;
-    public set_water_density(value: number): void;
-    public get_water_normal(): btVector3;
-    public set_water_normal(value: btVector3): void;
-    public get_water_offset(): number;
-    public set_water_offset(value: number): void;
-    public get_m_broadphase(): btBroadphaseInterface;
-    public set_m_broadphase(value: btBroadphaseInterface): void;
-    public get_m_dispatcher(): btDispatcher;
-    public set_m_dispatcher(value: btDispatcher): void;
+    get_air_density(): number;
+    set_air_density(value: number): void;
+    get_m_gravity(): btVector3;
+    set_m_gravity(value: btVector3): void;
+    get_m_maxDisplacement(): number;
+    set_m_maxDisplacement(value: number): void;
+    get_water_density(): number;
+    set_water_density(value: number): void;
+    get_water_normal(): btVector3;
+    set_water_normal(value: btVector3): void;
+    get_water_offset(): number;
+    set_water_offset(value: number): void;
+    get_m_broadphase(): btBroadphaseInterface;
+    set_m_broadphase(value: btBroadphaseInterface): void;
+    get_m_dispatcher(): btDispatcher;
+    set_m_dispatcher(value: btDispatcher): void;
 }
 
 export abstract class btSoftBodySolver {
@@ -453,25 +460,25 @@ export class btSoftRigidDynamicsWorld extends btDiscreteDynamicsWorld {
         solver?: btSoftBodySolver
     );
 
-    public getWorldInfo(): btSoftBodyWorldInfo;
-    public setWorldInfo(info: btSoftBodyWorldInfo): void;
+    getWorldInfo(): btSoftBodyWorldInfo;
+    setWorldInfo(info: btSoftBodyWorldInfo): void;
 
-    public getSoftBodyArray(): btSoftBodyArray;
+    getSoftBodyArray(): btSoftBodyArray;
 
-    public addSoftBody(body: btSoftBody, collisionFilterGroup: number, collisionFilterMask: number): void;
-    public removeSoftBody(body: btSoftBody): void;
+    addSoftBody(body: btSoftBody, collisionFilterGroup: number, collisionFilterMask: number): void;
+    removeSoftBody(body: btSoftBody): void;
 }
 
 export class btSoftBodyHelpers {
     constructor();
     
-    public CreateRope(
+    CreateRope(
         worldInfo: btSoftBodyWorldInfo,
         from: btVector3, to: btVector3,
         res: number,
         fixeds: number): btSoftBody;
 
-    public CreatePatch(
+    CreatePatch(
         worldInfo: btSoftBodyWorldInfo,
         corner00: btVector3,
         corner10: btVector3,
@@ -481,7 +488,7 @@ export class btSoftBodyHelpers {
         fixeds: number,
         gendiags: boolean): btSoftBody;
 
-    public CreatePatchUV(
+    CreatePatchUV(
         worldInfo: btSoftBodyWorldInfo,
         corner00: btVector3,
         corner10: btVector3,
@@ -492,20 +499,20 @@ export class btSoftBodyHelpers {
         gendiags: boolean,
         tex_coords: number[]): btSoftBody;
     
-    public CreateEllipsoid(
+    CreateEllipsoid(
         worldInfo: btSoftBodyWorldInfo,
         center: btVector3,
         radius: btVector3,
         lres: number): btSoftBody;
     
-    public CreateFromTriMesh(
+    CreateFromTriMesh(
         worldInfo: btSoftBodyWorldInfo,
         vertices: number[],
         triangles: number[],
         ntriangles: number,
         randomizeConstraints: boolean): btSoftBody;
     
-    public CreateFromConvexHull(
+    CreateFromConvexHull(
         worldInfo: btSoftBodyWorldInfo,
         vertices: btVector3,
         nvertices: number,

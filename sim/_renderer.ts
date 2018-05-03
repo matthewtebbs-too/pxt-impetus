@@ -4,8 +4,6 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path="../shared/detector.d.ts"/>
-
 /// <reference path="_runtime.ts"/>
 
 namespace pxsim {
@@ -81,8 +79,8 @@ namespace pxsim {
                 throw new Error(`Canvas container element ${id} not found.`);
             }
 
-            if (!Detector.webgl) {
-                Detector.addGetWebGLMessage({ parent: this._container });
+            if (!THREEX.Detector.webgl) {
+                THREEX.Detector.addGetWebGLMessage({ parent: this._container });
                 return;
             }
 

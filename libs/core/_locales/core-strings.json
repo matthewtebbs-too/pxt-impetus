@@ -233,6 +233,7 @@
   "design.randomColor|block": "random color",
   "design.sphereShape|block": "sphere of radius %radius",
   "design.standardColor|block": "%color",
+  "design.teapotShape|block": "teapot of size %size",
   "design|block": "Design",
   "fieldeditors.onOff|block": "%on",
   "fieldeditors|block": "fieldeditors",

@@ -250,6 +250,16 @@ declare namespace design {
     //% group="Shape"
     //% shim=shape::coneShape
     function coneShape(radius?: number, height?: number): Shape3d;
+
+    /**
+     * Utah teapot.
+     * @param size number, eg: 1
+     */
+    //% blockId=shape3d_teapot 
+    //% block="teapot of size %size"
+    //% group="Shape"
+    //% shim=shape::teapotShape
+    function teapotShape(size?: number): Shape3d;
 }
 
 declare namespace design {

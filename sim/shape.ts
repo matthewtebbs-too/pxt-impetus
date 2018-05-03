@@ -37,14 +37,24 @@ namespace pxsim {
                 this._ctorCollisionShape = ctor;
             }
 
-            protected _getBounds(target: THREE.Vector3): THREE.Vector3 {
+            protected _getBounds(): THREE.Vector3 {
+                return this._getBoundingBox().getSize(new THREE.Vector3());
+            }
+
+            protected _getBoundingBox(): THREE.Box3 {
                 this.computeBoundingBox();
 
-                return this.boundingBox.getSize(target);
+                return this.boundingBox;
+            }
+
+            protected _getBoundingSphere(): THREE.Sphere {
+                this.computeBoundingSphere();
+
+                return this.boundingSphere;
             }
 
             protected _createCollisionShapeFromHalfExtents(ctor: (bthalfextents: Ammo.btVector3) => Ammo.btCollisionShape): Ammo.btCollisionShape {
-                const bthalfextents = Helper.btVector3FromThree(this._getBounds(new THREE.Vector3()).divideScalar(2));
+                const bthalfextents = Helper.btVector3FromThree(this._getBounds().divideScalar(2));
 
                 const btshape = ctor(bthalfextents);
                 btshape.setMargin(Shape3d._collisionMargin);
@@ -126,6 +136,58 @@ namespace pxsim {
             this._setCtorCollisionShape(() => new Ammo.btConeShape(radius!, height!));
         }
     }
+
+    export class TeapotShape3d extends ShapeMixin(THREEX.TeapotBufferGeometry) {
+        constructor(size?: number) {
+            size = size || 1;
+
+            super(size, 2);
+
+            const quickhull = new THREEX.QuickHull();
+
+            const positions = this.getAttribute('position') as THREE.BufferAttribute;
+            const points = new Array<THREE.Vector3>(positions.count);
+            for (let index = 0; index < positions.count; index++) {
+                points[index] = new THREE.Vector3();
+                points[index].fromBufferAttribute(positions, index);
+            }
+
+            quickhull.setFromPoints(points);
+
+            const btshape = new Ammo.btConvexHullShape();
+            btshape.setMargin(0);
+
+            const btvec = new Ammo.btVector3();
+
+            let hullcount = 0;
+            const faces = quickhull.faces;
+            faces.forEach(face => {
+                let edge = face.edge;
+
+                do {
+                    const point = edge.head().point;
+
+                    btvec.setX(point.x);
+                    btvec.setY(point.y);
+                    btvec.setZ(point.z);
+
+                    btshape.addPoint(btvec);
+                    hullcount++;
+
+                    edge = edge.next;
+                } while (edge !== face.edge);
+            });
+
+            // tslint:disable
+            console.log(`Count of original points ${positions.count}`);
+            console.log(`Count of QuickHull points ${hullcount}`);
+
+            Helper.safeAmmoObjectDestroy(btvec);
+
+            this._setShapeVolume(1);
+            this._setCtorCollisionShape(() => btshape);
+        }
+    }
 }
 
 namespace pxsim.shape {
@@ -147,5 +209,9 @@ namespace pxsim.shape {
 
     export function coneShape(radius?: number, height?: number): ConeShape3d  {
         return new ConeShape3d(radius, height);
+    }
+
+    export function teapotShape(size?: number): TeapotShape3d  {
+        return new TeapotShape3d(size);
     }
 }

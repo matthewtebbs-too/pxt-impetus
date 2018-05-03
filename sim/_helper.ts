@@ -4,8 +4,6 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path="../shared/ammo.d.ts"/>
-
 namespace pxsim {
     export class Helper {
         public static btVector3FromThree(vec: THREE.Vector3): Ammo.btVector3 {
