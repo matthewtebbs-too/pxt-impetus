@@ -27,6 +27,21 @@ namespace pxsim {
                 return this._ctorCollisionShape ? this._ctorCollisionShape() : null;
             }
 
+            public getArrayAttribute<AT extends IFromBufferAttribute<AT>>(
+                name: string,
+                ctor: rt.ObjectConstructor<AT>,
+            ): AT[] {
+                const buffer = this.getAttribute(name) as THREE.BufferAttribute;
+                const array = new Array<AT>(buffer.count);
+
+                for (let index = 0; index < buffer.count; index++) {
+                    array[index] = new ctor();
+                    array[index].fromBufferAttribute(buffer, index);
+                }
+
+                return array;
+            }
+
             public copy(source: this): this {
                 super.copy(source);
 
@@ -66,21 +81,6 @@ namespace pxsim {
                 Helper.safeAmmoObjectDestroy(bthalfextents);
 
                 return btshape;
-            }
-
-            protected _getArrayAttribute<AT extends IFromBufferAttribute<AT>>(
-                name: string,
-                ctor: rt.ObjectConstructor<AT>,
-            ): AT[] {
-                const buffer = this.getAttribute(name) as THREE.BufferAttribute;
-                const array = new Array<AT>(buffer.count);
-
-                for (let index = 0; index < buffer.count; index++) {
-                    array[index] = new ctor();
-                    array[index].fromBufferAttribute(buffer, index);
-                }
-
-                return array;
             }
         };
     }
@@ -162,11 +162,8 @@ namespace pxsim {
 
             super(size, 2);
 
-            const quickhull = new THREEX.QuickHull();
-
-            const points = this._getArrayAttribute<THREE.Vector3>('position', THREE.Vector3);
-
-            quickhull.setFromPoints(points);
+            const quickhull = new QuickHull3d();
+            quickhull.setFromShape3d(this);
 
             const btshape = new Ammo.btConvexHullShape();
             btshape.setMargin(0);
