@@ -7,6 +7,10 @@
 /// <reference path="_runtime.ts"/>
 
 namespace pxsim {
+    export interface IFromBufferAttribute<T> {
+        fromBufferAttribute(attribute: THREE.BufferAttribute, index: number, offset?: number): T;
+    }
+
     export function ShapeMixin<T extends rt.ObjectConstructor<THREE.BufferGeometry>>(base: T) {
         return class extends base implements rt.ICloneableObject {
             protected static _radialSegments = 32;
@@ -62,6 +66,21 @@ namespace pxsim {
                 Helper.safeAmmoObjectDestroy(bthalfextents);
 
                 return btshape;
+            }
+
+            protected _getArrayAttribute<AT extends IFromBufferAttribute<AT>>(
+                name: string,
+                ctor: rt.ObjectConstructor<AT>,
+            ): AT[] {
+                const buffer = this.getAttribute(name) as THREE.BufferAttribute;
+                const array = new Array<AT>(buffer.count);
+
+                for (let index = 0; index < buffer.count; index++) {
+                    array[index] = new ctor();
+                    array[index].fromBufferAttribute(buffer, index);
+                }
+
+                return array;
             }
         };
     }
@@ -145,12 +164,7 @@ namespace pxsim {
 
             const quickhull = new THREEX.QuickHull();
 
-            const positions = this.getAttribute('position') as THREE.BufferAttribute;
-            const points = new Array<THREE.Vector3>(positions.count);
-            for (let index = 0; index < positions.count; index++) {
-                points[index] = new THREE.Vector3();
-                points[index].fromBufferAttribute(positions, index);
-            }
+            const points = this._getArrayAttribute<THREE.Vector3>('position', THREE.Vector3);
 
             quickhull.setFromPoints(points);
 
@@ -179,7 +193,6 @@ namespace pxsim {
             });
 
             // tslint:disable
-            console.log(`Count of original points ${positions.count}`);
             console.log(`Count of QuickHull points ${hullcount}`);
 
             Helper.safeAmmoObjectDestroy(btvec);
