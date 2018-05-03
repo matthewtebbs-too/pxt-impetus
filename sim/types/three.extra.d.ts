@@ -29,6 +29,14 @@ export namespace ColorConverter {
     export function getCMYK(color: THREE.Color): CMYK;
 }
 
+export class ConvexGeometry extends THREE.Geometry {
+    constructor(points: THREE.Vector3[]);
+}
+
+export class ConvexBufferGeometry extends THREE.BufferGeometry {
+    constructor(points: THREE.Vector3[]);
+}
+
 export namespace Detector {
     export const webgl: boolean;
     export function getWebGLErrorMessage(): HTMLElement;
