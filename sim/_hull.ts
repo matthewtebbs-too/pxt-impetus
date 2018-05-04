@@ -14,7 +14,8 @@ namespace pxsim {
 
     export class QuickHull3d extends THREEX.QuickHull {
         public setFromShape3d(shape3d: Shape3d) {
-            this.setFromPoints(shape3d.getArrayAttribute<THREE.Vector3>('position', THREE.Vector3));
+            this.setFromPoints(Helper.arrayFromBufferAttribute<THREE.Vector3>(
+                shape3d.getAttribute('position') as THREE.BufferAttribute, THREE.Vector3));
         }
 
         public getVectors() {

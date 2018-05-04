@@ -5,6 +5,10 @@
 */
 
 namespace pxsim {
+    export interface IFromBufferAttribute<T> {
+        fromBufferAttribute(attribute: THREE.BufferAttribute, index: number, offset?: number): T;
+    }
+
     export class Helper {
         public static btVector3FromThree(vec: THREE.Vector3): Ammo.btVector3 {
             return new Ammo.btVector3(vec.x, vec.y, vec.z);
@@ -12,6 +16,20 @@ namespace pxsim {
 
         public static btQuaternionFromThree(qtr: THREE.Quaternion): Ammo.btQuaternion {
             return new Ammo.btQuaternion(qtr.x, qtr.y, qtr.z, qtr.w);
+        }
+
+        public static arrayFromBufferAttribute<AT extends IFromBufferAttribute<AT>>(
+            attribute: THREE.BufferAttribute,
+            ctor: rt.ObjectConstructor<AT>,
+        ): AT[] {
+            const array = new Array<AT>(attribute.count);
+
+            for (let index = 0; index < attribute.count; index++) {
+                array[index] = new ctor();
+                array[index].fromBufferAttribute(attribute, index);
+            }
+
+            return array;
         }
 
         public static applyFn<T, R>(input: T | T[], fn: (t: T) => R): R | R[] {

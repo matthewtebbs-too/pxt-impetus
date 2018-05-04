@@ -7,10 +7,6 @@
 /// <reference path="_runtime.ts"/>
 
 namespace pxsim {
-    export interface IFromBufferAttribute<T> {
-        fromBufferAttribute(attribute: THREE.BufferAttribute, index: number, offset?: number): T;
-    }
-
     export function ShapeMixin<T extends rt.ObjectConstructor<THREE.BufferGeometry>>(base: T) {
         return class extends base implements rt.ICloneableObject {
             protected static _radialSegments = 32;
@@ -25,21 +21,6 @@ namespace pxsim {
 
             public createCollisionShape(): Ammo.btCollisionShape | null {
                 return this._ctorCollisionShape ? this._ctorCollisionShape() : null;
-            }
-
-            public getArrayAttribute<AT extends IFromBufferAttribute<AT>>(
-                name: string,
-                ctor: rt.ObjectConstructor<AT>,
-            ): AT[] {
-                const buffer = this.getAttribute(name) as THREE.BufferAttribute;
-                const array = new Array<AT>(buffer.count);
-
-                for (let index = 0; index < buffer.count; index++) {
-                    array[index] = new ctor();
-                    array[index].fromBufferAttribute(buffer, index);
-                }
-
-                return array;
             }
 
             public copy(source: this): this {
@@ -179,9 +160,6 @@ namespace pxsim {
 
                 hullcount++;
             });
-
-            // tslint:disable
-            console.log(`Count of QuickHull points ${hullcount}`);
 
             this._setShapeVolume(1);
             this._setCtorCollisionShape(() => btshape);
