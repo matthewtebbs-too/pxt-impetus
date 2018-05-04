@@ -165,34 +165,23 @@ namespace pxsim {
             const quickhull = new QuickHull3d();
             quickhull.setFromShape3d(this);
 
+            const vectors = quickhull.getVectors();
+
             const btshape = new Ammo.btConvexHullShape();
             btshape.setMargin(0);
 
-            const btvec = new Ammo.btVector3();
-
             let hullcount = 0;
-            const faces = quickhull.faces;
-            faces.forEach(face => {
-                let edge = face.edge;
 
-                do {
-                    const point = edge.head().point;
+            vectors.vertices.forEach(vertex => {
+                let btvec;
+                btshape.addPoint(btvec = Helper.btVector3FromThree(vertex));
+                Helper.safeAmmoObjectDestroy(btvec);
 
-                    btvec.setX(point.x);
-                    btvec.setY(point.y);
-                    btvec.setZ(point.z);
-
-                    btshape.addPoint(btvec);
-                    hullcount++;
-
-                    edge = edge.next;
-                } while (edge !== face.edge);
+                hullcount++;
             });
 
             // tslint:disable
             console.log(`Count of QuickHull points ${hullcount}`);
-
-            Helper.safeAmmoObjectDestroy(btvec);
 
             this._setShapeVolume(1);
             this._setCtorCollisionShape(() => btshape);
