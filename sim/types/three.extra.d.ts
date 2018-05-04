@@ -45,20 +45,45 @@ export namespace Detector {
 
 export class VertexNode {
     point: THREE.Vector3;
+    prev: VertexNode;
+    next: VertexNode;
+    face: Face;
+
+    constructor(point: THREE.Vector3);
 }
 
 export class Face {
+    normal: THREE.Vector3;
+    midpoint: THREE.Vector3;
+    area: number;
+    constant: number;   
+    outside: VertexNode;
+    mark: number;
     edge: HalfEdge;
+
+    constructor();
+
+    create(a: VertexNode, b: VertexNode, c: VertexNode ): Face;
+    getEdge(i: number): HalfEdge;
+    compute(): Face;
+    distanceToPoint(point: THREE.Vector3): number;
 }
 
 export class HalfEdge {
+    vertex: VertexNode;
+    prev: HalfEdge;
     next: HalfEdge;
+    twin: HalfEdge;
+    face: Face;
 
     constructor(vertext: VertexNode, face: Face);
 
     head(): VertexNode;
+    tail(): VertexNode;
+    length(): number;
+    lengthSquared(): number;
+    setTwin(edge: HalfEdge): HalfEdge;
 }
-
 
 export class QuickHull {
     tolerance: number;
