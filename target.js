@@ -553,6 +553,6 @@ var pxtTargetBundle = {
   },
   "versions": {
     "target": "0.1.0",
-    "pxt": "3.12.17"
+    "pxt": "3.12.22"
   }
 }
