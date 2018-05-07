@@ -10,6 +10,7 @@ namespace pxsim {
     export function ShapeMixin<T extends rt.ObjectConstructor<THREE.BufferGeometry>>(base: T) {
         return class extends base implements rt.ICloneableObject {
             protected static _radialSegments = 32;
+            protected static _patchSegments = 10;
             protected static _collisionMargin = 0.05;
 
             private _volume = 0;
@@ -53,7 +54,7 @@ namespace pxsim {
                 return this.boundingSphere;
             }
 
-            protected _createCollisionShapeFromHalfExtents(ctor: (bthalfextents: Ammo.btVector3) => Ammo.btCollisionShape): Ammo.btCollisionShape {
+            protected _btCollisionShapeFromHalfExtents(ctor: (bthalfextents: Ammo.btVector3) => Ammo.btCollisionShape): Ammo.btCollisionShape {
                 const bthalfextents = Helper.btVector3FromThree(this._getBounds().divideScalar(2));
 
                 const btshape = ctor(bthalfextents);
@@ -76,7 +77,7 @@ namespace pxsim {
             super(width, height);
 
             this.rotateX(-Math.PI / 2);
-            this._setCtorCollisionShape(() => this._createCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btBoxShape(bthalfextents)));
+            this._setCtorCollisionShape(() => this._btCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btBoxShape(bthalfextents)));
         }
     }
 
@@ -94,7 +95,7 @@ namespace pxsim {
             super(width, height, depth);
 
             this._setShapeVolume(width * height * depth);
-            this._setCtorCollisionShape(() => this._createCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btBoxShape(bthalfextents)));
+            this._setCtorCollisionShape(() => this._btCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btBoxShape(bthalfextents)));
         }
     }
 
@@ -110,7 +111,7 @@ namespace pxsim {
             super(radius, radius, height, Shape3d._radialSegments, 1, openEnded || false);
 
             this._setShapeVolume(Math.PI * Math.pow(radius, 2) * height);
-            this._setCtorCollisionShape(() => this._createCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btCylinderShape(bthalfextents)));
+            this._setCtorCollisionShape(() => this._btCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btCylinderShape(bthalfextents)));
         }
     }
 
@@ -141,18 +142,10 @@ namespace pxsim {
         constructor(size?: number) {
             size = size || 1;
 
-            super(size);
-
-            const geometry = new THREEX.TeapotBufferGeometry(size, 2);
-            const result = new QuickHull3d().calculateFromShape3d(geometry);
-
-            const btshape = new Ammo.btConvexHullShape();
-            btshape.setMargin(0);
-
-            result.points.forEach(point => btshape.addPoint(Helper.btVector3FromThree(point) /* btConvexHullShape owns alloc */));
+            super(size, Shape3d._patchSegments);
 
             this._setShapeVolume(1);
-            this._setCtorCollisionShape(() => btshape);
+            this._setCtorCollisionShape(() => btCollisionShapeFromQuickHull3dResult(new QuickHull3d().calculateFromShape3d(new THREEX.TeapotBufferGeometry(size, 2 /* less segments */))));
         }
     }
 }

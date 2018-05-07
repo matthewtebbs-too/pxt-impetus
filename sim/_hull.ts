@@ -7,14 +7,34 @@
 */
 
 namespace pxsim {
+    export function btCollisionShapeFromQuickHull3dResult(result: QuickHull3dResult) {
+        const btshape = new Ammo.btConvexHullShape();
+        btshape.setMargin(0);
+
+        result.hullindexes.forEach(index => btshape.addPoint(Helper.btVector3FromThree(result.vertices[index]) /* btConvexHullShape owns alloc */));
+
+        return btshape;
+    }
+
+    // tslint:disable-next-line:interface-name
     export class QuickHull3dResult {
-        public points: THREE.Vector3[] = [];
+        public area: number = 0;
+        public volume: number = 0;
+
+        public hullindexes: number[] = [];
+
         public vertices: THREE.Vector3[] = [];
         public normals: THREE.Vector3[] = [];
     }
 
+    // tslint:disable-next-line:interface-name
+    export interface QuickHull3dOptions {
+        includeAreaAndVolume?: boolean;
+        excludeGeometry?: boolean;
+    }
+
     export class QuickHull3d extends THREEX.QuickHull {
-        public calculateFromShape3d(geometry: THREE.Geometry | THREE.BufferGeometry): QuickHull3dResult {
+        public calculateFromShape3d(geometry: THREE.Geometry | THREE.BufferGeometry, options?: QuickHull3dOptions): QuickHull3dResult {
             let points: THREE.Vector3[];
 
             if (geometry instanceof THREE.Geometry) {
@@ -26,29 +46,41 @@ namespace pxsim {
                 throw new Error();
             }
 
-            return this.setFromPoints(points)._getResult();
+            return this.setFromPoints(points)._getResult(options);
         }
 
-        protected _getResult() {
+        protected _getResult(options?: QuickHull3dOptions) {
             const result = new QuickHull3dResult();
+
+            const origin = new THREE.Vector3();
 
             this.faces.forEach(face => {
                 let edge = face.edge;
 
-                do {
-                    const vertexnode = edge.head();
-                    const point = vertexnode.point;
+                if (options && options.includeAreaAndVolume) {
+                    result.area += face.area;
+                    result.volume += Math.abs(face.distanceToPoint(origin)) * face.area;
+                }
 
-                    const seen = !!vertexnode.userData;
-                    vertexnode.userData = true;
+                if (!(options && options.excludeGeometry)) {
+                    do {
+                        const vertexnode = edge.head();
+                        const point = vertexnode.point;
 
-                    if (!seen) { result.points.push(point); }
-                    result.vertices.push(point);
-                    result.normals.push(face.normal);
+                        const seen = !!vertexnode.userData;
+                        vertexnode.userData = true;
 
-                    edge = edge.next;
-                } while (edge !== face.edge);
+                        if (!seen) { result.hullindexes.push(result.vertices.length); }
+
+                        result.vertices.push(point);
+                        result.normals.push(face.normal);
+
+                        edge = edge.next;
+                    } while (edge !== face.edge);
+                }
             });
+
+            result.volume /= 3;
 
             return result;
         }
