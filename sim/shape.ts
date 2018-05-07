@@ -141,16 +141,15 @@ namespace pxsim {
         constructor(size?: number) {
             size = size || 1;
 
-            super(size, 2);
+            super(size);
 
-            const result = new QuickHull3d().calculateFromShape3d(this);
+            const geometry = new THREEX.TeapotBufferGeometry(size, 2);
+            const result = new QuickHull3d().calculateFromShape3d(geometry);
 
             const btshape = new Ammo.btConvexHullShape();
             btshape.setMargin(0);
 
-            const btpoint = new Ammo.btVector3();
-            result.points.forEach(point => btshape.addPoint(Helper.btVector3FromThree(point, btpoint)));
-            Helper.safeAmmoObjectDestroy(btpoint);
+            result.points.forEach(point => btshape.addPoint(Helper.btVector3FromThree(point) /* btshape owns alloc */));
 
             this._setShapeVolume(1);
             this._setCtorCollisionShape(() => btshape);
