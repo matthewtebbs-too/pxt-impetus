@@ -49,6 +49,8 @@ export class VertexNode {
     next: VertexNode;
     face: Face;
 
+    userData: any;
+
     constructor(point: THREE.Vector3);
 }
 
