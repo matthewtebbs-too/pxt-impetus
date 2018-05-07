@@ -14,11 +14,19 @@ namespace pxsim {
     }
 
     export class QuickHull3d extends THREEX.QuickHull {
-        public calculateFromShape3d(shape3d: Shape3d): QuickHull3dResult {
-            this.setFromPoints(Helper.arrayFromBufferAttribute<THREE.Vector3>(
-                shape3d.getAttribute('position') as THREE.BufferAttribute, THREE.Vector3));
+        public calculateFromShape3d(geometry: THREE.Geometry | THREE.BufferGeometry): QuickHull3dResult {
+            let points: THREE.Vector3[];
 
-            return this._getResult();
+            if (geometry instanceof THREE.Geometry) {
+                points = geometry.vertices;
+            } else if (geometry instanceof THREE.BufferGeometry) {
+                points = Helper.arrayFromBufferAttribute<THREE.Vector3>(
+                    geometry.getAttribute('position') as THREE.BufferAttribute, THREE.Vector3);
+            } else {
+                throw new Error();
+            }
+
+            return this.setFromPoints(points)._getResult();
         }
 
         protected _getResult() {
