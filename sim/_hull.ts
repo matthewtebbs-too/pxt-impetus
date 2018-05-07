@@ -7,34 +7,42 @@
 */
 
 namespace pxsim {
-    export class QuickHull3dVectors {
+    export class QuickHull3dResult {
+        public points: THREE.Vector3[] = [];
         public vertices: THREE.Vector3[] = [];
         public normals: THREE.Vector3[] = [];
     }
 
     export class QuickHull3d extends THREEX.QuickHull {
-        public setFromShape3d(shape3d: Shape3d) {
+        public calculateFromShape3d(shape3d: Shape3d): QuickHull3dResult {
             this.setFromPoints(Helper.arrayFromBufferAttribute<THREE.Vector3>(
                 shape3d.getAttribute('position') as THREE.BufferAttribute, THREE.Vector3));
+
+            return this._getResult();
         }
 
-        public getVectors() {
-            const vectors = new QuickHull3dVectors();
+        protected _getResult() {
+            const result = new QuickHull3dResult();
 
             this.faces.forEach(face => {
                 let edge = face.edge;
 
                 do {
-                    const point = edge.head().point;
+                    const vertexnode = edge.head();
+                    const point = vertexnode.point;
 
-                    vectors.vertices.push(point);
-                    vectors.normals.push(face.normal);
+                    const seen = !!vertexnode.userData;
+                    vertexnode.userData = true;
+
+                    if (!seen) { result.points.push(point); }
+                    result.vertices.push(point);
+                    result.normals.push(face.normal);
 
                     edge = edge.next;
                 } while (edge !== face.edge);
             });
 
-            return vectors;
+            return result;
         }
     }
 }
