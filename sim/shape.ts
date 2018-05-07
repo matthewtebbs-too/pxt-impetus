@@ -149,7 +149,7 @@ namespace pxsim {
             const btshape = new Ammo.btConvexHullShape();
             btshape.setMargin(0);
 
-            result.points.forEach(point => btshape.addPoint(Helper.btVector3FromThree(point) /* btshape owns alloc */));
+            result.points.forEach(point => btshape.addPoint(Helper.btVector3FromThree(point) /* btConvexHullShape owns alloc */));
 
             this._setShapeVolume(1);
             this._setCtorCollisionShape(() => btshape);
