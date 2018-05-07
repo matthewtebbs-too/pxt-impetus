@@ -10,12 +10,14 @@ namespace pxsim {
     }
 
     export class Helper {
-        public static btVector3FromThree(vec: THREE.Vector3): Ammo.btVector3 {
-            return new Ammo.btVector3(vec.x, vec.y, vec.z);
+        public static btVector3FromThree(vec: THREE.Vector3, btvec = new Ammo.btVector3()): Ammo.btVector3 {
+            btvec.setValue(vec.x, vec.y, vec.z);
+            return btvec;
         }
 
-        public static btQuaternionFromThree(qtr: THREE.Quaternion): Ammo.btQuaternion {
-            return new Ammo.btQuaternion(qtr.x, qtr.y, qtr.z, qtr.w);
+        public static btQuaternionFromThree(qtr: THREE.Quaternion, btqtr = new Ammo.btQuaternion()): Ammo.btQuaternion {
+            btqtr.setValue(qtr.x, qtr.y, qtr.z, qtr.w);
+            return btqtr;
         }
 
         public static arrayFromBufferAttribute<AT extends IFromBufferAttribute<AT>>(
