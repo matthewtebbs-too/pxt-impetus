@@ -9,8 +9,8 @@ namespace pxsim {
         const bttransform = new Ammo.btTransform();
         let btorigin, btquarternion;
 
-        bttransform.setOrigin(btorigin = Helper.btVector3FromThree(object3d.position as THREE.Vector3));
-        bttransform.setRotation(btquarternion = Helper.btQuaternionFromThree(object3d.quaternion as THREE.Quaternion));
+        bttransform.setOrigin(btorigin = Helper.btVector3FromThree(object3d.position));
+        bttransform.setRotation(btquarternion = Helper.btQuaternionFromThree(object3d.quaternion));
 
         btmotionstate.setWorldTransform(bttransform);
 
