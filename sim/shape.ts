@@ -143,23 +143,14 @@ namespace pxsim {
 
             super(size, 2);
 
-            const quickhull = new QuickHull3d();
-            quickhull.setFromShape3d(this);
-
-            const vectors = quickhull.getVectors();
+            const result = new QuickHull3d().calculateFromShape3d(this);
 
             const btshape = new Ammo.btConvexHullShape();
             btshape.setMargin(0);
 
-            let hullcount = 0;
-
-            vectors.vertices.forEach(vertex => {
-                let btvec;
-                btshape.addPoint(btvec = Helper.btVector3FromThree(vertex));
-                Helper.safeAmmoObjectDestroy(btvec);
-
-                hullcount++;
-            });
+            const btpoint = new Ammo.btVector3();
+            result.points.forEach(point => btshape.addPoint(Helper.btVector3FromThree(point, btpoint)));
+            Helper.safeAmmoObjectDestroy(btpoint);
 
             this._setShapeVolume(1);
             this._setCtorCollisionShape(() => btshape);
