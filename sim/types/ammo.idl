@@ -214,6 +214,11 @@ interface btCollisionShape {
 };
 
 interface btConvexShape {
+//  long getNumPreferredPenetrationDirections();
+//  void getPreferredPenetrationDirection(long index, [Ref] btVector3 penetrationVector);
+
+//  [Value] btVector3 localGetSupportingVertex([Const, Ref] btVector3 vec);
+//  [Value] btVector3 localGetSupportingVertexWithoutMargin([Const, Ref] btVector3 vec);
 };
 btConvexShape implements btCollisionShape;
 
@@ -292,7 +297,7 @@ interface btConvexHullShape {
   void setMargin(float margin);
   float getMargin();
 };
-btConvexHullShape implements btCollisionShape;
+btConvexHullShape implements btConvexShape;
 
 interface btConeShapeX {
   void btConeShapeX(float radius, float height);
@@ -450,7 +455,7 @@ interface btRigidBody {
   btMotionState getMotionState();
   void setMotionState(btMotionState motionState);
   void setAngularFactor([Const, Ref] btVector3 angularFactor);
-  btRigidBody upcast([Const] btCollisionObject colObj);
+  btRigidBody upcast(btCollisionObject colObj);
   void getAabb([Ref] btVector3 aabbMin, [Ref] btVector3 aabbMax);
   void applyGravity();
   [Const, Ref] btVector3 getGravity();
@@ -589,9 +594,9 @@ interface btCollisionWorld {
   void removeCollisionObject(btCollisionObject collisionObject);
   [Const] btBroadphaseInterface getBroadphase ();
   void convexSweepTest([Const] btConvexShape castShape, [Const, Ref] btTransform from, [Const, Ref] btTransform to, [Ref] ConvexResultCallback resultCallback, float allowedCcdPenetration);
-  void contactPairTest([Const] btCollisionObject colObjA, [Const] btCollisionObject colObjB, [Ref] ContactResultCallback resultCallback);
-  void contactTest([Const] btCollisionObject colObj, [Ref] ContactResultCallback resultCallback);
-  void updateSingleAabb([Const] btCollisionObject colObj);
+  void contactPairTest(btCollisionObject colObjA, btCollisionObject colObjB, [Ref] ContactResultCallback resultCallback);
+  void contactTest(btCollisionObject colObj, [Ref] ContactResultCallback resultCallback);
+  void updateSingleAabb(btCollisionObject colObj);
 };
 
 interface btContactSolverInfo {
@@ -643,7 +648,7 @@ interface btVehicleRaycasterResult {
 };
 
 interface btVehicleRaycaster {
-    void castRay ([Const, Ref] btVector3 from, [Const, Ref] btVector3 to, [Const, Ref] btVehicleRaycasterResult result);
+    void castRay ([Const, Ref] btVector3 from, [Const, Ref] btVector3 to, [Ref] btVehicleRaycasterResult result);
 };
 
 interface btDefaultVehicleRaycaster {
@@ -907,7 +912,7 @@ interface btSoftBody {
   void scale(  [Const, Ref] btVector3 scl);
   long generateClusters(long k, optional long maxiterations);
   long generateBendingConstraints(long distance, Material mat);
-  btSoftBody upcast([Const] btCollisionObject colObj);
+  btSoftBody upcast(btCollisionObject colObj);
 };
 btSoftBody implements btCollisionObject;
 
