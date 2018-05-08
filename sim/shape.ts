@@ -143,7 +143,7 @@ namespace pxsim {
 
             super(size, Shape3d._patchSegments);
 
-            this._setVolumeAndCollisionShapeFromGeometry(new THREEX.TeapotBufferGeometry(size, 2 /* less segments */));
+            this._setVolumeAndCollisionShapeFromGeometry(Shape3d._patchSegments > 2 ? new THREEX.TeapotBufferGeometry(size, 2 /* less segments */) : undefined);
         }
     }
 }
