@@ -53,27 +53,28 @@ namespace pxsim {
             return this._btbody.isStaticObject();
         }
 
-        public set isStatic(value: boolean) {
-            this._toggleCollisionFlag(Ammo.CollisionFlags.CF_STATIC_OBJECT, value);
-
-            this._btbody.setActivationState(value ? Ammo.ActivationState.DISABLE_SIMULATION : Ammo.ActivationState.ACTIVE_TAG);
-        }
+        /* public set isStatic(value: boolean); <- set once in constructor */
 
         public get isKinematic(): boolean {
             return this._btbody.isKinematicObject();
         }
 
         public set isKinematic(value: boolean) {
+            if (this.isStatic) {
+                return; /* not for static objects */
+            }
+
             this._toggleCollisionFlag(Ammo.CollisionFlags.CF_KINEMATIC_OBJECT, value);
 
-            this._btbody.setActivationState(value ? Ammo.ActivationState.DISABLE_DEACTIVATION : Ammo.ActivationState.ACTIVE_TAG);
-
-            if (!value) {
+            if (value) {
+                this._btbody.setActivationState(Ammo.ActivationState.DISABLE_DEACTIVATION);
+            } else {
+                this._btbody.setActivationState(Ammo.ActivationState.ACTIVE_TAG);
                 this._btbody.activate();
             }
 
             if (this._world) {
-                this.addRigidBody(this._world); /* will re-add */
+                this.addRigidBody(this._world); /* will re-add to physics world as appropriate */
             }
         }
 
@@ -108,8 +109,12 @@ namespace pxsim {
 
             this._btbody.setFriction(RigidBody._defaultFriction);
 
-            this.isStatic = !isDynamic;
-            this.isKinematic = isDynamic;
+            if (isDynamic) {
+                this.isKinematic = true; /* default is kinematic dyamic object */
+            } else {
+                this._toggleCollisionFlag(Ammo.CollisionFlags.CF_STATIC_OBJECT, true);
+                this._btbody.setActivationState(Ammo.ActivationState.DISABLE_SIMULATION);
+            }
 
             this._object3d = object3d;
         }
