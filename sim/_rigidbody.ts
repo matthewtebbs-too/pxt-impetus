@@ -110,7 +110,7 @@ namespace pxsim {
             this._btbody.setFriction(RigidBody._defaultFriction);
 
             if (isDynamic) {
-                this.isKinematic = true; /* default is kinematic dyamic object */
+                this.isKinematic = true; /* default is kinematic dynamic object */
             } else {
                 this._toggleCollisionFlag(Ammo.CollisionFlags.CF_STATIC_OBJECT, true);
                 this._btbody.setActivationState(Ammo.ActivationState.DISABLE_SIMULATION);
