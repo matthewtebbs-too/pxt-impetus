@@ -56,6 +56,13 @@ namespace pxsim {
 
                 return btshape;
             }
+
+            protected _setVolumeAndCollisionShapeFromGeometry(geometry?: THREE.Geometry | THREE.BufferGeometry) {
+                const result = new QuickHull3d().calculateFromShape3d(geometry || this, { includeAreaAndVolume: true });
+
+                this._volumeFn = () => result.volume;
+                this._btCollisionShapeFn = () => btCollisionShapeFromQuickHull3dResult(result);
+            }
         };
     }
 
@@ -136,11 +143,7 @@ namespace pxsim {
 
             super(size, Shape3d._patchSegments);
 
-            const geometry = new THREEX.TeapotBufferGeometry(size, 2 /* less segments */);
-            const result = new QuickHull3d().calculateFromShape3d(geometry, { includeAreaAndVolume: true });
-
-            this._volumeFn = () => result.volume;
-            this._btCollisionShapeFn = () => btCollisionShapeFromQuickHull3dResult(result);
+            this._setVolumeAndCollisionShapeFromGeometry(new THREEX.TeapotBufferGeometry(size, 2 /* less segments */));
         }
     }
 }
