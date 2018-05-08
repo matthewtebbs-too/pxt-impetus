@@ -214,7 +214,7 @@ namespace pxsim.shape {
         return new ConeShape3d(radius, height);
     }
 
-    export function polyhedronShape(polyhedron: Polyhedron, radius?: number): PolyhedronShape3d {
+    export function polyhedronShape(polyhedron: Polyhedron, radius?: number): Shape3d {
         switch (polyhedron) {
             case Polyhedron.Tetrahedron:
                 return new TetrahedronShape3d(radius);
