@@ -13,17 +13,21 @@ namespace pxsim {
         return class extends base {
             public static distFrustum = 100;
 
-            protected _configureShadow() {
-                if (this.shadow.camera instanceof THREE.OrthographicCamera) {
-                    (this.shadow.camera as THREE.OrthographicCamera).left = -Light.distFrustum;
-                    (this.shadow.camera as THREE.OrthographicCamera).right = Light.distFrustum;
-                    (this.shadow.camera as THREE.OrthographicCamera).top = Light.distFrustum;
-                    (this.shadow.camera as THREE.OrthographicCamera).bottom = -Light.distFrustum;
-                }
+            constructor(...args: any[]) {
+                super(...args);
 
-                this.shadow.bias = 0.0001;
-                this.shadow.mapSize.width = 2048;
-                this.shadow.mapSize.height = 2048;
+                if (undefined !== this.shadow && undefined !== this.shadow.camera) {
+                    if (this.shadow.camera instanceof THREE.OrthographicCamera) {
+                        (this.shadow.camera as THREE.OrthographicCamera).left = -Light.distFrustum;
+                        (this.shadow.camera as THREE.OrthographicCamera).right = Light.distFrustum;
+                        (this.shadow.camera as THREE.OrthographicCamera).top = Light.distFrustum;
+                        (this.shadow.camera as THREE.OrthographicCamera).bottom = -Light.distFrustum;
+                    }
+
+                    this.shadow.bias = 0.0001;
+                    this.shadow.mapSize.width = 2048;
+                    this.shadow.mapSize.height = 2048;
+                }
             }
         };
     }
@@ -39,8 +43,6 @@ namespace pxsim {
     export class DirectionalLight extends LightMixin(Object3dMixin(THREE.DirectionalLight)) {
         constructor(color?: Color, intensity?: number) {
             super(color || Palette.White, intensity || 1);
-
-            this._configureShadow();
         }
     }
 
@@ -57,8 +59,6 @@ namespace pxsim {
             decay?: number,
         ) {
             super(color || Palette.White, intensity || 1, distance || 0, decay || 2);
-
-            this._configureShadow();
         }
     }
 
@@ -73,8 +73,6 @@ namespace pxsim {
                 distance || 0, angle || Math.PI / 3,
                 penumbra || 0, decay || 2,
             );
-
-            this._configureShadow();
         }
     }
 }

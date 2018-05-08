@@ -16,6 +16,10 @@ namespace pxsim {
             protected _volumeFn: (() => number) | null = null;
             protected _btCollisionShapeFn: (() => Ammo.btCollisionShape) | null = null;
 
+            constructor(...args: any[]) {
+                super(...args);
+            }
+
             public get volume(): number {
                 return this._volumeFn ? this._volumeFn() : 0;
             }
