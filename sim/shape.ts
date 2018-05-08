@@ -137,6 +137,51 @@ namespace pxsim {
         }
     }
 
+    export function PolyhedronMixin<T extends rt.ObjectConstructor<THREE.PolyhedronBufferGeometry>>(base: T) {
+        return class extends base implements rt.ICloneableObject {
+        };
+    }
+
+    export class TetrahedronShape3d extends PolyhedronMixin(ShapeMixin(THREE.TetrahedronBufferGeometry)) {
+        constructor(radius?: number) {
+            radius = radius || .5;
+
+            super(radius);
+
+            this._setVolumeAndCollisionShapeFromGeometry();
+        }
+    }
+
+    export class OctahedronShape3d extends PolyhedronMixin(ShapeMixin(THREE.OctahedronBufferGeometry)) {
+        constructor(radius?: number) {
+            radius = radius || .5;
+
+            super(radius);
+
+            this._setVolumeAndCollisionShapeFromGeometry();
+        }
+    }
+
+    export class IcosahedronShape3d extends PolyhedronMixin(ShapeMixin(THREE.IcosahedronBufferGeometry)) {
+        constructor(radius?: number) {
+            radius = radius || .5;
+
+            super(radius);
+
+            this._setVolumeAndCollisionShapeFromGeometry();
+        }
+    }
+
+    export class DodecahedronShape3d extends PolyhedronMixin(ShapeMixin(THREE.DodecahedronBufferGeometry)) {
+        constructor(radius?: number) {
+            radius = radius || .5;
+
+            super(radius);
+
+            this._setVolumeAndCollisionShapeFromGeometry();
+        }
+    }
+
     export class TeapotShape3d extends ShapeMixin(THREEX.TeapotBufferGeometry) {
         constructor(size?: number) {
             size = size || 1;
@@ -167,6 +212,22 @@ namespace pxsim.shape {
 
     export function coneShape(radius?: number, height?: number): ConeShape3d  {
         return new ConeShape3d(radius, height);
+    }
+
+    export function polyhedronShape(polyhedron: Polyhedron, radius?: number): PolyhedronShape3d {
+        switch (polyhedron) {
+            case Polyhedron.Tetrahedron:
+                return new TetrahedronShape3d(radius);
+
+            case Polyhedron.Octahedron:
+                return new OctahedronShape3d(radius);
+
+            case Polyhedron.Icosahedron:
+                return new IcosahedronShape3d(radius);
+
+            case Polyhedron.Dodecahedron:
+                return new DodecahedronShape3d(radius);
+        }
     }
 
     export function teapotShape(size?: number): TeapotShape3d  {

@@ -4,6 +4,20 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
+const enum Polyhedron {
+    //% block="tetrahedron"
+    Tetrahedron = 4,
+
+    //% block="octahedron"
+    Octahedron = 8,
+
+    //% block="icosahedron"
+    Icosahedron = 20,
+
+    //% block="dodecahedron"
+    Dodecahedron = 30,
+}
+
 const enum MathOp {
     //% block="+"
     Add = 1,

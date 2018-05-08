@@ -252,6 +252,16 @@ declare namespace design {
     function coneShape(radius?: number, height?: number): Shape3d;
 
     /**
+     * Polyhedron shape.
+     * @param radius number, eg: 0.5
+     */
+    //% blockId=shape3d_polyhedron
+    //% block="%polyhedron of radius %radius"
+    //% group="Shape"
+    //% shim=shape::polyhedronShape
+    function polyhedronShape(polyhedron: Polyhedron, radius?: number): Shape3d;
+
+    /**
      * Utah teapot.
      * @param size number, eg: 1
      */
