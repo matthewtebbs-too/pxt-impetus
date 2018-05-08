@@ -47,7 +47,7 @@
     "three": "0.92.0"
   },
   "devDependencies": {
-    "less": "2.7.3",
+    "less": "3.0.4",
     "semantic-ui-less": "2.2.14",
     "tslint": "5.10.0",
     "typescript": "2.7.2"
