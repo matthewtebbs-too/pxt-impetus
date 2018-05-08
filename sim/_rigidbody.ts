@@ -87,7 +87,7 @@ namespace pxsim {
             const isDynamic = mass !== 0;
 
             const btmotionstate = new Ammo.btDefaultMotionState();
-            const btshape = shape3d.createCollisionShape()!;
+            const btshape = shape3d.btCollisionShape();
 
             const btvecLocalInertia = new Ammo.btVector3(0, 0, 0);
 

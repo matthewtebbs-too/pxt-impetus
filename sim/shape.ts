@@ -13,29 +13,21 @@ namespace pxsim {
             protected static _patchSegments = 10;
             protected static _collisionMargin = 0.05;
 
-            private _volume = 0;
-            private _ctorCollisionShape: (() => Ammo.btCollisionShape) | null = null;
+            protected _volumeFn: (() => number) | null = null;
+            protected _btCollisionShapeFn: (() => Ammo.btCollisionShape) | null = null;
 
             public get volume(): number {
-                return this._volume;
+                return this._volumeFn ? this._volumeFn() : 0;
             }
 
-            public createCollisionShape(): Ammo.btCollisionShape | null {
-                return this._ctorCollisionShape ? this._ctorCollisionShape() : null;
+            public btCollisionShape(): Ammo.btCollisionShape {
+                return this._btCollisionShapeFn!();
             }
 
             public copy(source: this): this {
                 super.copy(source);
 
                 throw new Error();
-            }
-
-            protected _setShapeVolume(volume: number) {
-                this._volume = volume;
-            }
-
-            protected _setCtorCollisionShape(ctor: () => Ammo.btCollisionShape) {
-                this._ctorCollisionShape = ctor;
             }
 
             protected _getBounds(): THREE.Vector3 {
@@ -77,7 +69,7 @@ namespace pxsim {
             super(width, height);
 
             this.rotateX(-Math.PI / 2);
-            this._setCtorCollisionShape(() => this._btCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btBoxShape(bthalfextents)));
+            this._btCollisionShapeFn = () => this._btCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btBoxShape(bthalfextents));
         }
     }
 
@@ -94,8 +86,8 @@ namespace pxsim {
 
             super(width, height, depth);
 
-            this._setShapeVolume(width * height * depth);
-            this._setCtorCollisionShape(() => this._btCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btBoxShape(bthalfextents)));
+            this._volumeFn = () => width! * height! * depth!;
+            this._btCollisionShapeFn = () => this._btCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btBoxShape(bthalfextents));
         }
     }
 
@@ -110,8 +102,8 @@ namespace pxsim {
 
             super(radius, radius, height, Shape3d._radialSegments, 1, openEnded || false);
 
-            this._setShapeVolume(Math.PI * Math.pow(radius, 2) * height);
-            this._setCtorCollisionShape(() => this._btCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btCylinderShape(bthalfextents)));
+            this._volumeFn = () => Math.PI * Math.pow(radius!, 2) * height!;
+            this._btCollisionShapeFn = () => this._btCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btCylinderShape(bthalfextents));
         }
     }
 
@@ -121,8 +113,8 @@ namespace pxsim {
 
             super(radius, Shape3d._radialSegments, Shape3d._radialSegments);
 
-            this._setShapeVolume(4 / 3 * Math.PI * Math.pow(radius, 3));
-            this._setCtorCollisionShape(() => new Ammo.btSphereShape(radius!));
+            this._volumeFn = () => 4 / 3 * Math.PI * Math.pow(radius!, 3);
+            this._btCollisionShapeFn = () => new Ammo.btSphereShape(radius!);
         }
     }
 
@@ -133,8 +125,8 @@ namespace pxsim {
 
             super(radius, height, Shape3d._radialSegments);
 
-            this._setShapeVolume(Math.PI * Math.pow(radius, 2) * height / 3);
-            this._setCtorCollisionShape(() => new Ammo.btConeShape(radius!, height!));
+            this._volumeFn = () => Math.PI * Math.pow(radius!, 2) * height! / 3;
+            this._btCollisionShapeFn = () => new Ammo.btConeShape(radius!, height!);
         }
     }
 
@@ -144,8 +136,11 @@ namespace pxsim {
 
             super(size, Shape3d._patchSegments);
 
-            this._setShapeVolume(1);
-            this._setCtorCollisionShape(() => btCollisionShapeFromQuickHull3dResult(new QuickHull3d().calculateFromShape3d(new THREEX.TeapotBufferGeometry(size, 2 /* less segments */))));
+            const geometry = new THREEX.TeapotBufferGeometry(size, 2 /* less segments */);
+            const result = new QuickHull3d().calculateFromShape3d(geometry, { includeAreaAndVolume: true });
+
+            this._volumeFn = () => result.volume;
+            this._btCollisionShapeFn = () => btCollisionShapeFromQuickHull3dResult(result);
         }
     }
 }
