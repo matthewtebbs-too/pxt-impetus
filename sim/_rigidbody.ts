@@ -55,6 +55,8 @@ namespace pxsim {
 
         public set isStatic(value: boolean) {
             this._toggleCollisionFlag(Ammo.CollisionFlags.CF_STATIC_OBJECT, value);
+
+            this._btbody.setActivationState(value ? Ammo.ActivationState.DISABLE_SIMULATION : Ammo.ActivationState.ACTIVE_TAG);
         }
 
         public get isKinematic(): boolean {
