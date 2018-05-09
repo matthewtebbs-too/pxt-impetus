@@ -10,9 +10,13 @@ namespace pxsim {
     export function ShapeMixin<T extends rt.ObjectConstructor<THREE.BufferGeometry>>(base: T) {
         return class extends base implements rt.ICloneableObject {
             protected static _radialSegments = 32;
+            protected static _radialSegmentsHull = 12;
+
             protected static _tubulaSegments = 24;
+            protected static _tubulaSegmentsHull = 8;
+
             protected static _patchSegments = 10;
-            protected static _collisionMargin = 0.05;
+            protected static _patchSegmentsHull = 2;
 
             protected _volumeFn: (() => number) | null = null;
             protected _btCollisionShapeFn: (() => Ammo.btCollisionShape) | null = null;
@@ -55,7 +59,7 @@ namespace pxsim {
                 const bthalfextents = Helper.btVector3FromThree(this._getBounds().divideScalar(2));
 
                 const btshape = ctor(bthalfextents);
-                btshape.setMargin(Shape3d._collisionMargin);
+                btshape.setMargin(collisionMargin);
 
                 Helper.safeAmmoObjectDestroy(bthalfextents);
 
@@ -194,7 +198,9 @@ namespace pxsim {
 
             super(radius, tube, Shape3d._radialSegments, Shape3d._tubulaSegments);
 
-            this._setVolumeAndCollisionShapeFromGeometry();
+            this._setVolumeAndCollisionShapeFromGeometry(
+                new THREE.TorusBufferGeometry(radius, tube, Shape3d._radialSegmentsHull, Shape3d._tubulaSegmentsHull),
+            );
         }
     }
 
@@ -203,9 +209,11 @@ namespace pxsim {
             radius = radius || .5;
             tube = tube || .2;
 
-            super(radius, tube, Shape3d._radialSegments, Shape3d._tubulaSegments);
+            super(radius, tube, Shape3d._radialSegments, Shape3d._tubulaSegments * 2);
 
-            this._setVolumeAndCollisionShapeFromGeometry();
+            this._setVolumeAndCollisionShapeFromGeometry(
+                new THREE.TorusKnotBufferGeometry(radius, tube, Shape3d._radialSegmentsHull, Shape3d._tubulaSegmentsHull * 2),
+            );
         }
     }
 
@@ -215,7 +223,9 @@ namespace pxsim {
 
             super(size, Shape3d._patchSegments);
 
-            this._setVolumeAndCollisionShapeFromGeometry(Shape3d._patchSegments > 2 ? new THREEX.TeapotBufferGeometry(size, 2 /* less segments */) : undefined);
+            this._setVolumeAndCollisionShapeFromGeometry(
+                new THREEX.TeapotBufferGeometry(size, Shape3d._patchSegmentsHull),
+            );
         }
     }
 }
