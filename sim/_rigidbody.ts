@@ -84,6 +84,8 @@ namespace pxsim {
             this._toggleCollisionFlag(Ammo.CollisionFlags.CF_KINEMATIC_OBJECT, value);
             this._btbody.activate();
 
+            this._object3d.matrixAutoUpdate = value;
+
             if (world) {
                 this.addRigidBody(world);
             }
@@ -146,6 +148,8 @@ namespace pxsim {
             if (!this._btbody.isStaticOrKinematicObject() /* motion controlled by physics world? */) {
                 if (this.isActive) {
                     btMotionStateToObject3d(this._btbody.getMotionState(), this._object3d);
+
+                    this._object3d.updateMatrix();
                 }
             }
         }
