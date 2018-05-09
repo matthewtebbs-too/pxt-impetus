@@ -38,7 +38,9 @@ namespace pxsim {
     export class RigidBody extends rt.DisposableObject {
         private static _minMass = 0;
         private static _maxMass = 100;
-        private static _defaultFriction = .75;
+        private static _defaultFriction = 1.;           /* Bullet physics default is .5 */
+        private static _linearSleepingThreshold = 1.6;  /* Bullet physics default is .8 */
+        private static _angularSleepingThreshold = 2.5; /* Bullet physics default is 1. */
 
         private _world: PhysicsWorld | null = null;
 
@@ -49,14 +51,23 @@ namespace pxsim {
         private _btmotionstate: Ammo.btMotionState;
         private _btinfo: Ammo.btRigidBodyConstructionInfo;
 
+        private _mass = 0;
+        private _btvecLocalInertia: Ammo.btVector3;
+
         public get isStatic(): boolean {
-            return this._btbody.isStaticObject();
+            return this._mass === 0;
         }
 
-        /* public set isStatic(value: boolean); <- set once in constructor */
+        public get isDynamic(): boolean {
+            return !this.isStatic;
+        }
 
         public get isKinematic(): boolean {
             return this._btbody.isKinematicObject();
+        }
+
+        public get isActive(): boolean {
+            return this._btbody.isActive();
         }
 
         public set isKinematic(value: boolean) {
@@ -64,14 +75,9 @@ namespace pxsim {
                 return; /* not for static objects */
             }
 
+            this._btbody.setMassProps(value ? 0 : this._mass, this._btvecLocalInertia);
             this._toggleCollisionFlag(Ammo.CollisionFlags.CF_KINEMATIC_OBJECT, value);
-
-            if (value) {
-                this._btbody.setActivationState(Ammo.ActivationState.DISABLE_DEACTIVATION);
-            } else {
-                this._btbody.setActivationState(Ammo.ActivationState.ACTIVE_TAG);
-                this._btbody.activate();
-            }
+            this._btbody.activate();
 
             if (this._world) {
                 this.addRigidBody(this._world); /* will re-add to physics world as appropriate */
@@ -87,36 +93,29 @@ namespace pxsim {
 
             mass = Math.max(RigidBody._minMass, Math.min(RigidBody._maxMass, mass));
 
-            const isDynamic = mass !== 0;
-
             const btmotionstate = new Ammo.btDefaultMotionState();
             const btshape = shape3d.btCollisionShape();
 
-            const btvecLocalInertia = new Ammo.btVector3(0, 0, 0);
+            this._mass = mass;
+            this._btvecLocalInertia = new Ammo.btVector3();
 
-            if (isDynamic) {
-                btshape.calculateLocalInertia(mass, btvecLocalInertia);
+            if (this.isDynamic) {
+                btshape.calculateLocalInertia(this._mass, this._btvecLocalInertia);
             }
 
-            const btinfo = new Ammo.btRigidBodyConstructionInfo(mass, btmotionstate, btshape, btvecLocalInertia);
-
-            Helper.safeAmmoObjectDestroy(btvecLocalInertia);
+            const btinfo = new Ammo.btRigidBodyConstructionInfo(this._mass, btmotionstate, btshape, this._btvecLocalInertia);
 
             this._btbody = new Ammo.btRigidBody(btinfo);
+            this._btbody.setFriction(RigidBody._defaultFriction);
+            this._btbody.setSleepingThresholds(RigidBody._linearSleepingThreshold, RigidBody._angularSleepingThreshold);
+
             this._btshape = btshape;
             this._btmotionstate = btmotionstate;
             this._btinfo = btinfo;
 
-            this._btbody.setFriction(RigidBody._defaultFriction);
-
-            if (isDynamic) {
-                this.isKinematic = true; /* default is kinematic dynamic object */
-            } else {
-                this._toggleCollisionFlag(Ammo.CollisionFlags.CF_STATIC_OBJECT, true);
-                this._btbody.setActivationState(Ammo.ActivationState.DISABLE_SIMULATION);
-            }
-
             this._object3d = object3d;
+
+            this.isKinematic = true; /* default is kinematic object */
         }
 
         public addRigidBody(world: PhysicsWorld) {
@@ -139,8 +138,10 @@ namespace pxsim {
         }
 
         public syncMotionStateToObject3d() {
-            if (!this._btbody.isStaticOrKinematicObject() /* is dynamic? */) {
-                btMotionStateToObject3d(this._btbody.getMotionState(), this._object3d);
+            if (!this._btbody.isStaticOrKinematicObject() /* motion controlled by physics world? */) {
+                if (this.isActive) {
+                    btMotionStateToObject3d(this._btbody.getMotionState(), this._object3d);
+                }
             }
         }
 
@@ -162,6 +163,8 @@ namespace pxsim {
             Helper.safeAmmoObjectDestroy(this._btinfo);
             Helper.safeAmmoObjectDestroy(this._btmotionstate);
             Helper.safeAmmoObjectDestroy(this._btshape);
+
+            Helper.safeAmmoObjectDestroy(this._btvecLocalInertia);
         }
     }
 }
