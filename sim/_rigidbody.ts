@@ -75,12 +75,17 @@ namespace pxsim {
                 return; /* not for static objects */
             }
 
+            const world = this._world;
+            if (world) {
+                this.removeRigidBody(world);
+            }
+
             this._btbody.setMassProps(value ? 0 : this._mass, this._btvecLocalInertia);
             this._toggleCollisionFlag(Ammo.CollisionFlags.CF_KINEMATIC_OBJECT, value);
             this._btbody.activate();
 
-            if (this._world) {
-                this.addRigidBody(this._world); /* will re-add to physics world as appropriate */
+            if (world) {
+                this.addRigidBody(world);
             }
         }
 
