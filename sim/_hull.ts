@@ -9,7 +9,7 @@
 namespace pxsim {
     export function btCollisionShapeFromQuickHull3dResult(result: QuickHull3dResult) {
         const btshape = new Ammo.btConvexHullShape();
-        btshape.setMargin(0);
+        btshape.setMargin(0.05);
 
         result.hullindexes.forEach(index => btshape.addPoint(Helper.btVector3FromThree(result.vertices[index]) /* btConvexHullShape owns alloc */));
 

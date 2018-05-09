@@ -256,10 +256,21 @@ declare namespace design {
      * @param radius number, eg: 0.5
      */
     //% blockId=shape3d_polyhedron
-    //% block="%polyhedron of radius %radius"
+    //% block="%polyhedron|of radius %radius"
     //% group="Shape"
     //% shim=shape::polyhedronShape
     function polyhedronShape(polyhedron: Polyhedron, radius?: number): Shape3d;
+
+    /**
+     * Torus shape.
+     * @param radius number, eg: 0.5
+     * @param tube number, eg: 0.2
+     */
+    //% blockId=shape3d_torus
+    //% block="%torus|of radius %radius|and tube %tube"
+    //% group="Shape"
+    //% shim=shape::torusShape
+    function torusShape(torus: Torus, radius?: number, tube?: number): Shape3d;
 
     /**
      * Utah teapot.

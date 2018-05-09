@@ -4,6 +4,12 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
+declare const enum Polyhedron {
+}
+
+declare const enum Torus {
+}
+
 declare const enum MathOp {
 }
 

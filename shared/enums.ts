@@ -18,6 +18,14 @@ const enum Polyhedron {
     Dodecahedron = 30,
 }
 
+declare const enum Torus {
+    //% block="torus"
+    Circle = 1,
+
+    //% block="torus knot"
+    Knot = 2,
+}
+
 const enum MathOp {
     //% block="+"
     Add = 1,

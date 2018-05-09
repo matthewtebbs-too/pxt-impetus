@@ -10,6 +10,7 @@ namespace pxsim {
     export function ShapeMixin<T extends rt.ObjectConstructor<THREE.BufferGeometry>>(base: T) {
         return class extends base implements rt.ICloneableObject {
             protected static _radialSegments = 32;
+            protected static _tubulaSegments = 24;
             protected static _patchSegments = 10;
             protected static _collisionMargin = 0.05;
 
@@ -186,6 +187,28 @@ namespace pxsim {
         }
     }
 
+    export class TorusShape3d extends ShapeMixin(THREE.TorusBufferGeometry) {
+        constructor(radius?: number, tube?: number) {
+            radius = radius || .5;
+            tube = tube || .2;
+
+            super(radius, tube, Shape3d._radialSegments, Shape3d._tubulaSegments);
+
+            this._setVolumeAndCollisionShapeFromGeometry();
+        }
+    }
+
+    export class TorusKnotShape3d extends ShapeMixin(THREE.TorusKnotBufferGeometry) {
+        constructor(radius?: number, tube?: number) {
+            radius = radius || .5;
+            tube = tube || .2;
+
+            super(radius, tube, Shape3d._radialSegments, Shape3d._tubulaSegments);
+
+            this._setVolumeAndCollisionShapeFromGeometry();
+        }
+    }
+
     export class TeapotShape3d extends ShapeMixin(THREEX.TeapotBufferGeometry) {
         constructor(size?: number) {
             size = size || 1;
@@ -218,7 +241,7 @@ namespace pxsim.shape {
         return new ConeShape3d(radius, height);
     }
 
-    export function polyhedronShape(polyhedron: Polyhedron, radius?: number): Shape3d {
+    export function polyhedronShape(polyhedron: Polyhedron, radius?: number): TetrahedronShape3d | OctahedronShape3d | IcosahedronShape3d | DodecahedronShape3d {
         switch (polyhedron) {
             case Polyhedron.Tetrahedron:
                 return new TetrahedronShape3d(radius);
@@ -231,6 +254,16 @@ namespace pxsim.shape {
 
             case Polyhedron.Dodecahedron:
                 return new DodecahedronShape3d(radius);
+        }
+    }
+
+    export function torusShape(torus: Torus, radius?: number, tube?: number): TorusShape3d | TorusKnotShape3d {
+        switch (torus) {
+            case Torus.Circle:
+                return new TorusShape3d(radius, tube);
+
+            case Torus.Knot:
+                return new TorusKnotShape3d(radius, tube);
         }
     }
 
