@@ -262,6 +262,7 @@
   "scene.onAnimate|block": "on scene animate",
   "scene.randomPositionInCube|block": "random position in %size size cube",
   "scene.randomPositionInSphere|block": "random position in %side diameter sphere",
+  "scene.randomPositionOnPlane|block": "random position on %size size plane",
   "scene|block": "Scene",
   "world.scene|block": "scene",
   "world|block": "World",

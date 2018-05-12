@@ -122,6 +122,13 @@ namespace pxsim {
 }
 
 namespace pxsim.scene {
+    export function randomPositionOnPlane(size: number): Vector {
+        return new VectorConstructor(
+            (Math.random() - .5) * size,
+            0,
+            (Math.random() - .5) * size);
+    }
+
     export function randomPositionInSphere(diameter: number): Vector {
         const spherical = new SphericalConstructor(
             Math.random() * diameter * .5,
@@ -132,9 +139,9 @@ namespace pxsim.scene {
 
     export function randomPositionInCube(size: number): Vector {
         return new VectorConstructor(
-            Math.random() * size,
-            Math.random() * size,
-            Math.random() * size).addScalar(size * -.5);
+            (Math.random() - .5) * size,
+            (Math.random() - .5) * size,
+            (Math.random() - .5) * size);
     }
 
     export function intersectedObjectAt(x: number, y: number): Object3d | null {

@@ -205,5 +205,7 @@
   "scene.randomPositionInCube|param|size": "value, eg: 1",
   "scene.randomPositionInSphere": "Random position in sphere.",
   "scene.randomPositionInSphere|param|diameter": "value, eg: 1",
+  "scene.randomPositionOnPlane": "Random position on plane.",
+  "scene.randomPositionOnPlane|param|size": "value, eg: 1",
   "world.scene": "Get current scene."
 }

@@ -426,6 +426,15 @@ declare class Scene3d extends Object3d {
 
 //% color="#d92680" icon="\uf03e" block="Scene" weight=95
 declare namespace scene { /* image icon */
+    /**
+     * Random position on plane.
+     * @param size value, eg: 1
+     */
+    //% blockId=scene_random_positiononplane
+    //% block="random position on %size size plane"
+    //% shim=scene::randomPositionOnPlane
+    function randomPositionOnPlane(size: number): Vector;
+
      /**
      * Random position in sphere.
      * @param diameter value, eg: 1
