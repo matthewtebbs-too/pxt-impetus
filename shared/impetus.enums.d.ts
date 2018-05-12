@@ -13,6 +13,9 @@ declare const enum Torus {
 declare const enum MathOp {
 }
 
+declare const enum CameraController {
+}
+
 declare const enum MouseButton {
 }
 

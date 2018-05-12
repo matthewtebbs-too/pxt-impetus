@@ -364,6 +364,15 @@ declare class Light extends Object3d {
 
 //%
 declare class Camera extends Object3d {
+    /**
+     * Attach camera controller.
+     * @param type value, eg: CameraController.Orbit
+     */
+    //% blockId=camera_attachcontroller
+    //% block="attach %type controller"
+    //% group="Camera"
+    //% shim=.attachController
+    attachController(type: CameraController): void;
 }
 
 declare namespace design {

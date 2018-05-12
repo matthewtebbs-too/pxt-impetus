@@ -86,6 +86,10 @@ namespace pxsim {
         public animate(timeStep: number) {
             this._physicsworld.animate(timeStep);
 
+            if (this._camera) {
+                this._camera.update();
+            }
+
             super.animate(timeStep);
 
             singletonWorldBoard().events!.queue(ScopeId.SceneObject, SceneEvent_Internal.Animate, timeStep);

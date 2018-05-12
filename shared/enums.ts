@@ -26,6 +26,17 @@ declare const enum Torus {
     Knot = 2,
 }
 
+declare const enum CameraController {
+    //% block="none"
+    None = 0,
+
+    //% block="orbit"
+    Orbit = 1,
+
+    //% block="track ball"
+    Trackball = 2,
+}
+
 const enum MathOp {
     //% block="+"
     Add = 1,

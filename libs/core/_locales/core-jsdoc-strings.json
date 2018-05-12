@@ -40,6 +40,8 @@
   "Array.splice|param|start": "The zero-based location in the array from which to start removing elements. eg: 0",
   "Array.unshift": "Add one element to the beginning of an array and return the new length of the array.",
   "Boolean.toString": "Returns a string representation of an object.",
+  "Camera.attachController": "Attach camera controller.",
+  "Camera.attachController|param|type": "value, eg: CameraController.Orbit",
   "Math": "More complex operations with numbers.",
   "Math.abs": "Returns the absolute value of a number (the value without regard to whether it is positive or negative).\nFor example, the absolute value of -5 is the same as the absolute value of 5.",
   "Math.abs|param|x": "A numeric expression for which the absolute value is needed.",

@@ -8,26 +8,60 @@
 
 namespace pxsim {
     export type OrbitControls = THREE.OrbitControls;
+    export type TrackballControls = THREE.TrackballControls;
 
     // tslint:disable-next-line:variable-name
     export const OrbitControlsConstructor = THREE.OrbitControls;
+
+    // tslint:disable-next-line:variable-name
+    export const TrackballControlsConstructor = THREE.TrackballControls;
 }
 
 namespace pxsim {
     export function CameraMixin<T extends rt.ObjectConstructor<THREE.Camera>>(base: T) {
         return class extends base {
-            private _controls: OrbitControls;
+            private _controls: OrbitControls | TrackballControls | null = null;
 
             constructor(...args: any[]) {
                 super(...args);
+            }
 
-                this._controls = new OrbitControlsConstructor(this);
-                this._controls.target.set(0, 0, 0);
-                this._controls.update();
+            public attachController(type: CameraController) {
+                if (this._controls) {
+                    this._controls.dispose();
+                    this._controls = null;
+                }
+
+                switch (type) {
+                    case CameraController.None:
+                        break;
+
+                    case CameraController.Orbit:
+                        this._controls = new OrbitControlsConstructor(this);
+                        break;
+
+                    case CameraController.Trackball:
+                        this._controls = new TrackballControlsConstructor(this);
+                        break;
+                }
+
+                if (this._controls) {
+                    this._controls.target.set(0, 0, 0);
+                }
             }
 
             public setSize(width: number, height: number) {
-                /* do nothing */
+                if (this._controls) {
+                    if (this._controls instanceof TrackballControlsConstructor) {
+                        this._controls.handleResize();
+                    }
+                }
+            }
+
+            public update() {
+                if (this._controls) {
+                    this._controls.update();
+                }
             }
         };
     }
