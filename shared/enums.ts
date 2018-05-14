@@ -28,13 +28,13 @@ declare const enum Torus {
 
 declare const enum CameraController {
     //% block="none"
-    None = 0,
+    None = 1,
 
     //% block="orbit"
-    Orbit = 1,
+    Orbit = 2,
 
     //% block="track ball"
-    Trackball = 2,
+    Trackball = 3,
 }
 
 const enum MathOp {
