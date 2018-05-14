@@ -7,9 +7,6 @@ Watch the spheres fall.
     let position: Vector = null
     let sphereobject: Mesh3d = null
     let count = 0
-    /**
-    * Watch the spheres fall.
-    */
     loops.forever(function () {
         if (count > 0) {
             sphereobject = object.fromShapeAndMaterial(sphereshape, design.materialOfColor(design.randomColor()))
