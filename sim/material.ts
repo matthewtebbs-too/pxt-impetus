@@ -51,9 +51,7 @@ namespace pxsim {
                 });
         }
 
-        private static _factory = new rt.ObjectFactory<SolidMaterial>(
-            parameters => new SolidMaterial(parameters),
-        );
+        private static _factory = new rt.ObjectFactory<SolidMaterial>(SolidMaterial);
     }
 }
 

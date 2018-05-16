@@ -45,8 +45,6 @@ namespace rt {
 
     export type ObjectConstructor<T = {}> = new (...args: any[]) => T;
 
-    export type ObjectCreator<T> = (parameters?: any) => T;
-
     export abstract class DisposableObject {
         private _isDisposed = false;
 
@@ -79,24 +77,24 @@ namespace rt {
 
         private static _factories = new Array<ObjectFactory<any>>();
 
-        private _creator: ObjectCreator<T>;
+        private _ctor: ObjectConstructor<T>;
         private _objectcache = new Map<ObjId, T>();
 
-        constructor(creator: ObjectCreator<T>) {
-            this._creator = creator;
+        constructor(ctor: ObjectConstructor<T>) {
+            this._ctor = ctor;
             ObjectFactory._factories.push(this);
         }
 
-        public instantiate(parameters?: any): T {
-            return this._creator(parameters);
+        public instantiate(...args: any[]): T {
+            return new this._ctor(...args);
         }
 
-        public instantiateWithCache(parameters?: any): T {
-            const hash = objectHash(parameters || {}, { algorithm: 'md5', encoding: 'hex', respectType: false } as any);
+        public instantiateWithCache(...args: any[]): T {
+            const hash = objectHash(args || {}, { algorithm: 'md5', encoding: 'hex', respectType: false } as any);
 
             let instance = this._objectcache.get(hash);
             if (!instance) {
-                this._objectcache.set(hash, instance = this.instantiate(parameters));
+                this._objectcache.set(hash, instance = this.instantiate(...args));
             }
 
             return instance;
