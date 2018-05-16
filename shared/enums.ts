@@ -212,7 +212,7 @@ const enum Palette {
     //% block="blanched almond"
     BlanchedAlmond = 0xffebcd,
 
-    //% block="Blue"
+    //% block="blue"
     Blue = 0x0000ff,
 
     //% block="blue violet"
