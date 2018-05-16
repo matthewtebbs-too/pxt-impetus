@@ -85,7 +85,7 @@ declare class Object3d {
      * @param angle number, eg: 0
      */
     //% blockId=object3d_set_rotation_from_axis_angle
-    //% block="set %object3d rotation|around %axis=math_vector|by %angle"
+    //% block="set %object3|rotation around %axis=math_vector|by %angle"
     //% shim=.setRotationFromAxisAngle
     setRotationFromAxisAngle(axis: Vector, angle: number): void;
 
@@ -94,7 +94,7 @@ declare class Object3d {
      * @param enabled is physics, e.g. gravity, enabled on this object?
      */
     //% blockId=object3d_set_physics_enabled
-    //% block="set %object3d physics %enabled=fieldeditors_toggleOnOff"
+    //% block="set %object3d|physics %enabled=fieldeditors_toggleOnOff"
     //% shim=.setPhysicsEnabled
     setPhysicsEnabled(enabled: boolean): void;
 
@@ -369,7 +369,7 @@ declare class Camera extends Object3d {
      * @param type value, eg: CameraController.Orbit
      */
     //% blockId=camera_attachcontroller
-    //% block="attach %type controller"
+    //% block="%camera|attach %type controller"
     //% group="Camera"
     //% shim=.attachController
     attachController(type: CameraController): void;
