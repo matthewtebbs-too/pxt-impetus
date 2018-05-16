@@ -89,4 +89,12 @@ namespace pxsim.light {
     export function hemisphereLight(colorSky?: Color, colorGround?: Color, intensity?: number): HemisphereLight  {
         return new HemisphereLight(colorSky, colorGround, intensity);
     }
+
+    export function pointLight(color?: Color, intensity?: number): PointLight  {
+        return new PointLight(color, intensity);
+    }
+
+    export function spotLight(color?: Color, intensity?: number): SpotLight  {
+        return new SpotLight(color, intensity);
+    }
 }

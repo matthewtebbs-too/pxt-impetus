@@ -286,14 +286,48 @@ declare namespace design {
 declare namespace design {
     /**
      * Directional light.
-     * @param color Color
+     * @param color Color, eg: 0xffffff
      * @param intensity number, eg: 1
      */
     //% blockId=light_directional
-    //% block="%color=color_picker directional light|with %intensity intensity"
+    //% block="%color=color_picker|directional light|with %intensity intensity"
     //% group="Light"
     //% shim=light::directionalLight
     function directionalLight(color?: Color, intensity?: number): Light;
+
+    /**
+     * Hemisphere light.
+     * @param colorSky Color, eg: 0xffffff
+     * @param colorGround Color
+     * @param intensity number, eg: 1
+     */
+    //% blockId=light_hemisphere
+    //% block="sky %colorSky=color_picker|ground %colorGround=color_picker|hemisphere light|with %intensity intensity"
+    //% group="Light"
+    //% shim=light::hemisphereLight
+    function hemisphereLight(colorSky?: Color, colorGround?: Color, intensity?: number): Light;
+
+    /**
+     * Point light.
+     * @param color Color, eg: 0xffffff
+     * @param intensity number, eg: 1
+     */
+    //% blockId=light_point
+    //% block="%color=color_picker|point light|with %intensity intensity"
+    //% group="Light"
+    //% shim=light::pointLight
+    function pointLight(color?: Color, intensity?: number): Light;
+
+    /**
+     * Spot light.
+     * @param color Color, eg: 0xffffff
+     * @param intensity number, eg: 1
+     */
+    //% blockId=light_spot
+    //% block="%color=color_picker|spot light|with %intensity intensity"
+    //% group="Light"
+    //% shim=light::spotLight
+    function spotLight(color?: Color, intensity?: number): Light;
 }
 
 //% blockNamespace=design
