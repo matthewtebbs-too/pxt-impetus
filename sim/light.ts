@@ -16,8 +16,8 @@ namespace pxsim {
             constructor(...args: any[]) {
                 super(...args);
 
-                if (undefined !== this.shadow && undefined !== this.shadow.camera) {
-                    if (this.shadow.camera instanceof THREE.OrthographicCamera) {
+                if (undefined !== this.shadow) {
+                    if (undefined !== this.shadow.camera && this.shadow.camera instanceof THREE.OrthographicCamera) {
                         (this.shadow.camera as THREE.OrthographicCamera).left = -Light.distFrustum;
                         (this.shadow.camera as THREE.OrthographicCamera).right = Light.distFrustum;
                         (this.shadow.camera as THREE.OrthographicCamera).top = Light.distFrustum;
