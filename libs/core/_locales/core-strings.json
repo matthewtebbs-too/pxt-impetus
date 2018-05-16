@@ -9,7 +9,7 @@
   "Array.shift|block": "get and remove first value from %list",
   "Array.unshift|block": "%list| insert %value| at beginning",
   "Array|block": "Array",
-  "Camera.attachController|block": "%camera|attach %type controller",
+  "Camera.attachController|block": "attach to %camera|%type controller",
   "CameraController.None|block": "none",
   "CameraController.Orbit|block": "orbit",
   "CameraController.Trackball|block": "track ball",

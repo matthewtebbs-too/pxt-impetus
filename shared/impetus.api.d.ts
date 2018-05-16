@@ -369,7 +369,7 @@ declare class Camera extends Object3d {
      * @param type value, eg: CameraController.Orbit
      */
     //% blockId=camera_attachcontroller
-    //% block="%camera|attach %type controller"
+    //% block="attach to %camera|%type controller"
     //% group="Camera"
     //% shim=.attachController
     attachController(type: CameraController): void;
