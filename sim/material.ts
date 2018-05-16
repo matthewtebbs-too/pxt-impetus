@@ -39,24 +39,16 @@ namespace pxsim {
     }
 
     export class Material extends MaterialMixin(THREE.MeshStandardMaterial) { }
-
-    export class SolidMaterial extends Material {
-        public static instantiate(solidColor?: Color) {
-            return SolidMaterial._factory.instantiate(
-                {
-                    color: (solidColor ? solidColor.getHex() : undefined) || Palette.White,
-                    emissive: 0.,
-                    metalness: 0.,
-                    roughness: .5,
-                });
-        }
-
-        private static _factory = new rt.ObjectFactory<SolidMaterial>(SolidMaterial);
-    }
 }
 
 namespace pxsim.material {
-    export function materialOfColor(color?: Color): SolidMaterial {
-        return SolidMaterial.instantiate(color);
+    export function materialOfColor(color?: Color): Material {
+        return new Material(
+            {
+                color: (color ? color.getHex() : undefined) || Palette.White,
+                emissive: 0.,
+                metalness: 0.,
+                roughness: .5,
+            });
     }
 }
