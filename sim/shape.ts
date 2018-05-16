@@ -78,10 +78,7 @@ namespace pxsim {
     export class Shape3d extends ShapeMixin(THREE.BufferGeometry) { }
 
     export class PlaneShape3d extends ShapeMixin(THREE.PlaneBufferGeometry) {
-        constructor(width?: number, height?: number) {
-            width = width || 100;
-            height = height || 100;
-
+        constructor(width: number, height: number) {
             super(width, height);
 
             this.rotateX(-Math.PI / 2);
@@ -90,16 +87,7 @@ namespace pxsim {
     }
 
     export class BoxShape3d extends ShapeMixin(THREE.BoxBufferGeometry) {
-        constructor(
-            width?: number,
-            height?: number,
-            depth?: number,
-            openEnded?: boolean,
-        ) {
-            width = width || 1;
-            height = height || 1;
-            depth = depth || 1;
-
+        constructor(width: number, height: number, depth: number) {
             super(width, height, depth);
 
             this._volumeFn = () => width! * height! * depth!;
@@ -108,15 +96,8 @@ namespace pxsim {
     }
 
     export class CylinderShape3d extends ShapeMixin(THREE.CylinderBufferGeometry) {
-        constructor(
-            radius?: number,
-            height?: number,
-            openEnded?: boolean,
-        ) {
-            radius = radius || .5;
-            height = height || 1;
-
-            super(radius, radius, height, Shape3d._radialSegments, 1, openEnded || false);
+        constructor(radius: number, height: number) {
+            super(radius, radius, height, Shape3d._radialSegments, 1, false);
 
             this._volumeFn = () => Math.PI * Math.pow(radius!, 2) * height!;
             this._btCollisionShapeFn = () => this._btCollisionShapeFromHalfExtents(bthalfextents => new Ammo.btCylinderShape(bthalfextents));
@@ -124,9 +105,7 @@ namespace pxsim {
     }
 
     export class SphereShape3d extends ShapeMixin(THREE.SphereBufferGeometry) {
-        constructor(radius?: number) {
-            radius = radius || .5;
-
+        constructor(radius: number) {
             super(radius, Shape3d._radialSegments, Shape3d._radialSegments);
 
             this._volumeFn = () => 4 / 3 * Math.PI * Math.pow(radius!, 3);
@@ -135,10 +114,7 @@ namespace pxsim {
     }
 
     export class ConeShape3d extends ShapeMixin(THREE.ConeBufferGeometry) {
-        constructor(radius?: number, height?: number) {
-            radius = radius || .5;
-            height = height || 1;
-
+        constructor(radius: number, height: number) {
             super(radius, height, Shape3d._radialSegments);
 
             this._volumeFn = () => Math.PI * Math.pow(radius!, 2) * height! / 3;
@@ -152,9 +128,7 @@ namespace pxsim {
     }
 
     export class TetrahedronShape3d extends PolyhedronMixin(ShapeMixin(THREE.TetrahedronBufferGeometry)) {
-        constructor(radius?: number) {
-            radius = radius || .5;
-
+        constructor(radius: number) {
             super(radius);
 
             this._setVolumeAndCollisionShapeFromGeometry();
@@ -162,9 +136,7 @@ namespace pxsim {
     }
 
     export class OctahedronShape3d extends PolyhedronMixin(ShapeMixin(THREE.OctahedronBufferGeometry)) {
-        constructor(radius?: number) {
-            radius = radius || .5;
-
+        constructor(radius: number) {
             super(radius);
 
             this._setVolumeAndCollisionShapeFromGeometry();
@@ -172,9 +144,7 @@ namespace pxsim {
     }
 
     export class IcosahedronShape3d extends PolyhedronMixin(ShapeMixin(THREE.IcosahedronBufferGeometry)) {
-        constructor(radius?: number) {
-            radius = radius || .5;
-
+        constructor(radius: number) {
             super(radius);
 
             this._setVolumeAndCollisionShapeFromGeometry();
@@ -182,9 +152,7 @@ namespace pxsim {
     }
 
     export class DodecahedronShape3d extends PolyhedronMixin(ShapeMixin(THREE.DodecahedronBufferGeometry)) {
-        constructor(radius?: number) {
-            radius = radius || .5;
-
+        constructor(radius: number) {
             super(radius);
 
             this._setVolumeAndCollisionShapeFromGeometry();
@@ -192,10 +160,7 @@ namespace pxsim {
     }
 
     export class TorusShape3d extends ShapeMixin(THREE.TorusBufferGeometry) {
-        constructor(radius?: number, tube?: number) {
-            radius = radius || .5;
-            tube = tube || .2;
-
+        constructor(radius: number, tube: number) {
             super(radius, tube, Shape3d._radialSegments, Shape3d._tubulaSegments);
 
             this._setVolumeAndCollisionShapeFromGeometry(
@@ -205,10 +170,7 @@ namespace pxsim {
     }
 
     export class TorusKnotShape3d extends ShapeMixin(THREE.TorusKnotBufferGeometry) {
-        constructor(radius?: number, tube?: number) {
-            radius = radius || .5;
-            tube = tube || .2;
-
+        constructor(radius: number, tube: number) {
             super(radius, tube, Shape3d._radialSegments, Shape3d._tubulaSegments * 2);
 
             this._setVolumeAndCollisionShapeFromGeometry(
@@ -218,9 +180,7 @@ namespace pxsim {
     }
 
     export class TeapotShape3d extends ShapeMixin(THREEX.TeapotBufferGeometry) {
-        constructor(size?: number) {
-            size = size || 1;
-
+        constructor(size: number) {
             super(size, Shape3d._patchSegments);
 
             this._setVolumeAndCollisionShapeFromGeometry(
@@ -232,26 +192,43 @@ namespace pxsim {
 
 namespace pxsim.shape {
     export function planeShape(width?: number, height?: number): PlaneShape3d {
+        width = width || 100;
+        height = height || 100;
+
         return new PlaneShape3d(width, height);
     }
 
     export function boxShape(width?: number, height?: number, depth?: number): BoxShape3d {
+        width = width || 1;
+        height = height || 1;
+        depth = depth || 1;
+
         return new BoxShape3d(width, height, depth);
     }
 
     export function cylinderShape(radius?: number, height?: number): CylinderShape3d  {
+        radius = radius || .5;
+        height = height || 1;
+
         return new CylinderShape3d(radius, height);
     }
 
     export function sphereShape(radius?: number): SphereShape3d  {
+        radius = radius || .5;
+
         return new SphereShape3d(radius);
     }
 
     export function coneShape(radius?: number, height?: number): ConeShape3d  {
+        radius = radius || .5;
+        height = height || 1;
+
         return new ConeShape3d(radius, height);
     }
 
     export function polyhedronShape(polyhedron: Polyhedron, radius?: number): TetrahedronShape3d | OctahedronShape3d | IcosahedronShape3d | DodecahedronShape3d {
+        radius = radius || .5;
+
         switch (polyhedron) {
             case Polyhedron.Tetrahedron:
                 return new TetrahedronShape3d(radius);
@@ -268,6 +245,9 @@ namespace pxsim.shape {
     }
 
     export function torusShape(torus: Torus, radius?: number, tube?: number): TorusShape3d | TorusKnotShape3d {
+        radius = radius || .5;
+        tube = tube || .2;
+
         switch (torus) {
             case Torus.Circle:
                 return new TorusShape3d(radius, tube);
@@ -278,6 +258,8 @@ namespace pxsim.shape {
     }
 
     export function teapotShape(size?: number): TeapotShape3d  {
+        size = size || 1;
+
         return new TeapotShape3d(size);
     }
 }
