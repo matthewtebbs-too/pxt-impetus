@@ -170,7 +170,7 @@ declare namespace design {
 
     /**
      * Pick color from slider.
-     * @param color color, eg: 0xffffff
+     * @param color color, eg: #FFFFFF
      */
     //% blockId=color_wheel
     //% block="%color"
@@ -183,7 +183,7 @@ declare namespace design {
 
     /**
      * Pick color from list.
-     * @param color color, eg: 0xffffff
+     * @param color color, eg: #FFFFFF
      */
     //% blockId=color_picker
     //% block="%color"
@@ -286,7 +286,7 @@ declare namespace design {
 declare namespace design {
     /**
      * Directional light.
-     * @param color Color, eg: 0xffffff
+     * @param color Color, eg: #FFFFFF
      * @param intensity number, eg: 1
      */
     //% blockId=light_directional
@@ -297,8 +297,8 @@ declare namespace design {
 
     /**
      * Hemisphere light.
-     * @param colorSky Color, eg: 0xffffff
-     * @param colorGround Color
+     * @param colorSky Color, eg: #3284FF
+     * @param colorGround Color, eg: #FFc87F
      * @param intensity number, eg: 1
      */
     //% blockId=light_hemisphere
@@ -309,7 +309,7 @@ declare namespace design {
 
     /**
      * Point light.
-     * @param color Color, eg: 0xffffff
+     * @param color Color, eg: #FFFFFF
      * @param intensity number, eg: 1
      */
     //% blockId=light_point
@@ -320,7 +320,7 @@ declare namespace design {
 
     /**
      * Spot light.
-     * @param color Color, eg: 0xffffff
+     * @param color Color, eg: #FFFFFF
      * @param intensity number, eg: 1
      */
     //% blockId=light_spot
@@ -396,7 +396,7 @@ declare namespace object { /* cube icon */
 declare class Light extends Object3d {
     /**
      * Color.
-     * @param color value, eg: 0xffffff
+     * @param color value, eg: #FFFFFF
      */
     //% blockCombine
     //% blockCombineShadow=,color_picker
