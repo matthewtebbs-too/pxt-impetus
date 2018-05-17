@@ -392,8 +392,26 @@ declare namespace object { /* cube icon */
     function fromShapeAndMaterial(shape3d: Shape3d, material: Material): Mesh3d;
 }
 
-//%
+//% blockNamespace=design
 declare class Light extends Object3d {
+    /**
+     * Color.
+     * @param color value, eg: 0xffffff
+     */
+    //% blockCombine
+    //% blockCombineShadow=,color_picker
+    //% group="Light"
+    //% shim=.color property
+    color: Color;
+
+    /**
+     * Intensity.
+     * @param intensity value, eg: 1
+     */
+    //% blockCombine
+    //% group="Light"
+    //% shim=.intensity_ property
+    intensity: number;
 }
 
 //%

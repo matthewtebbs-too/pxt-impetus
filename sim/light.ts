@@ -13,6 +13,14 @@ namespace pxsim {
         return class extends base {
             public static distFrustum = 100;
 
+            public get intensity_() {
+                return this.intensity;
+            }
+
+            public set intensity_(value: number) {
+                this.intensity = Math.max(0, value);
+            }
+
             constructor(...args: any[]) {
                 super(...args);
 

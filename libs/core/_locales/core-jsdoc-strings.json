@@ -42,6 +42,8 @@
   "Boolean.toString": "Returns a string representation of an object.",
   "Camera.attachController": "Attach camera controller.",
   "Camera.attachController|param|type": "value, eg: CameraController.Orbit",
+  "Light.color": "Color.",
+  "Light.intensity": "Intensity.",
   "Math": "More complex operations with numbers.",
   "Math.abs": "Returns the absolute value of a number (the value without regard to whether it is positive or negative).\nFor example, the absolute value of -5 is the same as the absolute value of 5.",
   "Math.abs|param|x": "A numeric expression for which the absolute value is needed.",
