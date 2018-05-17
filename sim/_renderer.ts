@@ -49,6 +49,10 @@ namespace pxsim {
             return this._container;
         }
 
+        public get stats(): HTMLDivElement {
+            return this._stats.dom;
+        }
+
         public get canvas(): HTMLCanvasElement | null {
             return this.reference.domElement;
         }
@@ -83,6 +87,8 @@ namespace pxsim {
                 THREEX.Detector.addGetWebGLMessage({ parent: this._container });
                 return;
             }
+
+            this._stats.dom.hidden = true;
 
             this._container.innerHTML = '';
             this._container.appendChild(this.reference.domElement);

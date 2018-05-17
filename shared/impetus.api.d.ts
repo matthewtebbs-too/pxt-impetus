@@ -91,7 +91,7 @@ declare class Object3d {
 
     /**
      * Enable/disable physics.
-     * @param enabled is physics, e.g. gravity, enabled on this object?
+     * @param enabled is physics enabled on this object?
      */
     //% blockId=object3d_set_physics_enabled
     //% block="set %object3d|physics %enabled=fieldeditors_toggleOnOff"

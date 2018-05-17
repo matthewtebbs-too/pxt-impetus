@@ -6,6 +6,7 @@
 
     "impetus.enums.d.ts",
     "impetus.console.d.ts",
+    "impetus.debug.d.ts",
     "impetus.math.d.ts",
     "impetus.api.d.ts",
 

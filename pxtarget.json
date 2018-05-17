@@ -76,7 +76,8 @@
       "functions": "#d97f26",
       "arrays": "#26d926",
       "text": "#2699d9",
-      "console": "#002050"
+      "debug": "202020",
+      "console": "#505050"
     },
     "simAnimationEnter": "fly right in",
     "simAnimationExit": "fly right out",
