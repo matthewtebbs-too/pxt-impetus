@@ -3,9 +3,9 @@ CACHE MANIFEST
 CACHE:
 /cdn/bluebird.min.js
 /cdn/pxtsim.js
-/sim/libs/ammo.js
-/sim/libs/stats.min.js
-/sim/libs/three.min.js
+/sim/scripts/ammo.js
+/sim/scripts/stats.min.js
+/sim/scripts/three.min.js
 /sim/sim.css
 /sim/sim.js
 

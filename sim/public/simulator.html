@@ -7,25 +7,22 @@
     <title>Impetus simulator</title>
     <link rel="stylesheet" type="text/css" href="/sim/sim.css">
 
-    <script src="/sim/libs/es6-shim.min.js"></script>
-    <script src="/sim/libs/object_hash.min.js"></script>
+    <script src="/sim/scripts/es6-shim.min.js"></script>
+    <script src="/sim/scripts/object_hash.min.js"></script>
 
-    <script src="/cdn/bluebird.min.js"></script>
-    <script src="/cdn/pxtsim.js"></script>
+    <script src="/sim/scripts/dat.gui.min.js"></script>
 
-    <script src="/sim/libs/dat.gui.min.js"></script>
+    <script src="/sim/scripts/ammojs/ammo.js"></script>
 
-    <script src="/sim/libs/ammojs/ammo.js"></script>
+    <script src="/sim/scripts/threejs/stats.min.js"></script>
+	<script src="/sim/scripts/threejs/three.min.js"></script>
 
-    <script src="/sim/libs/threejs/stats.min.js"></script>
-	<script src="/sim/libs/threejs/three.min.js"></script>
-
-    <script src="/sim/libs/threejs/ColorConverter.js"></script>
-    <script src="/sim/libs/threejs/Detector.js"></script>
-    <script src="/sim/libs/threejs/OrbitControls.js"></script>
-    <script src="/sim/libs/threejs/QuickHull.js"></script>
-    <script src="/sim/libs/threejs/TeapotBufferGeometry.js"></script>
-    <script src="/sim/libs/threejs/TrackballControls.js"></script>
+    <script src="/sim/scripts/threejs/ColorConverter.js"></script>
+    <script src="/sim/scripts/threejs/Detector.js"></script>
+    <script src="/sim/scripts/threejs/OrbitControls.js"></script>
+    <script src="/sim/scripts/threejs/QuickHull.js"></script>
+    <script src="/sim/scripts/threejs/TeapotBufferGeometry.js"></script>
+    <script src="/sim/scripts/threejs/TrackballControls.js"></script>
 
     <script>
         var Ammo = Ammo();
@@ -33,6 +30,9 @@
         var THREEX = THREE;
         THREEX.Detector = Detector;
     </script>
+
+<script src="/cdn/bluebird.min.js"></script>
+    <script src="/cdn/pxtsim.js"></script>
 
     <script src="/sim/sim.js"></script>
 </head>
