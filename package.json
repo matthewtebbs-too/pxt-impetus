@@ -49,6 +49,7 @@
     "three": "^0.92.0"
   },
   "devDependencies": {
+    "gulp": "^4.0.0",
     "less": "^3.0.4",
     "semantic-ui-less": "~2.2.14",
     "tslint": "^5.10.0",
