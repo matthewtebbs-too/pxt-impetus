@@ -14,9 +14,6 @@
   "bundleddirs": [
     "libs/core"
   ],
-  "serial": {
-    "useEditor": true
-  },
   "runtime": {
     "functionBlocks": true,
     "listsBlocks": true,
