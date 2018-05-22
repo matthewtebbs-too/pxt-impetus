@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.base.json",
+
+  "module": "commonjs",
+
+  "compilerOptions": {
+    "outDir": "../built",
+
+    "typeRoots": [
+      "../node_modules/@types"
+    ]
+  },
+
+  "include": [
+    "./**/*"
+  ]
+}
