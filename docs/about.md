@@ -1,3 +1,3 @@
 # About Impetus
 
-See [GitHub repo](https://github.com/muddytummy/pxt-Impetus.git) for details.
+See [GitHub repo](https://github.com/muddytummy/pxt-impetus.git) for details.

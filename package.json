@@ -16,11 +16,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/muddytummy/pxt-Impetus.git"
+    "url": "git+https://github.com/muddytummy/pxt-impetus.git"
   },
-  "homepage": "https://github.com/muddytummy/pxt-Impetus#readme",
+  "homepage": "https://github.com/muddytummy/pxt-impetus#readme",
   "bugs": {
-    "url": "https://github.com/muddytummy/pxt-Impetus/issues"
+    "url": "https://github.com/muddytummy/pxt-impetus/issues"
   },
   "files": [
     "README.md",

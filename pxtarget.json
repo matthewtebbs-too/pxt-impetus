@@ -33,9 +33,9 @@
     "cardLogo": "./static/icons/android-chrome-192x192.png",
     "docsLogo": "./static/logo.square.white.svg",
     "portraitLogo": "./static/logo.square.white.svg",    
-    "logoUrl": "https://github.com/muddytummy/pxt-Impetus#readme",
-    "homeUrl": "https://muddytummy.github.io/pxt-Impetus/",
-    "betaUrl": "https://github.com/muddytummy/pxt-Impetus#readme",
+    "logoUrl": "https://github.com/muddytummy/pxt-impetus#readme",
+    "homeUrl": "https://muddytummy.github.io/pxt-impetus/",
+    "betaUrl": "https://github.com/muddytummy/pxt-impetus#readme",
     "privacyUrl": "https://makecode.com/privacy",
     "termsOfUseUrl": "https://makecode.com/termsofuse",
     "docMenu": [
