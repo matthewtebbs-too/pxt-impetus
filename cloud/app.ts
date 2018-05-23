@@ -4,9 +4,12 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-import { Client } from './client';
-import { Server } from './server';
+import { WorldClient } from './client.world';
+import { WorldEndpoint } from './endpoint.world';
+import { WebServer } from './webserver';
 
-const server = new Server(process.env.IMPETUS_PORT || 3000);
+const serverWeb = new WebServer(process.env.IMPETUS_PORT || 3000);
 
-const client = new Client(process.env.IMPETUS_URI || 'http://localhost:3000');
+const endpointWorld = new WorldEndpoint(serverWeb.httpserver);
+
+const clientWorld = new WorldClient(process.env.IMPETUS_URI || 'http://localhost:3000');
