@@ -6,6 +6,8 @@
 
 import * as SocketIO from 'socket.io-client';
 
+import { Server } from './server';
+
 const debug = require('debug')('impetus:client');
 
 export abstract class Client {
@@ -24,7 +26,7 @@ export abstract class Client {
     }
 
     constructor(uri?: string, nsp?: string) {
-        this.attach(SocketIO(`${uri || ''}/${nsp || ''}`));
+        this.attach(SocketIO(`${uri || Server.defaultUri || ''}/${nsp || ''}`));
     }
 
     public attach(io: SocketIOClient.Socket) {

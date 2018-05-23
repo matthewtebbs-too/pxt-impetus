@@ -6,6 +6,8 @@
 
 import * as SocketIO from 'socket.io';
 
+import { Server } from './server';
+
 const debug = require('debug')('impetus:endpoint');
 
 export abstract class Endpoint {
@@ -16,6 +18,10 @@ export abstract class Endpoint {
     }
 
     constructor(server: any, nsp?: string) {
+        if (server instanceof Server) {
+            server = server.httpserver;
+        }
+
         this._attach(SocketIO(server).of(`/${nsp || ''}`));
     }
 
