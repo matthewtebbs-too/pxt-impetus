@@ -4,9 +4,9 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path="../shared/enums.ts"/>
+/// <reference path='../shared/enums.ts'/>
 
-/// <reference path="object.ts"/>
+/// <reference path='object.ts'/>
 
 namespace pxsim {
     export function LightMixin<T extends rt.ObjectConstructor<THREE.Light>>(base: T) {

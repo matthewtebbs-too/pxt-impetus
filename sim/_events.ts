@@ -4,7 +4,7 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path="../shared/enums.ts"/>
+/// <reference path='../shared/enums.ts'/>
 
 namespace pxsim {
     export const enum ScopeId {

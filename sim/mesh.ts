@@ -4,7 +4,7 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path="object.ts"/>
+/// <reference path='object.ts'/>
 
 namespace pxsim {
     export class Mesh3d extends Object3dMixin(THREE.Mesh) {

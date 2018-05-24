@@ -4,7 +4,7 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path="object.ts"/>
+/// <reference path='object.ts'/>
 
 namespace pxsim {
     export type OrbitControls = THREE.OrbitControls;

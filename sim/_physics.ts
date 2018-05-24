@@ -4,7 +4,7 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path="_runtime.ts"/>
+/// <reference path='_runtime.ts'/>
 
 namespace pxsim {
     export class PhysicsWorld /* rigid body physics */ extends rt.DisposableObject {

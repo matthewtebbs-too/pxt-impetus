@@ -4,9 +4,9 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path="../shared/enums.ts"/>
+/// <reference path='../shared/enums.ts'/>
 
-/// <reference path="_runtime.ts"/>
+/// <reference path='_runtime.ts'/>
 
 namespace pxsim {
     // tslint:disable-next-line:interface-name

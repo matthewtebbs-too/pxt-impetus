@@ -4,7 +4,7 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path="../node_modules/pxt-core/localtypings/pxtblockly.d.ts" />
+/// <reference path='../node_modules/pxt-core/localtypings/pxtblockly.d.ts'/>
 
 namespace impetus {
     export class FieldKey extends Blockly.FieldTextInput implements Blockly.FieldCustom {

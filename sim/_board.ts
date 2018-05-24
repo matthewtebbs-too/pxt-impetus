@@ -4,7 +4,7 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path="../node_modules/pxt-core/built/pxtsim.d.ts"/>
+/// <reference path='../node_modules/pxt-core/built/pxtsim.d.ts'/>
 
 namespace pxsim {
     export class WorldBoard extends BaseBoard {
