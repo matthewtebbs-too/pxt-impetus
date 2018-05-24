@@ -6,7 +6,7 @@ The editor is hosted on the GitHub pages [here](http://muddytummy.github.io/pxt-
 
 ## Running locally
 
-These instructions allow to run locally to modify the sample.
+These instructions will allow you to run the editor locally.
 
 ### Setup
 
