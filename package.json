@@ -60,6 +60,7 @@
     "npm": ">=5.6.0"
   },
   "scripts": {
+    "clean": "pxt clean",
     "start": "pxt serve",
     "package": "pxt staticpkg --githubpages --minify"
   }
