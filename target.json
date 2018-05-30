@@ -11,7 +11,8 @@
   "compile": {
     "isNative": false,
     "floatingPoint": true,
-    "vtableShift": 2
+    "vtableShift": 2,
+    "noSourceInFlash": true
   },
   "bundleddirs": [
     "libs/core"
@@ -499,7 +500,7 @@
   },
   "versions": {
     "target": "0.1.0",
-    "pxt": "3.16.6"
+    "pxt": "3.18.5"
   },
   "blocksprj": {
     "id": "blocksprj",
@@ -513,11 +514,7 @@
         "main.blocks",
         "main.ts",
         "README.md"
-      ],
-      "targetVersions": {
-        "target": "0.1.0",
-        "pxt": "3.16.6"
-      }
+      ]
     },
     "files": {
       "README.md": " ",
@@ -536,11 +533,7 @@
       "files": [
         "main.ts",
         "README.md"
-      ],
-      "targetVersions": {
-        "target": "0.1.0",
-        "pxt": "3.16.6"
-      }
+      ]
     },
     "files": {
       "README.md": " ",
