@@ -95,7 +95,6 @@ namespace pxsim {
             singletonWorldBoard().events!.queue(ScopeId.SceneObject, SceneEvent_Internal.Animate, timeStep);
         }
 
-        // tslint:disable-next-line:variable-name
         public intersectedObjects(x_: number, y_: number): Object3d[] | null {
             if (!this._camera) {
                 return null;

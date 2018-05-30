@@ -23,6 +23,7 @@
     "variable-name": [
         true,
         "allow-leading-underscore",
+        "allow-trailing-underscore",
         "ban-keywords",
         "check-format"
     ]
