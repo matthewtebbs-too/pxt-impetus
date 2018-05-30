@@ -1,0 +1,1 @@
+self.MonacoEnvironment={baseUrl:"/pxt-impetus/"},importScripts("/pxt-impetus/vs/base/worker/workerMain.js");

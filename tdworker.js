@@ -1,0 +1,1 @@
+var window=self;function require(){return null}window.localStorage={},importScripts("/blb/tdast.js"),onmessage=function(o){var e=o.data;if("td2ts"==e.op){var s=TDev.AST.td2ts(e.arg);postMessage({id:e.id,op:e.op,result:s})}else postMessage({id:e.id,op:e.op,error:"Command not understood"})},postMessage({id:"ready"});

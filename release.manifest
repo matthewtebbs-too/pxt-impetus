@@ -1,0 +1,70 @@
+CACHE MANIFEST
+
+CACHE:
+/pxt-impetus/semantic.js
+/pxt-impetus/main.js
+/pxt-impetus/pxtapp.js
+/pxt-impetus/typescript.js
+/pxt-impetus/marked/marked.min.js
+/pxt-impetus/highlight.js/highlight.pack.js
+/pxt-impetus/jquery.js
+/pxt-impetus/pxtlib.js
+/pxt-impetus/pxtcompiler.js
+/pxt-impetus/pxtblockly.js
+/pxt-impetus/pxtwinrt.js
+/pxt-impetus/pxteditor.js
+/pxt-impetus/pxtsim.js
+/pxt-impetus/pxtembed.js
+/pxt-impetus/pxtworker.js
+/pxt-impetus/pxtweb.js
+/pxt-impetus/blockly.css
+/pxt-impetus/semantic.css
+/pxt-impetus/rtlsemantic.css
+
+
+/pxt-impetus/editor.js
+/pxt-impetus/fieldeditors.js
+
+# blockly
+/pxt-impetus/blockly/media/sprites.png
+/pxt-impetus/blockly/media/click.mp3
+/pxt-impetus/blockly/media/disconnect.wav
+/pxt-impetus/blockly/media/delete.mp3
+
+# monaco; keep in sync with webapp/public/index.html
+/pxt-impetus/vs/loader.js
+/pxt-impetus/vs/base/worker/workerMain.js
+/pxt-impetus/vs/basic-languages/src/bat.js
+/pxt-impetus/vs/basic-languages/src/cpp.js
+/pxt-impetus/vs/editor/editor.main.css
+/pxt-impetus/vs/editor/editor.main.js
+/pxt-impetus/vs/editor/editor.main.nls.js
+/pxt-impetus/vs/language/json/jsonMode.js
+/pxt-impetus/vs/language/json/jsonWorker.js
+/pxt-impetus/vs/language/typescript/lib/typescriptServices.js
+/pxt-impetus/vs/language/typescript/src/mode.js
+/pxt-impetus/vs/language/typescript/src/worker.js
+
+# charts
+/pxt-impetus/smoothie/smoothie_compressed.js
+/pxt-impetus/images/Bars_black.gif
+
+# ai
+https://az416426.vo.msecnd.net/scripts/a/ai.0.js
+
+/pxt-impetus/worker.js
+/pxt-impetus/monacoworker.js
+
+# ver Wed May 30 2018 10:05:45 GMT-0700 (PDT)
+
+# target
+/pxt-impetus/docs/static/icons/android-chrome-192x192.png
+/pxt-impetus/docs/static/logo.wide.white.svg
+/pxt-impetus/docs/static/icons/android-chrome-192x192.png
+/pxt-impetus/docs/static/logo.square.white.svg
+/pxt-impetus/docs/static/logo.square.white.svg
+
+/pxt-impetus/target.js
+  
+NETWORK:
+*

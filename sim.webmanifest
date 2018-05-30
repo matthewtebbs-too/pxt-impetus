@@ -1,0 +1,23 @@
+{
+  "lang": "en",
+  "dir": "ltr",
+  "name": "Impetus",
+  "short_name": "Impetus",
+  "background_color": "#FAFAFA",
+  "icons": [
+    {
+      "src": "@cdnUrl@/blob/4490cf1290fd6e2d9000fe93b6178e118b5d8164/static/icons/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "types": "image/png"
+    },
+    {
+      "src": "@cdnUrl@/blob/14a24e2057e81bbb295dc36ccda13721dbf5182d/static/icons/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "types": "image/png"
+    }
+  ],
+  "scope": "/",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "landscape"
+}
