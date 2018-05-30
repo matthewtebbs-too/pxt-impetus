@@ -1,1 +1,0 @@
-"use strict";Object.defineProperty(exports,"__esModule",{value:!0});var path=require("path");exports.pxtCore=require("pxt-core"),exports.pxtCoreDir=path.resolve(require.resolve("pxt-core"),"..","..");
