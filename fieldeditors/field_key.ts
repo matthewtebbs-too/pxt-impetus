@@ -8,7 +8,6 @@
 
 namespace impetus {
     export class FieldKey extends Blockly.FieldTextInput implements Blockly.FieldCustom {
-        // tslint:disable-next-line:variable-name
         public isFieldCustom_: boolean = true;
 
         constructor(text: string, params: any, validator?: () => void) {
