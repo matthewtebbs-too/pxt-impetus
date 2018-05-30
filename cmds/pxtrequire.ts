@@ -1,4 +1,4 @@
-/// <reference path='../node_modules/pxt-core/built/pxtlib.d.ts'/>
+/// <reference types='pxt-core/built/pxtlib'/>
 
 import * as path from 'path';
 export let pxtCore = require('pxt-core');

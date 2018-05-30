@@ -4,7 +4,7 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path='../node_modules/pxt-core/built/pxteditor.d.ts'/>
+/// <reference types='pxt-core/built/pxteditor'/>
 
 namespace impetus {
     const defaultToolboxXml = ``;
