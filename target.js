@@ -91,6 +91,15 @@ var pxtTargetBundle = {
         "name": "About",
         "subitems": [],
         "path": "/about",
+        "nextName": "FAQ",
+        "nextPath": "/faq"
+      },
+      {
+        "name": "FAQ",
+        "subitems": [],
+        "path": "/faq",
+        "prevName": "About",
+        "prevPath": "/about",
         "nextName": "Blocks",
         "nextPath": "/blocks"
       },
@@ -237,8 +246,8 @@ var pxtTargetBundle = {
           }
         ],
         "path": "/blocks",
-        "prevName": "About",
-        "prevPath": "/about",
+        "prevName": "FAQ",
+        "prevPath": "/faq",
         "nextName": "On Start",
         "nextPath": "/blocks/on-start"
       },
@@ -415,15 +424,6 @@ var pxtTargetBundle = {
             "path": "/support",
             "prevName": "About",
             "prevPath": "/about",
-            "nextName": "FAQ",
-            "nextPath": "/faq"
-          },
-          {
-            "name": "FAQ",
-            "subitems": [],
-            "path": "/faq",
-            "prevName": "Support",
-            "prevPath": "/support",
             "nextName": "Translate",
             "nextPath": "/translate"
           },
@@ -431,8 +431,8 @@ var pxtTargetBundle = {
             "name": "Translate",
             "subitems": [],
             "path": "/translate",
-            "prevName": "FAQ",
-            "prevPath": "/faq",
+            "prevName": "Support",
+            "prevPath": "/support",
             "nextName": "Sharing projects",
             "nextPath": "/share"
           },
@@ -451,6 +451,15 @@ var pxtTargetBundle = {
             "path": "/offline",
             "prevName": "Sharing projects",
             "prevPath": "/share",
+            "nextName": "Save",
+            "nextPath": "/save"
+          },
+          {
+            "name": "Save",
+            "subitems": [],
+            "path": "/save",
+            "prevName": "Offline support",
+            "prevPath": "/offline",
             "nextName": "Command Line Interface",
             "nextPath": "/cli"
           }
@@ -465,8 +474,8 @@ var pxtTargetBundle = {
             "name": "Command Line Interface",
             "subitems": [],
             "path": "/cli",
-            "prevName": "Offline support",
-            "prevPath": "/offline",
+            "prevName": "Save",
+            "prevPath": "/save",
             "nextName": "Visual Studio Code support",
             "nextPath": "/code"
           },
@@ -487,8 +496,8 @@ var pxtTargetBundle = {
             "prevPath": "/code"
           }
         ],
-        "prevName": "Offline support",
-        "prevPath": "/offline"
+        "prevName": "Save",
+        "prevPath": "/save"
       }
     ],
     "embedUrl": "https://muddytummy.github.io/pxt-impetus/",
@@ -500,7 +509,7 @@ var pxtTargetBundle = {
   },
   "versions": {
     "target": "0.1.0",
-    "pxt": "3.18.5"
+    "pxt": "3.18.9"
   },
   "blocksprj": {
     "id": "blocksprj",

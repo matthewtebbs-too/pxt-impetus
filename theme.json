@@ -60,6 +60,15 @@
       "name": "About",
       "subitems": [],
       "path": "/about",
+      "nextName": "FAQ",
+      "nextPath": "/faq"
+    },
+    {
+      "name": "FAQ",
+      "subitems": [],
+      "path": "/faq",
+      "prevName": "About",
+      "prevPath": "/about",
       "nextName": "Blocks",
       "nextPath": "/blocks"
     },
@@ -206,8 +215,8 @@
         }
       ],
       "path": "/blocks",
-      "prevName": "About",
-      "prevPath": "/about",
+      "prevName": "FAQ",
+      "prevPath": "/faq",
       "nextName": "On Start",
       "nextPath": "/blocks/on-start"
     },
@@ -384,15 +393,6 @@
           "path": "/support",
           "prevName": "About",
           "prevPath": "/about",
-          "nextName": "FAQ",
-          "nextPath": "/faq"
-        },
-        {
-          "name": "FAQ",
-          "subitems": [],
-          "path": "/faq",
-          "prevName": "Support",
-          "prevPath": "/support",
           "nextName": "Translate",
           "nextPath": "/translate"
         },
@@ -400,8 +400,8 @@
           "name": "Translate",
           "subitems": [],
           "path": "/translate",
-          "prevName": "FAQ",
-          "prevPath": "/faq",
+          "prevName": "Support",
+          "prevPath": "/support",
           "nextName": "Sharing projects",
           "nextPath": "/share"
         },
@@ -420,6 +420,15 @@
           "path": "/offline",
           "prevName": "Sharing projects",
           "prevPath": "/share",
+          "nextName": "Save",
+          "nextPath": "/save"
+        },
+        {
+          "name": "Save",
+          "subitems": [],
+          "path": "/save",
+          "prevName": "Offline support",
+          "prevPath": "/offline",
           "nextName": "Command Line Interface",
           "nextPath": "/cli"
         }
@@ -434,8 +443,8 @@
           "name": "Command Line Interface",
           "subitems": [],
           "path": "/cli",
-          "prevName": "Offline support",
-          "prevPath": "/offline",
+          "prevName": "Save",
+          "prevPath": "/save",
           "nextName": "Visual Studio Code support",
           "nextPath": "/code"
         },
@@ -456,8 +465,8 @@
           "prevPath": "/code"
         }
       ],
-      "prevName": "Offline support",
-      "prevPath": "/offline"
+      "prevName": "Save",
+      "prevPath": "/save"
     }
   ],
   "embedUrl": "https://muddytummy.github.io/pxt-impetus/",
