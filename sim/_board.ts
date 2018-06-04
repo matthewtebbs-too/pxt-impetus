@@ -4,9 +4,11 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path='../node_modules/pxt-core/built/pxtsim.d.ts'/>
+/// <reference types='pxt-core/built/pxtsim'/>
 
 /// <reference types='pxt-cloud-client' />
+
+// tslint:disable
 
 namespace pxsim {
     export class WorldBoard extends BaseBoard implements rt.IDisposableObject {
@@ -33,12 +35,11 @@ namespace pxsim {
         private _events: WorldEventBus | null = null;
 
         public initAsync(msg: SimulatorRunMessage): Promise<void> {
-            this.dispose();
-
             return new Promise((resolve) => {
-                this._cloud = new PxtCloud.WorldClient();
                 this._world3d = new World3d();
                 this._events = new WorldEventBus(runtime);
+
+                this._cloud = new PxtCloud.WorldClient();
 
                 resolve();
             });
@@ -48,16 +49,19 @@ namespace pxsim {
             if (this._world3d) {
                 this._world3d.renderer.pause = true;
             }
+
+            Helper.safeObjectDispose(this._cloud);
+
+            this._cloud = null;
         }
 
         public dispose() {
-            rt.ObjectFactory.forgetAllInstances();
-
-            Helper.safeObjectDispose(this._cloud);
-            this._cloud = null;
-
             Helper.safeObjectDispose(this._world3d);
+
+            this._events = null;
             this._world3d = null;
+
+            rt.ObjectFactory.forgetAllInstances();
         }
 
         public receiveMessage(msg: SimulatorMessage) {
