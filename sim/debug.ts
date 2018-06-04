@@ -6,14 +6,15 @@
     OSS: Derived from https://github.com/Microsoft/pxt-common-packages.
 */
 
-// const debug = require('debug')('pxt-impetus');
+// const dbg = require('debug')('pxt-impetus');
+const dbg = console.log;
 
 namespace pxsim.debug {
-    export function renderStatistics(shown: boolean) {
-        singletonWorldBoard().world!.renderer.stats.hidden = !shown;
+    export function log(args: any) {
+        dbg(args);
     }
 
-    export function log(args: any) {
-        // debug.log(args);
+    export function renderStatistics(shown: boolean) {
+        singletonWorldBoard().world!.renderer.stats.hidden = !shown;
     }
 }

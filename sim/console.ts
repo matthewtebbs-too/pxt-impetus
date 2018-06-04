@@ -6,11 +6,13 @@
     OSS: Derived from https://github.com/Microsoft/pxt-common-packages.
 */
 
-namespace serial {
+namespace pxsim.serial {
     function writeString(text: string) {
-        // tslint:disable-next-line:no-console
-        console.log(text);
-        pxsim.runtime.board.writeSerial(text);
+        debug.log(text);
+
+        if (pxsim.runtime && pxsim.runtime.board) {
+            pxsim.runtime.board.writeSerial(text);
+        }
     }
 
     export function writeLine(text: string) {
