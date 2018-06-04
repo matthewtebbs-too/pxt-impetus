@@ -9,7 +9,7 @@
 /// <reference types='pxt-cloud-client' />
 
 namespace pxsim {
-    export class WorldBoard extends BaseBoard {
+    export class WorldBoard extends BaseBoard implements rt.IDisposableObject {
         private static _board: WorldBoard = new WorldBoard();
 
         public static get singleton(): WorldBoard {
@@ -33,17 +33,15 @@ namespace pxsim {
         private _events: WorldEventBus | null = null;
 
         public initAsync(msg: SimulatorRunMessage): Promise<void> {
-            this.init();
+            this.dispose();
 
-            return Promise.resolve();
-        }
+            return new Promise((resolve) => {
+                this._cloud = new PxtCloud.WorldClient();
+                this._world3d = new World3d();
+                this._events = new WorldEventBus(runtime);
 
-        public init() {
-            this.postkill();
-
-            this._cloud = new PxtCloud.WorldClient();
-            this._world3d = new World3d();
-            this._events = new WorldEventBus(runtime);
+                resolve();
+            });
         }
 
         public kill() {
@@ -52,7 +50,7 @@ namespace pxsim {
             }
         }
 
-        public postkill() {
+        public dispose() {
             rt.ObjectFactory.forgetAllInstances();
 
             Helper.safeObjectDispose(this._cloud);
@@ -72,7 +70,7 @@ namespace pxsim {
     }
 
     initCurrentRuntime = (msg: SimulatorMessage) => {
-        singletonWorldBoard().postkill();               /* post-kill now */
+        singletonWorldBoard().dispose();                /* dispose now */
 
         return runtime.board = singletonWorldBoard();   /* will be initialized by runtime */
     };
