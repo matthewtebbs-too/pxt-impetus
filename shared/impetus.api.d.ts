@@ -49,7 +49,7 @@ declare class Object3d {
     /**
      * Object position.
      */
-    //% blockCombine
+    //% blockCombine block="position"
     //% blockCombineShadow=math_zero_vector
     //% shim=.position_ property
     position: Vector;
@@ -57,7 +57,7 @@ declare class Object3d {
     /**
      * Object rotation.
      */
-    //% blockCombine
+    //% blockCombine block="rotation"
     //% blockCombineShadow=math_zero_vector
     //% shim=.rotation_ property
     rotation: Vector;
@@ -65,7 +65,7 @@ declare class Object3d {
     /**
      * Object quarternion.
      */
-    //% blockCombine
+    //% blockCombine block="quaternion"
     //% blockCombineShadow=math_zero_quaternion
     //% shim=.quaternion_ property
     //% advanced=true
@@ -74,7 +74,7 @@ declare class Object3d {
     /**
      * Object scale.
      */
-    //% blockCombine
+    //% blockCombine block="scale"
     //% blockCombineShadow=math_unit_vector
     //% shim=.scale_ property
     scale: Vector;
@@ -332,29 +332,29 @@ declare namespace design {
 
 //% blockNamespace=design
 declare class Material {
-    //% blockCombine
+    //% blockCombine block="color"
     //% blockCombineShadow=color_picker
     //% group="Material"
     //% shim=.color property
     color: Color;
 
-    //% blockCombine
+    //% blockCombine block="emissive color"
     //% blockCombineShadow=color_picker
     //% group="Material"
     //% shim=.emissive property
     emissive: Color;
 
-    //% blockCombine
+    //% blockCombine block="roughness"
     //% group="Material"
     //% shim=.roughness property
     roughness: number;
 
-    //% blockCombine
+    //% blockCombine block="metalness"
     //% group="Material"
     //% shim=.metalness property
     metalness: number;
 
-    //% blockCombine
+    //% blockCombine block="density"
     //% group="Material"
     //% shim=.density property
     density: number;
@@ -398,7 +398,7 @@ declare class Light extends Object3d {
      * Color.
      * @param color value, eg: #FFFFFF
      */
-    //% blockCombine
+    //% blockCombine block="color"
     //% blockCombineShadow=,color_picker
     //% group="Light"
     //% shim=.color property
@@ -408,7 +408,7 @@ declare class Light extends Object3d {
      * Intensity.
      * @param intensity value, eg: 1
      */
-    //% blockCombine
+    //% blockCombine block="intensity"
     //% group="Light"
     //% shim=.intensity_ property
     intensity: number;
@@ -447,7 +447,7 @@ declare class Scene3d extends Object3d {
     /**
      * Active camera.
      */
-    //% blockCombine
+    //% blockCombine block="camera"
     //% blockCombineShadow=world_scene,camera_perspective
     //% shim=.camera property
     camera: Camera;
@@ -455,7 +455,7 @@ declare class Scene3d extends Object3d {
     /**
      * Background color.
      */
-    //% blockCombine
+    //% blockCombine block="background color"
     //% blockCombineShadow=world_scene,color_picker
     //% shim=.backgroundColor property
     backgroundColor: Color;
@@ -463,7 +463,7 @@ declare class Scene3d extends Object3d {
     /**
      * Ambient light color.
      */
-    //% blockCombine
+    //% blockCombine block="ambient color"
     //% blockCombineShadow=world_scene,color_picker
     //% shim=.ambientColor property
     ambientColor: Color;
