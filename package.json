@@ -50,19 +50,23 @@
     "three": "^0.93.0"
   },
   "devDependencies": {
+    "del": "^3.0.0",
     "gulp": "^4.0.0",
     "less": "^3.0.4",
     "semantic-ui-less": "~2.2.14",
     "tslint": "^5.10.0",
-    "typescript": "=2.7.2"
+    "typescript": "=2.7.2",
+    "vinyl-buffer": "^1.0.1",
+    "vinyl-source-stream": "^2.0.0"
   },
   "engines": {
     "node": ">=8.11.0",
     "npm": ">=5.6.0"
   },
   "scripts": {
-    "clean": "pxt clean",
-    "start": "pxt serve",
-    "package": "pxt staticpkg --githubpages --minify"
+    "clean": "gulp clean",
+    "bundle": "gulp bundle",
+    "start": "gulp",
+    "package": "gulp package"
   }
 }
