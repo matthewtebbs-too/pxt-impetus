@@ -6,9 +6,7 @@
 
 /// <reference types='pxt-core/built/pxtsim'/>
 
-/// <reference types='pxt-cloud-client' />
-
-// tslint:disable
+/// <reference types='pxt-cloud-client/lib/pxtcloud' />
 
 namespace pxsim {
     export class WorldBoard extends BaseBoard implements rt.IDisposableObject {
