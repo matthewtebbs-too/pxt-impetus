@@ -12,10 +12,10 @@
 
 namespace pxsim {
     export class WorldBoard extends BaseBoard implements rt.IDisposableObject {
-        private static _board: WorldBoard = new WorldBoard();
+        private static _singleton = new WorldBoard();
 
         public static get singleton(): WorldBoard {
-            return this._board;
+            return this._singleton;
         }
 
         public get cloud(): PxtCloud.WorldClient | null {
