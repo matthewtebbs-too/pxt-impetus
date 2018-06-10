@@ -37,7 +37,7 @@ namespace pxsim {
                 this._world3d = new World3d();
                 this._events = new WorldEventBus(runtime);
 
-                this._cloud = new PxtCloud.WorldClient();
+                // this._cloud = new PxtCloud.WorldClient();
 
                 resolve();
             });
