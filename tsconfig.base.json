@@ -2,9 +2,6 @@
   "compilerOptions": {
     "target": "es5",
 
-    "rootDir": ".",
-    "outDir": "../built",
-    
     "newLine": "lf",
 
     "sourceMap": false,

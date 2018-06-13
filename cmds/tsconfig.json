@@ -1,15 +1,10 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
+  "extends": "../tsconfig.base.json",
 
+  "compilerOptions": {
     "rootDir": ".",
     "outDir": "../built",
 
-    "declaration": true,
-    "sourceMap": false,
-
-    "noImplicitAny": true,
-    "noImplicitReturns": true
+    "declaration": true
   }
 }

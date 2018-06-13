@@ -2,10 +2,9 @@
   "extends": "../tsconfig.base.json",
 
   "compilerOptions": {
+    "rootDir": ".",
     "out": "../built/fieldeditors.js",
 
-    "sourceMap": false,
-    
     "strictNullChecks": false,
     "strict": false
   }
