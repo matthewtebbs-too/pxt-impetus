@@ -121,6 +121,7 @@ namespace pxsim {
                 this.children.forEach(child => (child as Object3d).dispose());
 
                 Helper.safeObjectDispose(this._rigidbody);
+                this._rigidbody = null;
             }
         };
     }

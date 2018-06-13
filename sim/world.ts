@@ -13,13 +13,13 @@ namespace pxsim {
         private _listenerhelper: SimpleEventListenerHelper;
 
         private _scene3d: Scene3d | null = new Scene3d();
-        private _renderer: Renderer;
+        private _renderer: Renderer | null = null;
 
         public get scene(): Scene3d | null {
             return this._scene3d;
         }
 
-        public get renderer(): Renderer {
+        public get renderer(): Renderer | null {
             return this._renderer;
         }
 
@@ -55,7 +55,10 @@ namespace pxsim {
             this._listenerhelper.removeAllEventListeners();
 
             Helper.safeObjectDispose(this._renderer);
+            this._renderer = null;
+
             Helper.safeObjectDispose(this._scene3d);
+            this._scene3d = null;
         }
 
         protected _onElementEvent(sid: ScopeId, evid: EventId, event: Event, value?: EventValue) {
@@ -68,7 +71,7 @@ namespace pxsim {
         }
 
         protected _onElementMouseEvent(sid: ScopeId | undefined, evid: EventId, event: MouseEvent) {
-            if (!sid) {
+            if (!sid || !this._renderer) {
                 return;
             }
 

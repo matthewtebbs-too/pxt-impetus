@@ -15,6 +15,14 @@ namespace pxsim.debug {
     }
 
     export function renderStatistics(shown: boolean) {
-        singletonWorldBoard().world!.renderer.stats.hidden = !shown;
+        const world = singletonWorldBoard().world;
+
+        if (world) {
+            const renderer = world.renderer;
+
+            if (renderer) {
+                renderer.stats.hidden = !shown;
+            }
+        }
     }
 }
