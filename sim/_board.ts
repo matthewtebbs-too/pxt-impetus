@@ -6,7 +6,6 @@
 
 /// <reference types='pxt-core/built/pxtsim'/>
 
-/// <reference types='pxt-cloud/lib/pxtcloud' />
 /// <reference types='pxt-cloud-client/lib/pxtcloud.client' />
 
 namespace pxsim {
@@ -25,13 +24,13 @@ namespace pxsim {
             return this._events;
         }
 
-        public get cloudAPI(): PxtCloud.PublicAPI | null {
+        public get cloudAPI(): PxtCloudClient.PublicAPI | null {
             return this._cloudAPI;
         }
 
         private _world3d: World3d | null = null;
         private _events: WorldEventBus | null = null;
-        private _cloudAPI: PxtCloud.PublicAPI | null = null;
+        private _cloudAPI: PxtCloudClient.PublicAPI | null = null;
 
         public initAsync(msg: SimulatorRunMessage): Promise<void> {
             return new Promise((resolve, reject) => {
