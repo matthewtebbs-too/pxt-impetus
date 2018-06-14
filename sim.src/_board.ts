@@ -8,6 +8,8 @@
 
 /// <reference types='pxt-cloud-client/lib/pxtcloud.client' />
 
+/// <reference path='_runtime.ts'/>
+
 namespace pxsim {
     export class WorldBoard extends BaseBoard implements rt.IDisposableObject {
         private static _singleton = new WorldBoard();
@@ -80,5 +82,7 @@ namespace pxsim {
         return runtime.board = singletonWorldBoard();   /* will be initialized by runtime */
     };
 
-    export function singletonWorldBoard(): WorldBoard   { return WorldBoard.singleton; }
+    export function singletonWorldBoard(): WorldBoard {
+        return WorldBoard.singleton;
+    }
 }
