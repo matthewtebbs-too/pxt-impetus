@@ -57,7 +57,7 @@ gulp.task('build', function () {
         .pipe(tsProject(ts.reporter.defaultReporter()));
 
     return merge([
-        result.js.pipe(gulp.dest(BUILT)),
+        result.js.pipe(gulp.dest(BUILT_SRC)),
         result.dts.pipe(gulp.dest(BUILT_TYPINGS)),
     ]);
 });
@@ -69,24 +69,22 @@ var replace = require('gulp-replace');
 var rename = require('gulp-rename');
 
 gulp.task('bundle', function (done) {
-    done();
-    // var bundle = browserify(
-    //     {
-    //         entries: glob.sync(BUILT_SRC.concat('**/*.js')),
-    //         insertGlobalVars: 'pxsim',
-    //         options: {
-    //             transform: ['debowerify', 'decomponentify', 'deamdify', 'deglobalify'],
-    //         },
-    //     }).bundle();
+    var bundle = browserify(
+        {
+            entries: BUILT_SRC.concat('sim.js'),
+            options: {
+                transform: ['debowerify', 'decomponentify', 'deamdify', 'deglobalify'],
+            },
+        }).bundle();
 
-    // return bundle
-    //     .pipe(source('sim.js'))
-    //     .pipe(replace(/^(var pxsim);$/mg, '$1 = window.pxsim;'))
-    //     .pipe(buffer())
-    //     .pipe(gulp.dest(BUILT))
-    //     .pipe(uglify())
-    //     .pipe(rename({ extname: '.min.js' }))
-    //     .pipe(gulp.dest(BUILT));
+    return bundle
+        .pipe(source('sim.js'))
+        .pipe(replace(/^(var pxsim);$/mg, '$1 = window.pxsim;'))
+        .pipe(buffer())
+        .pipe(gulp.dest(BUILT))
+        .pipe(uglify())
+        .pipe(rename({ extname: '.min.js' }))
+        .pipe(gulp.dest(BUILT));
 });
 
 gulp.task('serve', function (done) {
