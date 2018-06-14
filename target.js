@@ -523,7 +523,8 @@ var pxtTargetBundle = {
         "main.blocks",
         "main.ts",
         "README.md"
-      ]
+      ],
+      "additionalFilePaths": []
     },
     "files": {
       "README.md": " ",
@@ -542,7 +543,8 @@ var pxtTargetBundle = {
       "files": [
         "main.ts",
         "README.md"
-      ]
+      ],
+      "additionalFilePaths": []
     },
     "files": {
       "README.md": " ",
