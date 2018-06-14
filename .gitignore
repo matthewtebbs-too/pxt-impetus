@@ -1,5 +1,6 @@
 .env
 built
+built.*
 gh-pages
 node_modules
 projects
