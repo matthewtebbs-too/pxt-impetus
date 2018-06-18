@@ -6,10 +6,11 @@
     OSS: Derived from https://github.com/Microsoft/pxt-common-packages.
 */
 
-// const dbg = require('debug')('pxt-impetus');
-const dbg = console.log;
+const dbg = require('debug')('pxt-impetus');
 
-namespace pxsim.debug {
+import { singletonWorldBoard } from './_board';
+
+export namespace pxsimImpetus.debug {
     export function log(args: any) {
         dbg(args);
     }

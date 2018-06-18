@@ -4,130 +4,134 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path='_runtime.ts'/>
+import * as THREE from 'three';
 
-namespace pxsim {
-    export function Object3dMixin<T extends rt.ObjectConstructor<THREE.Object3D>>(base: T) {
-        return class extends base implements rt.IDisposableObject, rt.ICloneableObject {
-            protected _rigidbody: RigidBody | null = null;
+import * as Helper from './_helper';
+import { RigidBody } from './_rigidbody';
+import * as RT from './_runtime';
+import { Quaternion, Vector, VectorConstructor } from './math';
+import { Scene3d } from './scene';
 
-            private _isDisposed = false;
+export function Object3dMixin<T extends RT.ObjectConstructor<THREE.Object3D>>(base: T) {
+    return class extends base implements RT.IDisposableObject, RT.ICloneableObject {
+        protected _rigidbody: RigidBody | null = null;
 
-            constructor(...args: any[]) {
-                super(...args);
+        private _isDisposed = false;
 
-                if (undefined !== this.castShadow) {
-                    this.castShadow = true;
-                }
+        constructor(...args: any[]) {
+            super(...args);
 
-                if (undefined !== this.receiveShadow) {
-                    this.receiveShadow = true;
-                }
+            if (undefined !== this.castShadow) {
+                this.castShadow = true;
             }
 
-            public get position_(): Vector {
-                return this.position;
+            if (undefined !== this.receiveShadow) {
+                this.receiveShadow = true;
+            }
+        }
+
+        public get position_(): Vector {
+            return this.position;
+        }
+
+        public set position_(position: Vector) {
+            this.position.copy(position);
+        }
+
+        public get rotation_(): Vector {
+            const rotation = this.rotation.toVector3();
+            return new VectorConstructor(THREE.Math.radToDeg(rotation.x), THREE.Math.radToDeg(rotation.y), THREE.Math.radToDeg(rotation.z));
+        }
+
+        public set rotation_(rotation: Vector) {
+            this.rotation.setFromVector3(new VectorConstructor(THREE.Math.degToRad(rotation.x), THREE.Math.degToRad(rotation.y), THREE.Math.degToRad(rotation.z)));
+        }
+
+        public get quaternion_(): Quaternion {
+            return this.quaternion;
+        }
+
+        public set quaternion_(quaternion: Quaternion) {
+            this.quaternion.copy(quaternion);
+        }
+
+        public get scale_(): Vector {
+            return this.scale;
+        }
+
+        public set scale_(scale: Vector) {
+            this.scale.copy(scale);
+        }
+
+        public setRotationFromAxisAngle(axis: Vector, angle: number) {
+            if (!axis) {
+                return;
             }
 
-            public set position_(position: Vector) {
-                this.position.copy(position);
+            this.setRotationFromAxisAngle(axis, THREE.Math.degToRad(angle));
+        }
+
+        public setPhysicsEnabled(enable: boolean) {
+            if (this._rigidbody) {
+                this._rigidbody.isKinematic = !enable;
+            }
+        }
+
+        public lookAtPosition(position: Vector) {
+            if (!position) {
+                return;
             }
 
-            public get rotation_(): Vector {
-                const rotation = this.rotation.toVector3();
-                return new VectorConstructor(THREE.Math.radToDeg(rotation.x), THREE.Math.radToDeg(rotation.y), THREE.Math.radToDeg(rotation.z));
+            this.lookAt(position);
+        }
+
+        public animate(timeStep: number) {
+            if (this._rigidbody) {
+                this._rigidbody.syncMotionStateToObject3d();
             }
 
-            public set rotation_(rotation: Vector) {
-                this.rotation.setFromVector3(new VectorConstructor(THREE.Math.degToRad(rotation.x), THREE.Math.degToRad(rotation.y), THREE.Math.degToRad(rotation.z)));
+            this.children.forEach(child => (child as Object3d).animate(timeStep));
+        }
+
+        public onAdded(scene3d: Scene3d) {
+            if (this._rigidbody) {
+                this._rigidbody.addRigidBody(scene3d.physicsWorld);
             }
 
-            public get quaternion_(): Quaternion {
-                return this.quaternion;
+            this.children.forEach(child => (child as Object3d).onAdded(scene3d));
+        }
+
+        public onRemoved(scene3d: Scene3d) {
+            this.children.forEach(child => (child as Object3d).onRemoved(scene3d));
+
+            if (this._rigidbody) {
+                this._rigidbody.removeRigidBody(scene3d.physicsWorld);
             }
+        }
 
-            public set quaternion_(quaternion: Quaternion) {
-                this.quaternion.copy(quaternion);
+        public copy(source: this, recursive?: boolean): this {
+            super.copy(source, recursive);
+
+            throw Error();
+        }
+
+        public dispose() {
+            if (!this._isDisposed) {
+                this._onDispose();
+                this._isDisposed = true;
             }
+        }
 
-            public get scale_(): Vector {
-                return this.scale;
-            }
+        protected _onDispose() {
+            this.children.forEach(child => (child as Object3d).dispose());
 
-            public set scale_(scale: Vector) {
-                this.scale.copy(scale);
-            }
-
-            public setRotationFromAxisAngle(axis: Vector, angle: number) {
-                if (!axis) {
-                    return;
-                }
-
-                this.setRotationFromAxisAngle(axis, THREE.Math.degToRad(angle));
-            }
-
-            public setPhysicsEnabled(enable: boolean) {
-                if (this._rigidbody) {
-                    this._rigidbody.isKinematic = !enable;
-                }
-            }
-
-            public lookAtPosition(position: Vector) {
-                if (!position) {
-                    return;
-                }
-
-                this.lookAt(position);
-            }
-
-            public animate(timeStep: number) {
-                if (this._rigidbody) {
-                    this._rigidbody.syncMotionStateToObject3d();
-                }
-
-                this.children.forEach(child => (child as Object3d).animate(timeStep));
-            }
-
-            public onAdded(scene3d: Scene3d) {
-                if (this._rigidbody) {
-                    this._rigidbody.addRigidBody(scene3d.physicsWorld);
-                }
-
-                this.children.forEach(child => (child as Object3d).onAdded(scene3d));
-            }
-
-            public onRemoved(scene3d: Scene3d) {
-                this.children.forEach(child => (child as Object3d).onRemoved(scene3d));
-
-                if (this._rigidbody) {
-                    this._rigidbody.removeRigidBody(scene3d.physicsWorld);
-                }
-            }
-
-            public copy(source: this, recursive?: boolean): this {
-                super.copy(source, recursive);
-
-                throw Error();
-            }
-
-            public dispose() {
-                if (!this._isDisposed) {
-                    this._onDispose();
-                    this._isDisposed = true;
-                }
-            }
-
-            protected _onDispose() {
-                this.children.forEach(child => (child as Object3d).dispose());
-
-                Helper.safeObjectDispose(this._rigidbody);
-                this._rigidbody = null;
-            }
-        };
-    }
-
-    export class Object3d extends Object3dMixin(THREE.Object3D) { }
+            Helper.safeObjectDispose(this._rigidbody);
+            this._rigidbody = null;
+        }
+    };
 }
 
-namespace pxsim.object {
+export class Object3d extends Object3dMixin(THREE.Object3D) { }
+
+export namespace pxsimImpetus.object {
 }

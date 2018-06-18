@@ -4,22 +4,25 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path='object.ts'/>
+import * as THREE from 'three';
 
-namespace pxsim {
-    export class Mesh3d extends Object3dMixin(THREE.Mesh) {
-        constructor(
-            shape3d: Shape3d,
-            material: Material,
-        ) {
-            super(shape3d, material);
+import { RigidBody } from './_rigidbody';
+import { Material } from './material';
+import { Object3d, Object3dMixin } from './object';
+import { Shape3d } from './shape';
 
-            this._rigidbody = new RigidBody(this, shape3d, shape3d.volume * material.density);
-        }
+export class Mesh3d extends Object3dMixin(THREE.Mesh) {
+    constructor(
+        shape3d: Shape3d,
+        material: Material,
+    ) {
+        super(shape3d, material);
+
+        this._rigidbody = new RigidBody(this, shape3d, shape3d.volume * material.density);
     }
 }
 
-namespace pxsim.mesh {
+export namespace pxsimImpetus.mesh {
     export function fromShapeAndMaterial(
         shape3d: Shape3d,
         material: Material,

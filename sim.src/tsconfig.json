@@ -2,12 +2,7 @@
   "extends": "../tsconfig.base.json",
 
   "compilerOptions": {
-    "out": "sim.js",
-
-    "typeRoots": [
-      "../node_modules/@types",
-      "./types"
-    ]
+    "outDir": "./built.src",
   },
 
   "include": [

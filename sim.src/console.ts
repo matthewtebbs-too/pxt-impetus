@@ -6,7 +6,11 @@
     OSS: Derived from https://github.com/Microsoft/pxt-common-packages.
 */
 
-namespace pxsim.serial {
+/// <reference types='pxt-core/built/pxtsim'/>
+
+const debug = require('debug')('pxt-impetus');
+
+export namespace pxsimImpetus.serial {
     function writeString(text: string) {
         debug.log(text);
 
@@ -24,7 +28,7 @@ namespace pxsim.serial {
     }
 }
 
-namespace pxsim.console {
+export namespace pxsimImpetus.console {
     export function log(text: string) {
         serial.writeLine(text);
     }

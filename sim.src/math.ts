@@ -6,29 +6,29 @@
 
 /// <reference path='../shared/enums.ts'/>
 
-namespace pxsim {
-    export type Vector = THREE.Vector3;
+import * as THREE from 'three';
 
-    // tslint:disable-next-line:variable-name
-    export const VectorConstructor = THREE.Vector3;
+export type Vector = THREE.Vector3;
 
-    export type Quaternion = THREE.Quaternion;
+// tslint:disable-next-line:variable-name
+export const VectorConstructor = THREE.Vector3;
 
-    // tslint:disable-next-line:variable-name
-    export const QuaternionConstructor = THREE.Quaternion;
+export type Quaternion = THREE.Quaternion;
 
-    export type Euler = THREE.Euler;
+// tslint:disable-next-line:variable-name
+export const QuaternionConstructor = THREE.Quaternion;
 
-    // tslint:disable-next-line:variable-name
-    export const EulerConstructor = THREE.Euler;
+export type Euler = THREE.Euler;
 
-    export type Spherical = THREE.Spherical;
+// tslint:disable-next-line:variable-name
+export const EulerConstructor = THREE.Euler;
 
-    // tslint:disable-next-line:variable-name
-    export const SphericalConstructor = THREE.Spherical;
-}
+export type Spherical = THREE.Spherical;
 
-namespace pxsim.math {
+// tslint:disable-next-line:variable-name
+export const SphericalConstructor = THREE.Spherical;
+
+export namespace pxsimImpetus.math {
     export function degreesInRadians(degrees: number): number {
         return THREE.Math.degToRad(degrees);
     }
@@ -38,7 +38,7 @@ namespace pxsim.math {
     }
 }
 
-namespace pxsim.math3d {
+export namespace pxsimImpetus.math3d {
     export function vectorToString(v: Vector): string {
         return `(${v.x}, ${v.y}, ${v.z})`;
     }

@@ -4,77 +4,77 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-namespace pxsim {
-    export interface IFromBufferAttribute<T> {
-        fromBufferAttribute(attribute: THREE.BufferAttribute, index: number, offset?: number): T;
+import * as Ammo from 'other_modules/ammo';
+
+import * as RT from './_runtime';
+
+export interface IFromBufferAttribute<T> {
+    fromBufferAttribute(attribute: THREE.BufferAttribute, index: number, offset?: number): T;
+}
+
+export function btVector3FromThree(vec: THREE.Vector3, btvec = new Ammo.btVector3()): Ammo.btVector3 {
+    btvec.setValue(vec.x, vec.y, vec.z);
+    return btvec;
+}
+
+export function btQuaternionFromThree(qtr: THREE.Quaternion, btqtr = new Ammo.btQuaternion()): Ammo.btQuaternion {
+    btqtr.setValue(qtr.x, qtr.y, qtr.z, qtr.w);
+    return btqtr;
+}
+
+export function arrayFromBufferAttribute<AT extends IFromBufferAttribute<AT>>(
+    attribute: THREE.BufferAttribute,
+    ctor: RT.ObjectConstructor<AT>,
+): AT[] {
+    const array = new Array<AT>(attribute.count);
+
+    for (let index = 0; index < attribute.count; index++) {
+        array[index] = new ctor();
+        array[index].fromBufferAttribute(attribute, index);
     }
 
-    export class Helper {
-        public static btVector3FromThree(vec: THREE.Vector3, btvec = new Ammo.btVector3()): Ammo.btVector3 {
-            btvec.setValue(vec.x, vec.y, vec.z);
-            return btvec;
-        }
+    return array;
+}
 
-        public static btQuaternionFromThree(qtr: THREE.Quaternion, btqtr = new Ammo.btQuaternion()): Ammo.btQuaternion {
-            btqtr.setValue(qtr.x, qtr.y, qtr.z, qtr.w);
-            return btqtr;
-        }
+export function applyFn<T, R>(input: T | T[], fn: (t: T) => R): R | R[] {
+    return Array.isArray(input) ? input.map(fn) : fn(input);
+}
 
-        public static arrayFromBufferAttribute<AT extends IFromBufferAttribute<AT>>(
-            attribute: THREE.BufferAttribute,
-            ctor: rt.ObjectConstructor<AT>,
-        ): AT[] {
-            const array = new Array<AT>(attribute.count);
+export function safeObjectDispose(object: RT.IDisposableObject | null) {
+    if (object) {
+        object.dispose();
+    }
+}
 
-            for (let index = 0; index < attribute.count; index++) {
-                array[index] = new ctor();
-                array[index].fromBufferAttribute(attribute, index);
-            }
+export function safeAmmoObjectDestroy(object: any | null) {
+    if (object) {
+        Ammo.destroy(object);
+    }
+}
 
-            return array;
-        }
+export class SimpleEventListenerHelper {
+    private _listeners = new Map<string, (this: HTMLElement, ev: Event) => any>();
 
-        public static applyFn<T, R>(input: T | T[], fn: (t: T) => R): R | R[] {
-            return Array.isArray(input) ? input.map(fn) : fn(input);
-        }
+    constructor(public readonly target: EventTarget) {
+    }
 
-        public static safeObjectDispose(object: rt.IDisposableObject | null) {
-            if (object) {
-                object.dispose();
-            }
-        }
+    public addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void {
+        this.target.addEventListener(type, listener);
+        this._listeners.set(type, listener);
+    }
 
-        public static safeAmmoObjectDestroy(object: any | null) {
-            if (object) {
-                Ammo.destroy(object);
-            }
+    public removeEventListener<K extends keyof HTMLElementEventMap>(type: K): void {
+        const listener = this._listeners.get(type);
+        if (listener) {
+            this.target.removeEventListener(type, listener);
+            this._listeners.delete(type);
         }
     }
 
-    export class SimpleEventListenerHelper {
-        private _listeners = new Map<string, (this: HTMLElement, ev: Event) => any>();
-
-        constructor(public readonly target: EventTarget) {
-        }
-
-        public addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any): void {
-            this.target.addEventListener(type, listener);
-            this._listeners.set(type, listener);
-        }
-
-        public removeEventListener<K extends keyof HTMLElementEventMap>(type: K): void {
-            const listener = this._listeners.get(type);
-            if (listener) {
-                this.target.removeEventListener(type, listener);
-                this._listeners.delete(type);
-            }
-        }
-
-        public removeAllEventListeners() {
-            this._listeners.forEach((listener, type) => {
-                this.target.removeEventListener(type, listener);
-            });
-            this._listeners.clear();
-        }
+    public removeAllEventListeners() {
+        this._listeners.forEach((listener, type) => {
+            this.target.removeEventListener(type, listener);
+        });
+        this._listeners.clear();
     }
 }

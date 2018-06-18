@@ -6,125 +6,133 @@
 
 /// <reference path='../shared/enums.ts'/>
 
-/// <reference path='object.ts'/>
+import * as THREE from 'three';
 
-namespace pxsim {
-    export type Raycaster = THREE.Raycaster;
+import { singletonWorldBoard } from './_board';
+import {
+    SceneEvent_Internal,
+    ScopeId,
+} from './_events';
+import { PhysicsWorld } from './_physics';
+import { Camera } from './camera';
+import { Color, ColorConstructor } from './color';
+import { AmbientLight, Light } from './light';
+import { SphericalConstructor, Vector, VectorConstructor } from './math';
+import { Object3d, Object3dMixin } from './object';
 
-    // tslint:disable-next-line:variable-name
-    export const RaycasterConstructor = THREE.Raycaster;
-}
+export type Raycaster = THREE.Raycaster;
 
-namespace pxsim {
-    export class Scene3d extends Object3dMixin(THREE.Scene) {
-        private _physicsworld: PhysicsWorld = new PhysicsWorld();
+// tslint:disable-next-line:variable-name
+export const RaycasterConstructor = THREE.Raycaster;
 
-        private _camera: Camera | null = null;
-        private _ambientlight: AmbientLight = new AmbientLight();
-        private _raycaster: Raycaster = new RaycasterConstructor();
+export class Scene3d extends Object3dMixin(THREE.Scene) {
+    private _physicsworld: PhysicsWorld = new PhysicsWorld();
 
-        public get physicsWorld(): PhysicsWorld {
-            return this._physicsworld;
+    private _camera: Camera | null = null;
+    private _ambientlight: AmbientLight = new AmbientLight();
+    private _raycaster: Raycaster = new RaycasterConstructor();
+
+    public get physicsWorld(): PhysicsWorld {
+        return this._physicsworld;
+    }
+
+    constructor() {
+        super();
+
+        this.background = new ColorConstructor(Palette.SkyBlue);
+        this._ambientlight.color.setScalar(.5);
+
+        this.addAt(this._ambientlight, new VectorConstructor(0, 0, 0));
+    }
+
+    public get camera(): Camera | null {
+        return this._camera;
+    }
+
+    public set camera(camera: Camera | null) {
+        this._camera = camera;
+    }
+
+    public get backgroundColor(): Color {
+        return this.background;
+    }
+
+    public set backgroundColor(color: Color) {
+        this.background = color;
+    }
+
+    public get ambientColor(): Color {
+        return this._ambientlight.color;
+    }
+
+    public set ambientColor(color: Color) {
+        this._ambientlight.color = color;
+    }
+
+    public addAt(object3d: Object3d, position: Vector) {
+        if (!object3d) {
+            return;
         }
 
-        constructor() {
-            super();
+        object3d.position.copy(position);
+        this.add(object3d);
+    }
 
-            this.background = new ColorConstructor(Palette.SkyBlue);
-            this._ambientlight.color.setScalar(.5);
+    public add(...objects3d: Object3d[]) {
+        if (objects3d) {
+            super.add(...objects3d);
+            objects3d.forEach(object3d => object3d.onAdded(this));
+        }
+    }
 
-            this.addAt(this._ambientlight, math3d.zeroVector());
+    public remove(object3d: Object3d) {
+        if (object3d) {
+            object3d.onRemoved(this);
+            super.remove(object3d);
+        }
+    }
+
+    public animate(timeStep: number) {
+        this._physicsworld.animate(timeStep);
+
+        if (this._camera) {
+            this._camera.update();
         }
 
-        public get camera(): Camera | null {
-            return this._camera;
+        super.animate(timeStep);
+
+        singletonWorldBoard().events!.queue(ScopeId.SceneObject, SceneEvent_Internal.Animate, timeStep);
+    }
+
+    public intersectedObjects(x_: number, y_: number): Object3d[] | null {
+        if (!this._camera) {
+            return null;
         }
 
-        public set camera(camera: Camera | null) {
-            this._camera = camera;
-        }
+        this._raycaster.setFromCamera({x: x_, y: y_}, this._camera);
+        const intersections = this._raycaster.intersectObjects(this.children);
 
-        public get backgroundColor(): Color {
-            return this.background;
-        }
+        return intersections ? intersections.map(intersection => intersection.object as any) : null;
+    }
 
-        public set backgroundColor(color: Color) {
-            this.background = color;
-        }
+    public setPhysicsEnabled(enable: boolean) {
+        /* TODO$: */
+    }
 
-        public get ambientColor(): Color {
-            return this._ambientlight.color;
-        }
+    public copy(source: this, recursive?: boolean): this {
+        super.copy(source, recursive);
 
-        public set ambientColor(color: Color) {
-            this._ambientlight.color = color;
-        }
+        throw Error();
+    }
 
-        public addAt(object3d: Object3d, position: Vector) {
-            if (!object3d) {
-                return;
-            }
+    protected _onDispose() {
+        super._onDispose();
 
-            object3d.position.copy(position);
-            this.add(object3d);
-        }
-
-        public add(...objects3d: Object3d[]) {
-            if (objects3d) {
-                super.add(...objects3d);
-                objects3d.forEach(object3d => object3d.onAdded(this));
-            }
-        }
-
-        public remove(object3d: Object3d) {
-            if (object3d) {
-                object3d.onRemoved(this);
-                super.remove(object3d);
-            }
-        }
-
-        public animate(timeStep: number) {
-            this._physicsworld.animate(timeStep);
-
-            if (this._camera) {
-                this._camera.update();
-            }
-
-            super.animate(timeStep);
-
-            singletonWorldBoard().events!.queue(ScopeId.SceneObject, SceneEvent_Internal.Animate, timeStep);
-        }
-
-        public intersectedObjects(x_: number, y_: number): Object3d[] | null {
-            if (!this._camera) {
-                return null;
-            }
-
-            this._raycaster.setFromCamera({x: x_, y: y_}, this._camera);
-            const intersections = this._raycaster.intersectObjects(this.children);
-
-            return intersections ? intersections.map(intersection => intersection.object as any) : null;
-        }
-
-        public setPhysicsEnabled(enable: boolean) {
-            /* TODO$: */
-        }
-
-        public copy(source: this, recursive?: boolean): this {
-            super.copy(source, recursive);
-
-            throw Error();
-        }
-
-        protected _onDispose() {
-            super._onDispose();
-
-            this._physicsworld.dispose();
-        }
+        this._physicsworld.dispose();
     }
 }
 
-namespace pxsim.scene {
+export namespace pxsimImpetus.scene {
     export function randomPositionOnPlane(size: number): Vector {
         return new VectorConstructor(
             (Math.random() - .5) * size,
@@ -148,13 +156,14 @@ namespace pxsim.scene {
     }
 
     export function intersectedObjectAt(x: number, y: number): Object3d | null {
-        const scene3d = pxsim.world.scene();
+        const world = singletonWorldBoard().world;
+        const scene3d = world ? world.scene : null;
         const objects = scene3d ? scene3d.intersectedObjects(x, y) : null;
 
         return objects && objects.length > 0 ? objects[0] : null;
     }
 
-    export function onAnimate(handler: RefAction) {
+    export function onAnimate(handler: pxsim.RefAction) {
         singletonWorldBoard().events!.listen(ScopeId.SceneObject, SceneEvent_Internal.Animate, handler);
     }
 }

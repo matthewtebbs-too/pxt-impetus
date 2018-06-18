@@ -71,7 +71,7 @@ var rename = require('gulp-rename');
 gulp.task('bundle', function (done) {
     var bundle = browserify(
         {
-            entries: BUILT_SRC.concat('sim.js'),
+            entries: [BUILT_SRC.concat('_runtime.js'), glob.sync(BUILT_SRC.concat('**/*.js'))],
             options: {
                 transform: ['debowerify', 'decomponentify', 'deamdify', 'deglobalify'],
             },

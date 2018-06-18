@@ -4,14 +4,14 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-namespace pxsim {
-    export type Color = THREE.Color;
+import * as THREE from 'three';
 
-    // tslint:disable-next-line:variable-name
-    export const ColorConstructor = THREE.Color;
-}
+export type Color = THREE.Color;
 
-namespace pxsim.color {
+// tslint:disable-next-line:variable-name
+export const ColorConstructor = THREE.Color;
+
+export namespace pxsimImpetus.color {
     export function colorToString(color: Color): string {
         return `(${color.r * 255}, ${color.g * 255}, ${color.b * 255})`;
     }
