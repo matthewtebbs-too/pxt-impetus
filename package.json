@@ -31,6 +31,9 @@
     "docs/**",
     "sim/public"
   ],
+  "browser": {
+    "ammo": "other_modules/ammo.js"
+  },
   "dependencies": {
     "@types/bluebird": "^2.0.33",
     "@types/dat.gui": "^0.7.0",
