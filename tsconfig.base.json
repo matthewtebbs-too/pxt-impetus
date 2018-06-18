@@ -21,7 +21,14 @@
     "removeComments": true,
     "strict": true,
     "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true
+    "suppressImplicitAnyIndexErrors": true,
+
+    "paths": {
+      "*": [
+        "*",
+        "other_modules/*"
+      ]
+    }
   }
 }
     

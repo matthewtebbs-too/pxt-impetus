@@ -4,9 +4,9 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-import * as Ammo from 'other_modules/ammo';
-import * as THREEX from 'other_modules/three.extra';
+import * as Ammo from 'ammo';
 import * as THREE from 'three';
+import * as THREEX from 'three.extra';
 
 import * as Helper from './_helper';
 import { btCollisionShapeFromQuickHull3dResult, collisionMargin, QuickHull3d } from './_hull';

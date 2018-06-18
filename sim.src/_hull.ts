@@ -6,9 +6,9 @@
     OSS: Portions derived from convex geometries & quickhull https://github.com/mrdoob/three.js
 */
 
-import * as Ammo from 'other_modules/ammo';
-import * as THREEX from 'other_modules/three.extra';
+import * as Ammo from 'ammo';
 import * as THREE from 'three';
+import * as THREEX from 'three.extra';
 
 import * as Helper from './_helper';
 

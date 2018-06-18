@@ -6,8 +6,8 @@
 
 /// <reference types='stats' />
 
-import * as THREEX from 'other_modules/three.extra';
 import * as THREE from 'three';
+import * as THREEX from 'three.extra';
 
 import * as RT from './_runtime';
 import { Scene3d } from './scene';

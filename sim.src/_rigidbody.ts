@@ -4,7 +4,7 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-import * as Ammo from 'other_modules/ammo';
+import * as Ammo from 'ammo';
 
 import * as Helper from './_helper';
 import { PhysicsWorld } from './_physics';
