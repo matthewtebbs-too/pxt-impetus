@@ -8,6 +8,16 @@
 /* Reference import */
 @import (reference) "semantic.less";
 
+.ui.item.logo img {
+    margin-left: 1.6rem;
+}
+
+@media only screen {
+    .simView #boardview, .fullscreensim #boardview, .fullscreensim #simulators {
+        padding: 0px;
+    }
+}
+
 /* Mobile */
 @media only screen and (max-width: @largestMobileScreen) {
 }
@@ -23,3 +33,4 @@
 /* Large Monitor */
 @media only screen and (min-width: @largeMonitorBreakpoint) {
 }
+

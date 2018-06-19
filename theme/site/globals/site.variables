@@ -9,7 +9,7 @@
 @darkGrey: #2F2F2F;
 
 @primaryColor        : @grey;
-@secondaryColor      : #2680d9;
+@secondaryColor      : @black;
 
 @lightPrimaryColor   : lighten(@primaryColor, 50%);
 @lightSecondaryColor : lighten(@secondaryColor, 50%);
