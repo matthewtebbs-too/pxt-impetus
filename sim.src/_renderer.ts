@@ -90,6 +90,7 @@ export class Renderer extends RT.ProxyObject<THREE.WebGLRenderer> {
             return;
         }
 
+        this._stats.dom.style.left = `calc(100% - 80px)`;
         this._stats.dom.hidden = true;
 
         this._container.innerHTML = '';
