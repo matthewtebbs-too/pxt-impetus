@@ -414,7 +414,7 @@ declare class Light extends Object3d {
     intensity: number;
 }
 
-//%
+//% blockNamespace=design
 declare class Camera extends Object3d {
     /**
      * Attach camera controller.
