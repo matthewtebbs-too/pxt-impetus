@@ -7,7 +7,7 @@
       "es5", "dom", "dom.iterable"
     ],
     "module": "commonjs",
-  
+
     "outDir": "./built.src",
   },
 
