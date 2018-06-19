@@ -104,31 +104,38 @@ export class Renderer extends RT.ProxyObject<THREE.WebGLRenderer> {
 
     public runRenderLoop() {
         this._callbackRequestId = requestAnimationFrame((time: number) => {
-            if (!this._paused) {
-                this._stats.begin();
+            const notPaused = !this._paused;
 
-                let wasRendered = false;
+            const stats = this._stats;
+            if (notPaused) {
+                stats.begin();
+            }
 
-                const scene3d = this._scene3d;
-                if (scene3d) {
+            let wasRendered = false;
+
+            const scene3d = this._scene3d;
+            if (scene3d) {
+                if (notPaused) {
                     scene3d.animate(this._clock.getDelta());
-
-                    const camera = scene3d.camera;
-                    if (camera) {
-                        const size = this.reference.getSize();
-                        camera.setSize(size.width, size.height);
-
-                        this.reference.render(scene3d, camera);
-
-                        wasRendered = true;
-                    }
                 }
 
-                if (!wasRendered) {
-                        this.reference.clear();
-                }
+                const camera = scene3d.camera;
+                if (camera) {
+                    const size = this.reference.getSize();
+                    camera.setSize(size.width, size.height);
 
-                this._stats.end();
+                    this.reference.render(scene3d, camera);
+
+                    wasRendered = true;
+                }
+            }
+
+            if (!wasRendered) {
+                this.reference.clear();
+            }
+
+            if (notPaused) {
+                stats.end();
             }
 
             this.runRenderLoop();
