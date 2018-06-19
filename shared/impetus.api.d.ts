@@ -539,8 +539,50 @@ declare namespace world { /* globe icon */
      */
     //% blockId=world_scene
     //% block="scene"
+    //% group="World"
     //% shim=world::scene
     function scene(): Scene3d;
+}
+
+//% blockNamespace=world
+declare class User {
+    /**
+     * Name.
+     */
+    //% blockCombine block="name"
+    //% blockCombineShadow=world_current_user,
+    //% shim=user::name property
+    name: string;
+}
+
+//% blockNamespace=world
+declare namespace user {
+    /**
+     * Get current user.
+     */
+    //% blockId=world_current_user
+    //% block="current user"
+    //% group="User"
+    //% shim=world::currentUser
+    function currentUser(): User;
+
+    /**
+     * Message user.
+    */
+    //% blockId=user_message
+    //% block="say %message|to %name"
+    //% group="User"
+    //% shim=user::messageUser
+    function messageUser(message: string, name: string): void;
+
+    /**
+     * Code to run when a message is received.
+     */
+    //% blockId=user_on_message
+    //% block="on"
+    //% group="User"
+    //% shim=input::onUserMessage
+    function onUserMessage(cb: (message: string, from: string) => void): void;
 }
 
 //% color="#B4009E" icon="\uf192" block="Input" weight=93

@@ -147,6 +147,7 @@
   "String.substr": "Return a substring of the current string.",
   "String.substr|param|length": "number of characters to extract",
   "String.substr|param|start": "first character index; can be negative from counting from the end, eg:0",
+  "User.name": "Name.",
   "console.log": "Write a line of text to the console output.",
   "console.logValue": "Write a name:value pair as a line of text to the console output.",
   "console.logValue|param|name": "of the value, eg: \"x\"",
@@ -226,5 +227,8 @@
   "scene.randomPositionInSphere|param|diameter": "value, eg: 1",
   "scene.randomPositionOnPlane": "Random position on plane.",
   "scene.randomPositionOnPlane|param|size": "value, eg: 1",
+  "user.currentUser": "Get current user.",
+  "user.messageUser": "Message user.",
+  "user.onUserMessage": "Code to run when a message is received.",
   "world.scene": "Get current scene."
 }

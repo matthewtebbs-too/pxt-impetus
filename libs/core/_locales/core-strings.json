@@ -240,6 +240,7 @@
   "String|block": "String",
   "Torus.Circle|block": "torus",
   "Torus.Knot|block": "torus knot",
+  "User.name|block": "name",
   "console.logValue|block": "console|log value %name|= %value",
   "console.log|block": "console|log %text",
   "console|block": "Console",
@@ -287,6 +288,10 @@
   "scene.randomPositionInSphere|block": "random position in %side diameter sphere",
   "scene.randomPositionOnPlane|block": "random position on %size size plane",
   "scene|block": "Scene",
+  "user.currentUser|block": "current user",
+  "user.messageUser|block": "say %message|to %name",
+  "user.onUserMessage|block": "on",
+  "user|block": "user",
   "world.scene|block": "scene",
   "world|block": "World",
   "{id:category}Array": "Array",
@@ -312,6 +317,7 @@
   "{id:category}Scene3d": "Scene3d",
   "{id:category}String": "String",
   "{id:category}Text": "Text",
+  "{id:category}User": "User",
   "{id:category}Vector": "Vector",
   "{id:category}World": "World",
   "{id:group}Camera": "Camera",
@@ -320,5 +326,7 @@
   "{id:group}Material": "Material",
   "{id:group}Quaternion": "Quaternion",
   "{id:group}Shape": "Shape",
-  "{id:group}Vector": "Vector"
+  "{id:group}User": "User",
+  "{id:group}Vector": "Vector",
+  "{id:group}World": "World"
 }
