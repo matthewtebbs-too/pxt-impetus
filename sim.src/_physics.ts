@@ -5,14 +5,23 @@
 */
 
 import * as Ammo from 'ammo';
+import * as THREE from 'three';
 
 import * as Helper from './_helper';
 import * as RT from './_runtime';
 
 export class PhysicsWorld /* rigid body physics */ extends RT.DisposableObject {
+    public static worldOfRigidBody(btbody: Ammo.btRigidBody): PhysicsWorld | null {
+        return PhysicsWorld._objectcache.get((btbody as any)._uuid) || null;
+    }
+
+    private static _objectcache = new Map<RT.ObjId, PhysicsWorld>();
+
     private static _numIterationsSolver = 4;
     private static _maxStepSimulation = 3;      /* min 20 fps */
     private static _fixedTimeStep = 1 / 60;     /* normal 60 fps */
+
+    private _uuid = THREE.Math.generateUUID();
 
     private _btconfig: Ammo.btDefaultCollisionConfiguration;
     private _btdispatcher: Ammo.btCollisionDispatcher;
@@ -21,12 +30,10 @@ export class PhysicsWorld /* rigid body physics */ extends RT.DisposableObject {
 
     private _btworld: Ammo.btDiscreteDynamicsWorld;
 
-    public get btWorld() {
-        return this._btworld;
-    }
-
     constructor() {
         super();
+
+        PhysicsWorld._objectcache.set(this._uuid, this);
 
         this._btconfig = new Ammo.btDefaultCollisionConfiguration();
         this._btdispatcher = new Ammo.btCollisionDispatcher(this._btconfig);
@@ -50,6 +57,22 @@ export class PhysicsWorld /* rigid body physics */ extends RT.DisposableObject {
         Helper.safeAmmoObjectDestroy(btvecGravity);
     }
 
+    public addRigidBody(btbody: Ammo.btRigidBody, btmotionstate: Ammo.btMotionState) {
+        this.removeRigidBody(btbody);
+
+        btbody.setMotionState(btmotionstate);
+        this._btworld.addRigidBody(btbody);
+        (btbody as any)._uuid = this._uuid;
+    }
+
+    public removeRigidBody(btbody: Ammo.btRigidBody) {
+        if ((btbody as any)._uuid !== this._uuid) {
+            return;
+        }
+
+        this._btworld.removeRigidBody(btbody);
+    }
+
     public animate(timeStep: number) {
         this._btworld.stepSimulation(timeStep, PhysicsWorld._maxStepSimulation, PhysicsWorld._fixedTimeStep);
     }
@@ -61,5 +84,7 @@ export class PhysicsWorld /* rigid body physics */ extends RT.DisposableObject {
         Helper.safeAmmoObjectDestroy(this._btbroadphase);
         Helper.safeAmmoObjectDestroy(this._btdispatcher);
         Helper.safeAmmoObjectDestroy(this._btconfig);
+
+        PhysicsWorld._objectcache.delete(this._uuid);
     }
 }

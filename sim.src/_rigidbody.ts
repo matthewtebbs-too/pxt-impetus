@@ -49,8 +49,6 @@ export class RigidBody extends RT.DisposableObject {
     private static _linearSleepingThreshold = 1.6;  /* Bullet physics default is .8 */
     private static _angularSleepingThreshold = 2.5; /* Bullet physics default is 1. */
 
-    private _world: PhysicsWorld | null = null;
-
     private _object3d: Object3d;
 
     private _btbody: Ammo.btRigidBody;
@@ -82,7 +80,7 @@ export class RigidBody extends RT.DisposableObject {
             return; /* not for static objects */
         }
 
-        const world = this._world;
+        const world = PhysicsWorld.worldOfRigidBody(this._btbody);
         if (world) {
             this.removeRigidBody(world);
         }
@@ -133,22 +131,12 @@ export class RigidBody extends RT.DisposableObject {
     }
 
     public addRigidBody(world: PhysicsWorld) {
-        this.removeRigidBody(world);
-
         btMotionStateFromObject3d(this._btmotionstate, this._object3d);
-        this._btbody.setMotionState(this._btmotionstate);
-
-        this._world = world;
-        this._world.btWorld.addRigidBody(this._btbody);
+        world.addRigidBody(this._btbody, this._btmotionstate);
     }
 
     public removeRigidBody(world: PhysicsWorld) {
-        if (this._world !== world) {
-            return;
-        }
-
-        this._world.btWorld.removeRigidBody(this._btbody);
-        this._world = null;
+        world.removeRigidBody(this._btbody);
     }
 
     public syncMotionStateToObject3d() {
