@@ -79,7 +79,7 @@ export function Object3dMixin<T extends RT.ObjectConstructor<THREE.Object3D>>(ba
 
         public setPhysicsEnabled(enable: boolean) {
             if (this._rigidbody) {
-                this._rigidbody.isKinematic = !enable;
+                this._rigidbody.setIsKinematic(!enable, this);
 
                 this.matrixAutoUpdate = this._rigidbody.isKinematic;
             }
@@ -95,7 +95,7 @@ export function Object3dMixin<T extends RT.ObjectConstructor<THREE.Object3D>>(ba
 
         public animate(timeStep: number) {
             if (this._rigidbody) {
-                if (this._rigidbody.syncMotionStateToObject3d()) {
+                if (this._rigidbody.syncMotionStateToObject3d(this)) {
                     this.updateMatrix();
                 }
             }
@@ -105,7 +105,7 @@ export function Object3dMixin<T extends RT.ObjectConstructor<THREE.Object3D>>(ba
 
         public onAdded(scene3d: Scene3d) {
             if (this._rigidbody) {
-                this._rigidbody.addRigidBody(scene3d.physicsWorld);
+                this._rigidbody.addRigidBody(scene3d.physicsWorld, this);
             }
 
             this.children.forEach(child => (child as Object3d).onAdded(scene3d));

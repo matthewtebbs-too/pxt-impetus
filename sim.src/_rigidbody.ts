@@ -5,12 +5,11 @@
 */
 
 import * as Ammo from 'ammo';
-import * as THREE from 'three';
 
 import * as Helper from './_helper';
 import { PhysicsWorld } from './_physics';
 import * as RT from './_runtime';
-import { IObject3dPose, Object3d } from './object';
+import { IObject3dPose } from './object';
 
 export function btMotionStateFromObject3dPose(btmotionstate: Ammo.btMotionState, pose: IObject3dPose) {
     const bttransform = new Ammo.btTransform();
@@ -49,7 +48,7 @@ export class RigidBody extends RT.DisposableObject {
     private static _linearSleepingThreshold = 1.6;  /* Bullet physics default is .8 */
     private static _angularSleepingThreshold = 2.5; /* Bullet physics default is 1. */
 
-    private _object3d: Object3d;
+    //private _object3d: Object3d;
 
     private _btbody: Ammo.btRigidBody;
     private _btshape: Ammo.btCollisionShape;
@@ -67,7 +66,40 @@ export class RigidBody extends RT.DisposableObject {
         return this._btbody && this._btbody.isKinematicObject();
     }
 
-    public set isKinematic(value: boolean) {
+    public get isStaticOrKinematicObject(): boolean {
+        return this._btbody && this._btbody.isStaticOrKinematicObject();
+    }
+
+    public get isActive(): boolean {
+        return this._btbody && this._btbody.isActive();
+    }
+
+    constructor(mass: number, btshape: Ammo.btCollisionShape) {
+        super();
+
+        mass = Math.max(RigidBody._minMass, Math.min(RigidBody._maxMass, mass));
+
+        this._mass = mass;
+        this._btmotionstate = new Ammo.btDefaultMotionState();
+        this._btshape = btshape;
+        this._btvecLocalInertia = new Ammo.btVector3();
+
+        if (!this.isStatic) {
+            this._btshape.calculateLocalInertia(this._mass, this._btvecLocalInertia);
+        }
+
+        const btinfo = new Ammo.btRigidBodyConstructionInfo(this._mass, this._btmotionstate, this._btshape, this._btvecLocalInertia);
+
+        this._btbody = new Ammo.btRigidBody(btinfo);
+        this._btbody.setFriction(RigidBody._defaultFriction);
+        this._btbody.setSleepingThresholds(RigidBody._linearSleepingThreshold, RigidBody._angularSleepingThreshold);
+
+        this._btinfo = btinfo;
+
+        this.setIsKinematic(); /* default is kinematic object */
+    }
+
+    public setIsKinematic(value: boolean = true, object3d?: IObject3dPose) {
         if (this.isStatic) {
             return; /* not for static objects */
         }
@@ -82,53 +114,14 @@ export class RigidBody extends RT.DisposableObject {
         this._btbody.activate();
 
         if (world) {
-            this.addRigidBody(world);
+            if (object3d) {
+                this.addRigidBody(world, object3d);
+            }
         }
     }
 
-    public get isStaticOrKinematicObject(): boolean {
-        return this._btbody && this._btbody.isStaticOrKinematicObject();
-    }
-
-    public get isActive(): boolean {
-        return this._btbody && this._btbody.isActive();
-    }
-
-    constructor(
-        object3d: Object3d,
-        btshape: Ammo.btCollisionShape,
-        mass: number,
-    ) {
-        super();
-
-        mass = Math.max(RigidBody._minMass, Math.min(RigidBody._maxMass, mass));
-
-        const btmotionstate = new Ammo.btDefaultMotionState();
-
-        this._mass = mass;
-        this._btvecLocalInertia = new Ammo.btVector3();
-
-        if (!this.isStatic) {
-            btshape.calculateLocalInertia(this._mass, this._btvecLocalInertia);
-        }
-
-        const btinfo = new Ammo.btRigidBodyConstructionInfo(this._mass, btmotionstate, btshape, this._btvecLocalInertia);
-
-        this._btbody = new Ammo.btRigidBody(btinfo);
-        this._btbody.setFriction(RigidBody._defaultFriction);
-        this._btbody.setSleepingThresholds(RigidBody._linearSleepingThreshold, RigidBody._angularSleepingThreshold);
-
-        this._btshape = btshape;
-        this._btmotionstate = btmotionstate;
-        this._btinfo = btinfo;
-
-        this._object3d = object3d;
-
-        this.isKinematic = true; /* default is kinematic object */
-    }
-
-    public addRigidBody(world: PhysicsWorld) {
-        btMotionStateFromObject3dPose(this._btmotionstate, this._object3d);
+    public addRigidBody(world: PhysicsWorld, object3d: IObject3dPose) {
+        btMotionStateFromObject3dPose(this._btmotionstate, object3d);
         world.addRigidBody(this._btbody, this._btmotionstate);
     }
 
@@ -136,14 +129,13 @@ export class RigidBody extends RT.DisposableObject {
         world.removeRigidBody(this._btbody);
     }
 
-    public syncMotionStateToObject3d(): boolean {
-        const update = !this.isStaticOrKinematicObject && this.isActive;
-
-        if (update) {
-            btMotionStateToObject3dPose(this._btbody.getMotionState(), this._object3d);
+    public syncMotionStateToObject3d(object3d: IObject3dPose): boolean {
+        if (this.isStaticOrKinematicObject || !this.isActive) {
+            return false;
         }
 
-        return update;
+        btMotionStateToObject3dPose(this._btbody.getMotionState(), object3d);
+        return true;
     }
 
     protected _toggleCollisionFlag(flag: number, on: boolean) {

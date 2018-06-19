@@ -12,13 +12,10 @@ import { Object3d, Object3dMixin } from './object';
 import { Shape3d } from './shape';
 
 export class Mesh3d extends Object3dMixin(THREE.Mesh) {
-    constructor(
-        shape3d: Shape3d,
-        material: Material,
-    ) {
+    constructor(shape3d: Shape3d, material: Material) {
         super(shape3d, material);
 
-        this._rigidbody = new RigidBody(this, shape3d.btCollisionShape(), shape3d.volume * material.density);
+        this._rigidbody = new RigidBody(shape3d.volume * material.density, shape3d.btCollisionShape());
     }
 }
 
