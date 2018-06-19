@@ -12,8 +12,14 @@ import * as RT from './_runtime';
 import { Quaternion, Vector, VectorConstructor } from './math';
 import { Scene3d } from './scene';
 
+// tslint:disable-next-line:interface-name
+export interface IObject3dPose {
+    position: THREE.Vector3;
+    quaternion: THREE.Quaternion;
+}
+
 export function Object3dMixin<T extends RT.ObjectConstructor<THREE.Object3D>>(base: T) {
-    return class extends base implements RT.IDisposableObject, RT.ICloneableObject {
+    return class extends base implements IObject3dPose, RT.IDisposableObject, RT.ICloneableObject {
         protected _rigidbody: RigidBody | null = null;
 
         private _isDisposed = false;
@@ -74,6 +80,8 @@ export function Object3dMixin<T extends RT.ObjectConstructor<THREE.Object3D>>(ba
         public setPhysicsEnabled(enable: boolean) {
             if (this._rigidbody) {
                 this._rigidbody.isKinematic = !enable;
+
+                this.matrixAutoUpdate = this._rigidbody.isKinematic;
             }
         }
 
@@ -87,7 +95,9 @@ export function Object3dMixin<T extends RT.ObjectConstructor<THREE.Object3D>>(ba
 
         public animate(timeStep: number) {
             if (this._rigidbody) {
-                this._rigidbody.syncMotionStateToObject3d();
+                if (this._rigidbody.syncMotionStateToObject3d()) {
+                    this.updateMatrix();
+                }
             }
 
             this.children.forEach(child => (child as Object3d).animate(timeStep));

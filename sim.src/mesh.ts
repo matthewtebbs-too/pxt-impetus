@@ -18,7 +18,7 @@ export class Mesh3d extends Object3dMixin(THREE.Mesh) {
     ) {
         super(shape3d, material);
 
-        this._rigidbody = new RigidBody(this, shape3d, shape3d.volume * material.density);
+        this._rigidbody = new RigidBody(this, shape3d.btCollisionShape(), shape3d.volume * material.density);
     }
 }
 
