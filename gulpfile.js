@@ -86,7 +86,7 @@ gulp.task('browserify', function (done) {
     return mybrowserify({
         entries: [BUILT_SRC.concat('_runtime.js'), ...glob.sync(BUILT_SRC.concat('**/*.js'))],
         insertGlobalVars: {
-            'THREE': function () { return 'require("THREE")'; },
+            'THREE': function () { return 'require("three")'; },
         },
         fn: replace(/^(var pxsimImpetus);$/mg, '$1 = window.pxsim;'),
         outfile: 'sim.js',

@@ -5,18 +5,19 @@
 */
 
 import * as THREE from 'three';
+import * as THREEX from 'three.extra';
 
 import * as RT from './_runtime';
 import { Object3dMixin } from './object';
 
-export type OrbitControls = THREE.OrbitControls;
-export type TrackballControls = THREE.TrackballControls;
+export type OrbitControls = THREEX.OrbitControls;
+export type TrackballControls = THREEX.TrackballControls;
 
 // tslint:disable-next-line:variable-name
-export const OrbitControlsConstructor = THREE.OrbitControls;
+export const OrbitControlsConstructor = THREEX.OrbitControls;
 
 // tslint:disable-next-line:variable-name
-export const TrackballControlsConstructor = THREE.TrackballControls;
+export const TrackballControlsConstructor = THREEX.TrackballControls;
 
 export function CameraMixin<T extends RT.ObjectConstructor<THREE.Camera>>(base: T) {
     return class extends base {

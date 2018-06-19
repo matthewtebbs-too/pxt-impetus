@@ -6,6 +6,8 @@
 
 import * as THREE from 'three';
 
+export * from 'three';
+
 export namespace ColorConverter {
     // tslint:disable-next-line:interface-name
     export interface HSV {
@@ -103,3 +105,6 @@ export class QuickHull {
 export class TeapotBufferGeometry extends THREE.BufferGeometry {
     constructor(size?: number, segments?: number, bottom?: boolean, lid?: boolean, body?: boolean, fitLid?: boolean, blinn?: boolean);
 }
+
+export as namespace THREEX;
+
