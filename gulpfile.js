@@ -39,26 +39,6 @@ function myexec(command, done) {
     });
 }
 
-var glob = require('glob');
-var browserify = require('browserify');
-var replace = require('gulp-replace');
-
-function mybrowserify(options) {
-    var bundle =
-        browserify(options).bundle()
-        .pipe(source(options.outfile));
-
-    if (options.fn) {
-        bundle = bundle.pipe(options.fn);
-    }
-
-    bundle = bundle
-        .pipe(buffer())
-        .pipe(gulp.dest(BUILT));
-
-    return bundle;
-}
-
 var ts = require('gulp-typescript');
 var tsProject = ts.createProject(SRC.concat('tsconfig.json'));
 
@@ -82,16 +62,32 @@ gulp.task('build', function () {
     ]);
 });
 
-gulp.task('browserify', function (done) {
-    return mybrowserify({
-        entries: [BUILT_SRC.concat('_runtime.js'), ...glob.sync(BUILT_SRC.concat('**/*.js'))],
-        insertGlobalVars: {
-            'THREE': function () { return 'require("three")'; },
-        },
-        fn: replace(/^(var pxsimImpetus);$/mg, '$1 = window.pxsim;'),
-        outfile: 'sim.js',
-    });
+var glob = require('glob');
+var watchify = require('watchify');
+var browserify = require('browserify');
+var replace = require('gulp-replace');
+
+var bunlder_opts = Object.assign({}, watchify.args, {
+    entries: glob.sync(BUILT_SRC.concat('**/*.js')),
+    insertGlobalVars: {
+        'THREE': function () { return 'require("three")'; },
+    },
 });
+
+var bundler = watchify(browserify(bunlder_opts));
+
+function bundle() {
+    return bundler
+        .bundle()
+        .pipe(source('sim.js'))
+        .pipe(replace(/^(var pxsimImpetus);$/mg, '$1 = window.pxsim;'))
+        .pipe(buffer())
+        .pipe(gulp.dest(BUILT));
+}
+
+bundler.on('update', bundle);
+
+gulp.task('bundle', bundle);
 
 gulp.task('serve', function (done) {
     myexec('pxt serve', done);
@@ -101,6 +97,6 @@ gulp.task('staticpkg', function (done) {
     myexec('pxt staticpkg --githubpages --minify', done);
 });
 
-gulp.task('package', gulp.series('clean', 'build', 'browserify', 'staticpkg'));
+gulp.task('package', gulp.series('clean', 'build', 'bundle', 'staticpkg'));
 
-gulp.task('default', gulp.series('clean', 'build', 'browserify', 'serve'));
+gulp.task('default', gulp.series('clean', 'build', 'bundle', 'serve'));
