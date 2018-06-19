@@ -39,6 +39,26 @@ function myexec(command, done) {
     });
 }
 
+var glob = require('glob');
+var browserify = require('browserify');
+var replace = require('gulp-replace');
+
+function mybrowserify(options) {
+    var bundle =
+        browserify(options).bundle()
+        .pipe(source(options.outfile));
+
+    if (options.fn) {
+        bundle = bundle.pipe(options.fn);
+    }
+
+    bundle = bundle
+        .pipe(buffer())
+        .pipe(gulp.dest(BUILT));
+
+    return bundle;
+}
+
 var ts = require('gulp-typescript');
 var tsProject = ts.createProject(SRC.concat('tsconfig.json'));
 
@@ -62,29 +82,15 @@ gulp.task('build', function () {
     ]);
 });
 
-var glob = require('glob');
-var browserify = require('browserify');
-var uglify = require('gulp-uglify');
-var replace = require('gulp-replace');
-var rename = require('gulp-rename');
-
-gulp.task('bundle', function (done) {
-    var bundle = browserify(
-        {
-            entries: [BUILT_SRC.concat('_runtime.js'), glob.sync(BUILT_SRC.concat('**/*.js'))],
-            options: {
-                transform: ['debowerify', 'decomponentify', 'deamdify', 'deglobalify'],
-            },
-        }).bundle();
-
-    return bundle
-        .pipe(source('sim.js'))
-        .pipe(replace(/^(var pxsim);$/mg, '$1 = window.pxsim;'))
-        .pipe(buffer())
-        .pipe(gulp.dest(BUILT))
-        .pipe(uglify())
-        .pipe(rename({ extname: '.min.js' }))
-        .pipe(gulp.dest(BUILT));
+gulp.task('browserify', function (done) {
+    return mybrowserify({
+        entries: [BUILT_SRC.concat('_runtime.js'), ...glob.sync(BUILT_SRC.concat('**/*.js'))],
+        insertGlobalVars: {
+            'THREE': function () { return 'require("THREE")'; },
+        },
+        fn: replace(/^(var pxsimImpetus);$/mg, '$1 = window.pxsim;'),
+        outfile: 'sim.js',
+    });
 });
 
 gulp.task('serve', function (done) {
@@ -95,6 +101,6 @@ gulp.task('staticpkg', function (done) {
     myexec('pxt staticpkg --githubpages --minify', done);
 });
 
-gulp.task('package', gulp.series('clean', 'build', 'bundle', 'staticpkg'));
+gulp.task('package', gulp.series('clean', 'build', 'browserify', 'staticpkg'));
 
-gulp.task('default', gulp.series('clean', 'build', 'bundle', 'serve'));
+gulp.task('default', gulp.series('clean', 'build', 'browserify', 'serve'));

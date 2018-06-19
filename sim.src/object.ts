@@ -133,5 +133,5 @@ export function Object3dMixin<T extends RT.ObjectConstructor<THREE.Object3D>>(ba
 
 export class Object3d extends Object3dMixin(THREE.Object3D) { }
 
-export namespace pxsimImpetus.object {
+namespace pxsimImpetus.object {
 }

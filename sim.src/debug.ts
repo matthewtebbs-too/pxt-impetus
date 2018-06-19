@@ -10,7 +10,7 @@ const dbg = require('debug')('pxt-impetus');
 
 import { singletonWorldBoard } from './_board';
 
-export namespace pxsimImpetus.debug {
+namespace pxsimImpetus.debug {
     export function log(args: any) {
         dbg(args);
     }

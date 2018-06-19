@@ -97,7 +97,7 @@ export class World3d extends RT.DisposableObject {
     }
 }
 
-export namespace pxsimImpetus.world {
+namespace pxsimImpetus.world {
     export function world(): World3d | null {
         return singletonWorldBoard().world;
     }

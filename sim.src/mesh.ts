@@ -22,7 +22,7 @@ export class Mesh3d extends Object3dMixin(THREE.Mesh) {
     }
 }
 
-export namespace pxsimImpetus.mesh {
+namespace pxsimImpetus.mesh {
     export function fromShapeAndMaterial(
         shape3d: Shape3d,
         material: Material,

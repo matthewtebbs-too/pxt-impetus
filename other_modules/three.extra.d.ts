@@ -1,4 +1,3 @@
-
 /*
     MIT License
 
@@ -104,5 +103,3 @@ export class QuickHull {
 export class TeapotBufferGeometry extends THREE.BufferGeometry {
     constructor(size?: number, segments?: number, bottom?: boolean, lid?: boolean, body?: boolean, fitLid?: boolean, blinn?: boolean);
 }
-
-export as namespace THREEX;

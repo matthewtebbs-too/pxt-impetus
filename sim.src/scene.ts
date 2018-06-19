@@ -132,7 +132,7 @@ export class Scene3d extends Object3dMixin(THREE.Scene) {
     }
 }
 
-export namespace pxsimImpetus.scene {
+namespace pxsimImpetus.scene {
     export function randomPositionOnPlane(size: number): Vector {
         return new VectorConstructor(
             (Math.random() - .5) * size,

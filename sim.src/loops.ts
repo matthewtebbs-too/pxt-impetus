@@ -6,7 +6,7 @@
 
 /// <reference types='pxt-core/built/pxtsim'/>
 
-export namespace pxsimImpetus.loops {
+namespace pxsimImpetus.loops {
     export function forever(body: pxsim.RefAction): void {
         pxsim.thread.forever(body);
     }

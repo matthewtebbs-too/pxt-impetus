@@ -16,7 +16,7 @@ import {
     ScopeId,
 } from './_events';
 
-export namespace pxsimImpetus.input {
+namespace pxsimImpetus.input {
     export function onKeyEvent(key: KeyboardKey | string, event: KeyEvent, handler: pxsim.RefAction) {
         singletonWorldBoard().events!.listen(keyboardScopeIdFromKey(key), event, handler);
     }

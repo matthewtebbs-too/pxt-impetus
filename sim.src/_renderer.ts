@@ -4,8 +4,7 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference types='stats' />
-
+import Stats = require('stats.js');
 import * as THREE from 'three';
 import * as THREEX from 'three.extra';
 

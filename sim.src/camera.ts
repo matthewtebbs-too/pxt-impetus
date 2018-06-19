@@ -87,7 +87,7 @@ export class PerspectiveCamera extends CameraMixin(Object3dMixin(THREE.Perspecti
     }
 }
 
-export namespace pxsimImpetus.camera {
+namespace pxsimImpetus.camera {
     export function perspectiveCamera() {
         return new PerspectiveCamera();
     }

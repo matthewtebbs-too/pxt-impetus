@@ -10,7 +10,7 @@
 
 const debug = require('debug')('pxt-impetus');
 
-export namespace pxsimImpetus.serial {
+namespace pxsimImpetus.serial {
     function writeString(text: string) {
         debug.log(text);
 
@@ -28,7 +28,7 @@ export namespace pxsimImpetus.serial {
     }
 }
 
-export namespace pxsimImpetus.console {
+namespace pxsimImpetus.console {
     export function log(text: string) {
         serial.writeLine(text);
     }

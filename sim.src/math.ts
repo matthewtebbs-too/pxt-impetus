@@ -28,7 +28,7 @@ export type Spherical = THREE.Spherical;
 // tslint:disable-next-line:variable-name
 export const SphericalConstructor = THREE.Spherical;
 
-export namespace pxsimImpetus.math {
+namespace pxsimImpetus.math {
     export function degreesInRadians(degrees: number): number {
         return THREE.Math.degToRad(degrees);
     }
@@ -38,7 +38,7 @@ export namespace pxsimImpetus.math {
     }
 }
 
-export namespace pxsimImpetus.math3d {
+namespace pxsimImpetus.math3d {
     export function vectorToString(v: Vector): string {
         return `(${v.x}, ${v.y}, ${v.z})`;
     }

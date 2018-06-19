@@ -87,7 +87,7 @@ export class SpotLight extends LightMixin(Object3dMixin(THREE.SpotLight)) {
     }
 }
 
-export namespace pxsimImpetus.light {
+namespace pxsimImpetus.light {
     export function ambientLight(color?: Color, intensity?: number): DirectionalLight  {
         return new DirectionalLight(color, intensity);
     }

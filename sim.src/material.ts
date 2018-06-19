@@ -42,7 +42,7 @@ export function MaterialMixin<T extends RT.ObjectConstructor<THREE.MeshStandardM
 
 export class Material extends MaterialMixin(THREE.MeshStandardMaterial) { }
 
-export namespace pxsimImpetus.material {
+namespace pxsimImpetus.material {
     export function materialOfColor(color?: Color): Material {
         return new Material(
             {

@@ -11,7 +11,7 @@ export type Color = THREE.Color;
 // tslint:disable-next-line:variable-name
 export const ColorConstructor = THREE.Color;
 
-export namespace pxsimImpetus.color {
+namespace pxsimImpetus.color {
     export function colorToString(color: Color): string {
         return `(${color.r * 255}, ${color.g * 255}, ${color.b * 255})`;
     }

@@ -194,7 +194,7 @@ export class TeapotShape3d extends ShapeMixin(THREEX.TeapotBufferGeometry) {
     }
 }
 
-export namespace pxsimImpetus.shape {
+namespace pxsimImpetus.shape {
     export function planeShape(width?: number, height?: number): PlaneShape3d {
         width = width || 100;
         height = height || 100;
