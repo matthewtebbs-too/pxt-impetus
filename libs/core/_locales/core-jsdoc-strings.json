@@ -228,7 +228,7 @@
   "scene.randomPositionOnPlane": "Random position on plane.",
   "scene.randomPositionOnPlane|param|size": "value, eg: 1",
   "user.currentUser": "Get current user.",
-  "user.messageUser": "Message user.",
+  "user.messageEveryone": "Message user.",
   "user.onUserMessage": "Code to run when a message is received.",
   "world.scene": "Get current scene."
 }

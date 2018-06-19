@@ -551,7 +551,7 @@ declare class User {
      */
     //% blockCombine block="name"
     //% blockCombineShadow=world_current_user,
-    //% shim=user::name property
+    //% shim=user.name property
     name: string;
 }
 
@@ -569,11 +569,11 @@ declare namespace user {
     /**
      * Message user.
     */
-    //% blockId=user_message
-    //% block="say %message|to %name"
+    //% blockId=user_message_everyone
+    //% block="say %message to everyone"
     //% group="User"
-    //% shim=user::messageUser
-    function messageUser(message: string, name: string): void;
+    //% promise shim=user::messageEveryone
+    function messageEveryone(message: string): void;
 
     /**
      * Code to run when a message is received.

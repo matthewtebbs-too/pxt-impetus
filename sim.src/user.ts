@@ -4,7 +4,11 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-export class User {
+import * as PxtCloudClient from 'pxt-cloud-client';
+
+import { singletonWorldBoard } from './_board';
+
+export class User implements PxtCloudClient.UserData {
     private static _singleton = new User();
 
     public static get singleton(): User {
@@ -12,7 +16,7 @@ export class User {
     }
 
     public get name(): string {
-        return 'Bobby';
+        return '';
     }
 
     public set name(name: string) {
@@ -25,8 +29,8 @@ namespace pxsimImpetus.user {
         return User.singleton;
     }
 
-    export function messageUser(message: string, name: string) {
-        /* foo */
+    export function messageEveryone(message: string): Promise<void> {
+        return singletonWorldBoard().cloudAPI!.chat.newMessage(message);
     }
 
     export function onUserMessage(cb: (message: string, from: string) => void) {

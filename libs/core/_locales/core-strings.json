@@ -289,7 +289,7 @@
   "scene.randomPositionOnPlane|block": "random position on %size size plane",
   "scene|block": "Scene",
   "user.currentUser|block": "current user",
-  "user.messageUser|block": "say %message|to %name",
+  "user.messageEveryone|block": "say %message to everyone",
   "user.onUserMessage|block": "on",
   "user|block": "user",
   "world.scene|block": "scene",
