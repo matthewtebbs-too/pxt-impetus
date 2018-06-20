@@ -16,7 +16,7 @@ export interface MaterialParameters extends THREE.MeshStandardMaterialParameters
 }
 
 export function MaterialMixin<T extends RT.ObjectConstructor<THREE.MeshStandardMaterial>>(base: T) {
-    return class extends base implements RT.ICloneableObject {
+    return class extends base implements RT.ICloneableObject, RT.IDisposableObject {
         private _density: number = 1;
 
         public get density(): number {

@@ -16,7 +16,7 @@ export type Clock = THREE.Clock;
 // tslint:disable-next-line:variable-name
 export const ClockConstructor = THREE.Clock;
 
-export class Renderer extends RT.ProxyObject<THREE.WebGLRenderer> {
+export class Renderer extends RT.ProxyObject<THREE.WebGLRenderer> implements RT.IDisposableObject {
     private static _renderers = new Map<RT.ObjId, THREE.WebGLRenderer>();
 
     private static _instantiateReference(id: RT.ObjId): THREE.WebGLRenderer {
