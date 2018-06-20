@@ -13,7 +13,7 @@ import { btCollisionShapeFromQuickHull3dResult, collisionMargin, QuickHull3d } f
 import * as RT from './_runtime';
 
 export function ShapeMixin<T extends RT.ObjectConstructor<THREE.BufferGeometry>>(base: T) {
-    return class extends base implements RT.ICloneableObject {
+    return class extends base implements RT.ICloneableObject, RT.IDisposableObject {
         protected static _radialSegments = 32;
         protected static _radialSegmentsHull = 12;
 
@@ -26,16 +26,25 @@ export function ShapeMixin<T extends RT.ObjectConstructor<THREE.BufferGeometry>>
         protected _volumeFn: (() => number) | null = null;
         protected _btCollisionShapeFn: (() => Ammo.btCollisionShape) | null = null;
 
+        private _volumeCached: number | undefined;
+        private _btshapeCached: Ammo.btCollisionShape | undefined;
+
         constructor(...args: any[]) {
             super(...args);
         }
 
-        public get volume(): number {
-            return this._volumeFn ? this._volumeFn() : 0;
+        public dispose() {
+            super.dispose();
+
+            Helper.safeAmmoObjectDestroy(this._btshapeCached);
         }
 
-        public btCollisionShape(): Ammo.btCollisionShape {
-            return this._btCollisionShapeFn!();
+        public get volume(): number {
+            return this._volumeFn ? (this._volumeCached || (this._volumeCached = this._volumeFn())) : 0;
+        }
+
+        public btCollisionShape(): Ammo.btCollisionShape | null {
+           return this._btCollisionShapeFn ? (undefined !== this._btshapeCached ? this._btshapeCached : (this._btshapeCached = this._btCollisionShapeFn!())) : null;
         }
 
         public copy(source: this): this {

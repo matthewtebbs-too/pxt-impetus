@@ -48,8 +48,6 @@ export class RigidBody extends RT.DisposableObject {
     private static _linearSleepingThreshold = 1.6;  /* Bullet physics default is .8 */
     private static _angularSleepingThreshold = 2.5; /* Bullet physics default is 1. */
 
-    //private _object3d: Object3d;
-
     private _btbody: Ammo.btRigidBody;
     private _btshape: Ammo.btCollisionShape;
     private _btmotionstate: Ammo.btMotionState;
@@ -155,7 +153,6 @@ export class RigidBody extends RT.DisposableObject {
 
         Helper.safeAmmoObjectDestroy(this._btinfo);
         Helper.safeAmmoObjectDestroy(this._btmotionstate);
-        Helper.safeAmmoObjectDestroy(this._btshape);
 
         Helper.safeAmmoObjectDestroy(this._btvecLocalInertia);
     }
