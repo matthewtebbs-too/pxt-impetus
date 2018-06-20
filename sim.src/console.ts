@@ -8,11 +8,17 @@
 
 /// <reference types='pxt-core/built/pxtsim'/>
 
-const debug = require('debug')('pxt-impetus');
+const debug_ = require('debug')('pxt-impetus');
+
+export function debug(...args: any[]) {
+    debug_(...args);
+}
+
+const serial_ = require('debug')('pxt-impetus:serial');
 
 namespace pxsimImpetus.serial {
     function writeString(text: string) {
-        debug.log(text);
+        serial_(text);
 
         if (pxsim.runtime && pxsim.runtime.board) {
             pxsim.runtime.board.writeSerial(text);
