@@ -21,13 +21,26 @@ export interface INameableObject {
     name: string;
 }
 
+export function isNameable(object: any): object is INameableObject {
+    return undefined !== (object as INameableObject).name;
+}
+
 export interface IDisposableObject {
     dispose(): void;
+}
+
+export function isDisposable(object: any): object is IDisposableObject {
+    return undefined !== (object as IDisposableObject).dispose;
 }
 
 export interface ICloneableObject {
     clone(recursive?: boolean): this;
     copy(source: this, recursive?: boolean): this;
+}
+
+export function isCloneable(object: any): object is ICloneableObject {
+    return undefined !== (object as ICloneableObject).clone &&
+           undefined !== (object as ICloneableObject).copy;
 }
 
 export interface INameableObjectWithId extends IObjectWithId, INameableObject {
