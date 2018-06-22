@@ -95,6 +95,32 @@ export class World3d extends RT.DisposableObject {
 
         this._onElementEvent(sid, evid, event, new EventCoordValue(x, y));
     }
+
+    // protected _clonerGlobals(value: any): any {
+    //     if (value === pxsim.runtime.globals) {
+    //         const globalsCloned = new value.constructor();
+
+    //         for (const key in value) {
+    //             if (value.hasOwnProperty(key)) {
+    //                 const valueCloned = CloneDeep(value[key], instanceClone);
+
+    //                 if (undefined !== valueCloned) {
+    //                     globalsCloned[key] = valueCloned;
+    //                 }
+    //             }
+    //         }
+
+    //         return globalsCloned;
+    //     }
+
+    //     if (!RT.isCloneable(value)) {
+    //         return;
+    //     }
+
+    //     if (value instanceof THREE.Vector3) {
+    //         return value.clone();
+    //     }
+    // }
 }
 
 namespace pxsimImpetus.world {
