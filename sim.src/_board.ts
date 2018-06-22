@@ -8,6 +8,11 @@
 
 import * as PxtCloudClient from 'pxt-cloud-client';
 
+import {
+    CloudEvent_Internal,
+    ScopeId,
+} from './_events';
+
 import { WorldEventBus } from './_events';
 import * as Helper from './_helper';
 import * as RT from './_runtime';
@@ -42,10 +47,12 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
             this._events = new WorldEventBus(pxsim.runtime);
 
             PxtCloudClient.makeAPIConnection()
-                .then(api => this._cloudAPI = api)
-                .catch(reject);
+                .then(api => {
+                    this._cloudAPI = api;
 
-            resolve();
+                    api.chat!.on('new message', this._onCloudNewMessage);
+                })
+                .then(resolve, reject);
         });
     }
 
@@ -76,13 +83,17 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
     public updateView() {
         /* do nothing */
     }
+
+    protected _onCloudNewMessage(msg: PxtCloudClient.MessageData) {
+        singletonWorldBoard().events!.queue(ScopeId.CloudObject, CloudEvent_Internal.NewMessage, [msg.text, msg.name || '']);
+    }
 }
 
 pxsim.initCurrentRuntime = (msg: pxsim.SimulatorMessage) => {
     singletonWorldBoard().dispose();                /* dispose now */
 
     return pxsim.runtime.board = singletonWorldBoard();   /* will be initialized by runtime */
-    };
+};
 
 export function singletonWorldBoard(): WorldBoard {
     return WorldBoard.singleton;

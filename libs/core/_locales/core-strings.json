@@ -290,7 +290,7 @@
   "scene|block": "Scene",
   "user.currentUser|block": "current user",
   "user.messageEveryone|block": "say %message to everyone",
-  "user.onUserMessage|block": "on",
+  "user.onNewMessage|block": "on new",
   "user|block": "user",
   "world.scene|block": "scene",
   "world|block": "World",

@@ -26,6 +26,9 @@
   "simulator": {
     "autoRun": true
   },
+  "serial": {
+    "useEditor": true
+  },
   "appTheme": {
     "boardName": "Impetus",
     "appLogo": "./static/icons/android-chrome-192x192.png",

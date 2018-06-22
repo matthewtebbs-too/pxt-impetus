@@ -7,6 +7,10 @@
 import * as PxtCloudClient from 'pxt-cloud-client';
 
 import { singletonWorldBoard } from './_board';
+import {
+    CloudEvent_Internal,
+    ScopeId,
+} from './_events';
 
 export class User implements PxtCloudClient.UserData {
     private static _singleton = new User();
@@ -29,11 +33,11 @@ namespace pxsimImpetus.user {
         return User.singleton;
     }
 
-    export function messageEveryone(message: string): Promise<void> {
+    export function messageEveryone(message: string): PromiseLike<void> {
         return singletonWorldBoard().cloudAPI!.chat.newMessage(message);
     }
 
-    export function onUserMessage(cb: (message: string, from: string) => void) {
-        /* foo */
+    export function onNewMessage(handler: pxsim.RefAction) {
+        singletonWorldBoard().events!.listen(ScopeId.CloudObject, CloudEvent_Internal.NewMessage, handler);
     }
 }

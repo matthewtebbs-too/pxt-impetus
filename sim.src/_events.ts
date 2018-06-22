@@ -8,8 +8,9 @@
 
 export const enum ScopeId {
     Objects = 0,
-    WorldObject = Objects + 0,
-    SceneObject = Objects + 1,
+    CloudObject = Objects + 0,
+    WorldObject = Objects + 1,
+    SceneObject = Objects + 2,
 
     Devices = 100,
     KeyboardDevice = Devices + 0,
@@ -46,6 +47,13 @@ export function mouseScopeIdFromButton(button: number): number {
 
 export type EventId = number;
 
+export const enum CloudEvent_Internal {
+    NewMessage,
+}
+
+export const enum WorldEvent_Internal {
+}
+
 export const enum SceneEvent_Internal {
     Animate,
 }
@@ -56,32 +64,26 @@ export const enum MouseEvent_Internal {
     Leave,
 }
 
-export abstract class EventValue {
-    public abstract toActionArgs(): any[];
+export interface IEventValue {
+    toActionArgs(): any[];
 }
 
-export class EventCoordValue extends EventValue {
-    constructor(public x: number, public y: number) {
-        super();
+export class WorldEventBus extends pxsim.EventBusGeneric<IEventValue | Array<string | number> | string | number> {
+    private static _toActionArgs(value: any) {
+        if (value) {
+            if  (typeof value === 'object') {
+                if ('toActionArgs' in value) {
+                    value = value.toActionArgs();
+                } else  if (!('length' in value)) {
+                    value = [value];
+                }
+            }
+        }
+
+        return value || [];
     }
 
-    public toActionArgs(): any[] {
-        return [this.x, this.y];
-    }
-}
-
-export class EventKeyValue extends EventValue {
-    constructor(public key: KeyboardKey) {
-        super();
-    }
-
-    public toActionArgs(): any[] {
-        return [this.key];
-    }
-}
-
-export class WorldEventBus extends pxsim.EventBusGeneric<EventValue | string | number> {
     constructor(runtime: pxsim.Runtime) {
-        super(runtime, value => value ? (typeof value === 'object' ? value.toActionArgs() : [value]) : []);
+        super(runtime, WorldEventBus._toActionArgs);
     }
 }

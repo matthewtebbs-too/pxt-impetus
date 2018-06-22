@@ -578,11 +578,11 @@ declare namespace user {
     /**
      * Code to run when a message is received.
      */
-    //% blockId=user_on_message
-    //% block="on"
+    //% blockId=user_on_new_message
+    //% block="on new"
     //% group="User"
-    //% shim=input::onUserMessage
-    function onUserMessage(cb: (message: string, from: string) => void): void;
+    //% shim=user::onNewMessage
+    function onNewMessage(cb: (message: string, from: string) => void): void;
 }
 
 //% color="#B4009E" icon="\uf192" block="Input" weight=93

@@ -8,7 +8,7 @@
 
 import { singletonWorldBoard } from './_board';
 import {
-    EventCoordValue, EventId, EventValue,
+    EventId,
     keyboardScopeIdFromKey,
     MouseEvent_Internal, mouseScopeIdFromButton,
     ScopeId,
@@ -37,6 +37,8 @@ export class World3d extends RT.DisposableObject {
 
         this._renderer = new Renderer(id);
         this._renderer.scene = this._scene3d;
+
+        const cloudAPI = singletonWorldBoard().cloudAPI!;
 
         this._listenerhelper = new  Helper.SimpleEventListenerHelper(this._renderer.container!);
 
@@ -70,7 +72,7 @@ export class World3d extends RT.DisposableObject {
         this._scene3d = null;
     }
 
-    protected _onElementEvent(sid: ScopeId, evid: EventId, event: Event, value?: EventValue) {
+    protected _onElementEvent(sid: ScopeId, evid: EventId, event: Event, value?: any) {
         singletonWorldBoard().events!.queue(sid, evid, value);
     }
 
@@ -93,7 +95,7 @@ export class World3d extends RT.DisposableObject {
         const x = ((event.clientX - client.left) / client.width) * 2 - 1;
         const y = - ((event.clientY - client.top) / client.height) * 2 + 1;
 
-        this._onElementEvent(sid, evid, event, new EventCoordValue(x, y));
+        this._onElementEvent(sid, evid, event, [x, y]);
     }
 
     // protected _clonerGlobals(value: any): any {
