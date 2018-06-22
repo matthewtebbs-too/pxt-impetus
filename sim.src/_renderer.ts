@@ -22,7 +22,7 @@ export class Renderer extends RT.ProxyObject<THREE.WebGLRenderer> implements RT.
     private static _instantiateReference(id: RT.ObjId): THREE.WebGLRenderer {
         let webglrenderer = Renderer._renderers.get(id);
         if (!webglrenderer) {
-            Renderer._renderers.set(id, webglrenderer = new THREE.WebGLRenderer({ antialias: true }));
+            Renderer._renderers.set(id, webglrenderer = new THREE.WebGLRenderer({ precision: 'mediump' }));
 
             webglrenderer.shadowMap.enabled = true;
             webglrenderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -152,7 +152,7 @@ export class Renderer extends RT.ProxyObject<THREE.WebGLRenderer> implements RT.
 
     protected _onWindowResize = () => {
         if (this._container) {
-            this.reference.setPixelRatio(window.devicePixelRatio);
+            this.reference.setPixelRatio(1);
             this.reference.setSize(this._container.clientWidth, this._container.clientHeight);
         }
     }
