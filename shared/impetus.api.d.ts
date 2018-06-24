@@ -582,7 +582,7 @@ declare namespace user {
     //% block="on new"
     //% group="User"
     //% shim=user::onNewMessage
-    function onNewMessage(cb: (message: string, from: string) => void): void;
+    function onNewMessage(cb: (message: string, sender: string) => void): void;
 }
 
 //% color="#B4009E" icon="\uf192" block="Input" weight=93
