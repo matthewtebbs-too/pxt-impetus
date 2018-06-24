@@ -18,7 +18,7 @@ export class PhysicsWorld /* rigid body physics */ extends RT.DisposableObject {
     private static _objectcache = new Map<RT.ObjId, PhysicsWorld>();
 
     private static _numIterationsSolver = 4;
-    private static _maxStepSimulation = 3;      /* min 20 fps */
+    private static _maxStepSimulation = 2;      /* min 30 fps */
     private static _fixedTimeStep = 1 / 60;     /* normal 60 fps */
 
     private _uuid = THREE.Math.generateUUID();
