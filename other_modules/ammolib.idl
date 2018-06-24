@@ -132,6 +132,7 @@ interface RayResultCallback {
   boolean hasHit();
   attribute short m_collisionFilterGroup;
   attribute short m_collisionFilterMask;
+  attribute float m_closestHitFraction;
   [Const] attribute btCollisionObject m_collisionObject;
 };
 
@@ -214,11 +215,6 @@ interface btCollisionShape {
 };
 
 interface btConvexShape {
-//  long getNumPreferredPenetrationDirections();
-//  void getPreferredPenetrationDirection(long index, [Ref] btVector3 penetrationVector);
-
-//  [Value] btVector3 localGetSupportingVertex([Const, Ref] btVector3 vec);
-//  [Value] btVector3 localGetSupportingVertexWithoutMargin([Const, Ref] btVector3 vec);
 };
 btConvexShape implements btCollisionShape;
 
@@ -297,7 +293,7 @@ interface btConvexHullShape {
   void setMargin(float margin);
   float getMargin();
 };
-btConvexHullShape implements btConvexShape;
+btConvexHullShape implements btCollisionShape;
 
 interface btConeShapeX {
   void btConeShapeX(float radius, float height);
@@ -810,9 +806,12 @@ interface btSoftBodyWorldInfo {
 [Prefix="btSoftBody::"]
 interface Node {
   [Value] attribute btVector3 m_x;
-  [Value] attribute btVector3 m_n;
-  [Value] attribute btVector3 m_f;
+  [Value] attribute btVector3 m_q;
   [Value] attribute btVector3 m_v;
+  [Value] attribute btVector3 m_f;
+  [Value] attribute btVector3 m_n;
+  attribute float m_im;	
+  attribute float m_area;
 };
 
 [Prefix="btSoftBody::"]
