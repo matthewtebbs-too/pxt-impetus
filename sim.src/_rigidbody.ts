@@ -109,7 +109,7 @@ export class RigidBody extends RT.DisposableObject {
 
         this._btbody.setMassProps(value ? 0 : this._mass, this._btvecLocalInertia);
         this._toggleCollisionFlag(Ammo.CollisionFlags.CF_KINEMATIC_OBJECT, value);
-        this._btbody.setActivationState(value ? Ammo.ActivationState.DISABLE_DEACTIVATION : Ammo.ActivationState.ACTIVE_TAG);
+        this._btbody.forceActivationState(value ? Ammo.ActivationState.DISABLE_DEACTIVATION : Ammo.ActivationState.ACTIVE_TAG);
 
         this._btbody.activate();
 
