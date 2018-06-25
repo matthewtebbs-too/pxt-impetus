@@ -4,7 +4,7 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path='../shared/enums.ts'/>
+/// <reference types='../shared/impetus.enums'/>
 
 import { singletonWorldBoard } from './_board';
 import {

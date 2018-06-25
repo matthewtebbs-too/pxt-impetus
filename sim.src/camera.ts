@@ -7,6 +7,8 @@
 import * as THREE from 'three';
 import * as THREEX from 'three.extra';
 
+/// <reference types='../shared/impetus.enums'/>
+
 import * as RT from './_runtime';
 import { Object3dMixin } from './object';
 

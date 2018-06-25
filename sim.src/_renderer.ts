@@ -8,6 +8,8 @@ import Stats = require('stats.js');
 import * as THREE from 'three';
 import * as THREEX from 'three.extra';
 
+/// <reference types='../shared/impetus.enums'/>
+
 import * as RT from './_runtime';
 import { Scene3d } from './scene';
 
@@ -104,7 +106,7 @@ export class Renderer extends RT.ProxyObject<THREE.WebGLRenderer> implements RT.
     }
 
     public runRenderLoop() {
-        this._callbackRequestId = requestAnimationFrame((time: number) => {
+        this._callbackRequestId = requestAnimationFrame(() => {
             const notPaused = !this._paused;
 
             const stats = this._stats;

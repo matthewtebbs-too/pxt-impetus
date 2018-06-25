@@ -9,6 +9,10 @@
 var _SRC = './sim.src';
 var SRC = _SRC.concat('/');
 
+var _SHARED= './shared';
+var SHARED = _SHARED.concat('/');
+
+
 var _BUILT = './built';
 var BUILT = _BUILT.concat('/');
 var BUILT_SRC = _BUILT.concat('.src/');
@@ -53,7 +57,7 @@ gulp.task('clean', function (done) {
 });
 
 gulp.task('build', function () {
-    var result = gulp.src(SRC.concat('**/*.ts'))
+    var result = gulp.src([SHARED.concat('**/enums.ts'), SRC.concat('**/*.ts')])
         .pipe(tsProject(ts.reporter.defaultReporter()));
 
     return merge([
@@ -67,14 +71,15 @@ var watchify = require('watchify');
 var browserify = require('browserify');
 var replace = require('gulp-replace');
 
-var bunlder_opts = Object.assign({}, watchify.args, {
+var bundler_opts = Object.assign({}, watchify.args, {
     entries: glob.sync(BUILT_SRC.concat('**/*.js')),
     insertGlobalVars: {
         'THREE': function () { return 'require("three")'; },
     },
 });
 
-var bundler = watchify(browserify(bunlder_opts));
+// var bundler = watchify(browserify(bundler_opts));
+var bundler = browserify(bundler_opts);
 
 function bundle() {
     return bundler

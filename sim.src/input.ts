@@ -6,10 +6,11 @@
 
 /// <reference types='pxt-core/built/pxtsim'/>
 
-/// <reference path='../shared/enums.ts'/>
+/// <reference types='../shared/impetus.enums'/>
 
 import { singletonWorldBoard } from './_board';
 import {
+    KeyboardKey,
     keyboardScopeIdFromKey,
     MouseEvent_Internal,
     mouseScopeIdFromButton,

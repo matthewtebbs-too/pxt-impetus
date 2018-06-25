@@ -4,9 +4,9 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path='../shared/enums.ts'/>
-
 import * as THREE from 'three';
+
+/// <reference types='../shared/impetus.enums'/>
 
 export type Vector = THREE.Vector3;
 

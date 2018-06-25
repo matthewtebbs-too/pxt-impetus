@@ -32,6 +32,8 @@
     "sim/public"
   ],
   "browser": {
+    "enums": "./built.src/enums.js",
+
     "ammo": "./other_modules/ammo.js",
     "three.extra": "./other_modules/three.extra.js"
   },

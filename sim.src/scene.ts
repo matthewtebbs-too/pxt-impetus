@@ -4,9 +4,9 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-/// <reference path='../shared/enums.ts'/>
-
 import * as THREE from 'three';
+
+/// <reference types='../shared/impetus.enums'/>
 
 import { singletonWorldBoard } from './_board';
 import {
@@ -113,10 +113,6 @@ export class Scene3d extends Object3dMixin(THREE.Scene) {
         const intersections = this._raycaster.intersectObjects(this.children);
 
         return intersections ? intersections.map(intersection => intersection.object as any) : null;
-    }
-
-    public setPhysicsEnabled(enable: boolean) {
-        /* TODO$: */
     }
 
     public copy(source: this, recursive?: boolean): this {

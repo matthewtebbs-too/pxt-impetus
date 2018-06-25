@@ -6,6 +6,55 @@
 
 /// <reference types='pxt-core/built/pxtsim'/>
 
+/// <reference types='../shared/impetus.enums'/>
+
+/* !! enum keys if non-Unicode must match KeyboardEvent.key !! */
+/* !! enum values are based on Windows KeyboardEvent.keycodes but just need to be unique !! */
+export enum KeyboardKey {
+    //% block="delete"
+    Delete = 8,
+
+    //% block="tab"
+    Tab = 9,
+
+    //% block="enter"
+    Enter = 13,
+
+    //% block="escape"
+    Escape = 27,
+
+    // %block="space bar"
+    Spacebar = 32,
+
+    /* 0-9, 48-57 */
+    /* a-z, 65-90 */
+
+    //% block="f1"
+    F1 = 112,
+    //% block="f2"
+    F2,
+    //% block="f3"
+    F3,
+    //% block="f4"
+    F4,
+    //% block="f5"
+    F5,
+    //% block="f6"
+    F6,
+    //% block="f7"
+    F7,
+    //% block="f8"
+    F8,
+    //% block="f9"
+    F9,
+    //% block="f10"
+    F10,
+    //% block="f11"
+    F11,
+    //% block="f12"
+    F12,
+}
+
 export const enum ScopeId {
     Objects = 0,
     CloudObject = Objects + 0,

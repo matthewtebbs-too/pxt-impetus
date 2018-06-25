@@ -8,6 +8,8 @@ import * as Ammo from 'ammo';
 import * as THREE from 'three';
 import * as THREEX from 'three.extra';
 
+/// <reference types='../shared/impetus.enums'/>
+
 import * as Helper from './_helper';
 import { btCollisionShapeFromQuickHull3dResult, collisionMargin, QuickHull3d } from './_hull';
 import * as RT from './_runtime';

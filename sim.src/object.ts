@@ -83,6 +83,8 @@ export function Object3dMixin<T extends RT.ObjectConstructor<THREE.Object3D>>(ba
 
                 this.matrixAutoUpdate = this._rigidbody.isKinematic;
             }
+
+            this.children.forEach(child => (child as Object3d).setPhysicsEnabled(enable));
         }
 
         public lookAtPosition(position: Vector) {
