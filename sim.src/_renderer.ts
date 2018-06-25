@@ -24,7 +24,7 @@ export class Renderer extends RT.ProxyObject<THREE.WebGLRenderer> implements RT.
     private static _instantiateReference(id: RT.ObjId): THREE.WebGLRenderer {
         let webglrenderer = Renderer._renderers.get(id);
         if (!webglrenderer) {
-            Renderer._renderers.set(id, webglrenderer = new THREE.WebGLRenderer({ precision: 'mediump' }));
+            Renderer._renderers.set(id, webglrenderer = new THREE.WebGLRenderer({ antialias: true, precision: 'mediump' }));
 
             webglrenderer.shadowMap.enabled = true;
             webglrenderer.shadowMap.type = THREE.PCFSoftShadowMap;
