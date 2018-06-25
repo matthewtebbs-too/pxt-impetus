@@ -52,7 +52,6 @@ export class World3d extends RT.DisposableObject {
         this._listenerhelper.addEventListener('dblclick', (event: MouseEvent) => this._onElementMouseEvent(mouseScopeIdFromButton(event.button), MouseButtonEvent.DoubleClick, event));
         this._listenerhelper.addEventListener('mouseup', (event: MouseEvent) => this._onElementMouseEvent(mouseScopeIdFromButton(event.button), MouseButtonEvent.Up, event));
 
-        // tslint:disable-next-line
         this._listenerhelper.addEventListener('keydown', (event: KeyboardEvent) => this._onElementEvent(keyboardScopeIdFromKey(event.key), KeyEvent.Down, event));
         this._listenerhelper.addEventListener('keypress', (event: KeyboardEvent) => this._onElementEvent(keyboardScopeIdFromKey(event.key), KeyEvent.Press, event));
         this._listenerhelper.addEventListener('keyup', (event: KeyboardEvent) => this._onElementEvent(keyboardScopeIdFromKey(event.key), KeyEvent.Up, event));
@@ -95,32 +94,6 @@ export class World3d extends RT.DisposableObject {
 
         this._onElementEvent(sid, evid, event, [x, y]);
     }
-
-    // protected _clonerGlobals(value: any): any {
-    //     if (value === pxsim.runtime.globals) {
-    //         const globalsCloned = new value.constructor();
-
-    //         for (const key in value) {
-    //             if (value.hasOwnProperty(key)) {
-    //                 const valueCloned = CloneDeep(value[key], instanceClone);
-
-    //                 if (undefined !== valueCloned) {
-    //                     globalsCloned[key] = valueCloned;
-    //                 }
-    //             }
-    //         }
-
-    //         return globalsCloned;
-    //     }
-
-    //     if (!RT.isCloneable(value)) {
-    //         return;
-    //     }
-
-    //     if (value instanceof THREE.Vector3) {
-    //         return value.clone();
-    //     }
-    // }
 }
 
 namespace pxsimImpetus.world {
