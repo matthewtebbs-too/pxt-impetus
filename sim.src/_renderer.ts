@@ -102,10 +102,10 @@ export class Renderer extends RT.ProxyObject<THREE.WebGLRenderer> implements RT.
         window.addEventListener('resize', this._onWindowResize);
         this._onWindowResize();
 
-        this.runRenderLoop();
+        this._runRenderLoop();
     }
 
-    public runRenderLoop() {
+    protected _runRenderLoop() {
         this._callbackRequestId = requestAnimationFrame(() => {
             const notPaused = !this._paused;
 
@@ -141,11 +141,11 @@ export class Renderer extends RT.ProxyObject<THREE.WebGLRenderer> implements RT.
                 stats.end();
             }
 
-            this.runRenderLoop();
+            this._runRenderLoop();
         });
     }
 
-    public stopRenderLoop() {
+    protected _stopRenderLoop() {
         if (0 !== this._callbackRequestId) {
             cancelAnimationFrame(this._callbackRequestId);
             this._callbackRequestId = 0;
@@ -160,7 +160,7 @@ export class Renderer extends RT.ProxyObject<THREE.WebGLRenderer> implements RT.
     }
 
     protected _onDispose() {
-        this.stopRenderLoop();
+        this._stopRenderLoop();
 
         if (this._container) {
             window.removeEventListener('resize', this._onWindowResize);
