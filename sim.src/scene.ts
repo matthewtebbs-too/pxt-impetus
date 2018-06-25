@@ -8,7 +8,7 @@ import * as THREE from 'three';
 
 /// <reference types='../shared/impetus.enums'/>
 
-import { singletonWorldBoard } from './_board';
+import { worldBoard } from './_board';
 import {
     SceneEvent_Internal,
     ScopeId,
@@ -101,7 +101,7 @@ export class Scene3d extends Object3dMixin(THREE.Scene) {
 
         super.animate(timeStep);
 
-        singletonWorldBoard().events!.queue(ScopeId.SceneObject, SceneEvent_Internal.Animate, timeStep);
+        worldBoard().events!.queue(ScopeId.SceneObject, SceneEvent_Internal.Animate, timeStep);
     }
 
     public intersectedObjects(x_: number, y_: number): Object3d[] | null {
@@ -152,7 +152,7 @@ namespace pxsimImpetus.scene {
     }
 
     export function intersectedObjectAt(x: number, y: number): Object3d | null {
-        const world = singletonWorldBoard().world;
+        const world = worldBoard().world;
         const scene3d = world ? world.scene : null;
         const objects = scene3d ? scene3d.intersectedObjects(x, y) : null;
 
@@ -160,6 +160,6 @@ namespace pxsimImpetus.scene {
     }
 
     export function onAnimate(handler: pxsim.RefAction) {
-        singletonWorldBoard().events!.listen(ScopeId.SceneObject, SceneEvent_Internal.Animate, handler);
+        worldBoard().events!.listen(ScopeId.SceneObject, SceneEvent_Internal.Animate, handler);
     }
 }

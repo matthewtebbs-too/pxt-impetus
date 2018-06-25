@@ -85,16 +85,20 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
     }
 
     protected _onCloudNewMessage(msg: PxtCloudClient.MessageData) {
-        singletonWorldBoard().events!.queue(ScopeId.CloudObject, CloudEvent_Internal.NewMessage, [msg.text, msg.name || '']);
+        worldBoard().events!.queue(ScopeId.CloudObject, CloudEvent_Internal.NewMessage, [msg.text, msg.name || '']);
     }
 }
 
 pxsim.initCurrentRuntime = (msg: pxsim.SimulatorMessage) => {
-    singletonWorldBoard().dispose();                /* dispose now */
+    worldBoard().dispose();                /* dispose now */
 
-    return pxsim.runtime.board = singletonWorldBoard();   /* will be initialized by runtime */
+    return pxsim.runtime.board = worldBoard();   /* will be initialized by runtime */
 };
 
-export function singletonWorldBoard(): WorldBoard {
+export function worldBoard(): WorldBoard {
     return WorldBoard.singleton;
+}
+
+export function cloudAPI(): PxtCloudClient.PublicAPI | null {
+    return worldBoard().cloudAPI;
 }

@@ -27,6 +27,7 @@ declare namespace loops {
      */
     //% blockId=loops_forever
     //% block="forever" weight=55
+    //% afterOnStart=true
     //% shim=loops::forever
     function forever(body: () => void): void;
 

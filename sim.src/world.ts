@@ -6,7 +6,7 @@
 
 /// <reference types='../shared/impetus.enums'/>
 
-import { singletonWorldBoard } from './_board';
+import { worldBoard } from './_board';
 import {
     EventId,
     keyboardScopeIdFromKey,
@@ -37,8 +37,6 @@ export class World3d extends RT.DisposableObject {
 
         this._renderer = new Renderer(id);
         this._renderer.scene = this._scene3d;
-
-        const cloudAPI = singletonWorldBoard().cloudAPI!;
 
         this._listenerhelper = new  Helper.SimpleEventListenerHelper(this._renderer.container!);
 
@@ -73,7 +71,7 @@ export class World3d extends RT.DisposableObject {
     }
 
     protected _onElementEvent(sid: ScopeId, evid: EventId, event: Event, value?: any) {
-        singletonWorldBoard().events!.queue(sid, evid, value);
+        worldBoard().events!.queue(sid, evid, value);
     }
 
     protected _onElementFocused(target: HTMLElement, focused: boolean) {
@@ -127,7 +125,7 @@ export class World3d extends RT.DisposableObject {
 
 namespace pxsimImpetus.world {
     export function world(): World3d | null {
-        return singletonWorldBoard().world;
+        return worldBoard().world;
     }
 
     export function scene(): Scene3d | null {

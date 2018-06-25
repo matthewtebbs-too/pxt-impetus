@@ -8,7 +8,7 @@
 
 /// <reference types='../shared/impetus.enums'/>
 
-import { singletonWorldBoard } from './_board';
+import { worldBoard } from './_board';
 import {
     KeyboardKey,
     keyboardScopeIdFromKey,
@@ -19,22 +19,22 @@ import {
 
 namespace pxsimImpetus.input {
     export function onKeyEvent(key: KeyboardKey | string, event: KeyEvent, handler: pxsim.RefAction) {
-        singletonWorldBoard().events!.listen(keyboardScopeIdFromKey(key), event, handler);
+        worldBoard().events!.listen(keyboardScopeIdFromKey(key), event, handler);
     }
 
     export function onMouseEnter(handler: pxsim.RefAction) {
-        singletonWorldBoard().events!.listen(ScopeId.MouseDevice, MouseEvent_Internal.Enter, handler);
+        worldBoard().events!.listen(ScopeId.MouseDevice, MouseEvent_Internal.Enter, handler);
     }
 
     export function onMouseMove(handler: pxsim.RefAction) {
-        singletonWorldBoard().events!.listen(ScopeId.MouseDevice, MouseEvent_Internal.Move, handler);
+        worldBoard().events!.listen(ScopeId.MouseDevice, MouseEvent_Internal.Move, handler);
     }
 
     export function onMouseLeave(handler: pxsim.RefAction) {
-        singletonWorldBoard().events!.listen(ScopeId.MouseDevice, MouseEvent_Internal.Leave, handler);
+        worldBoard().events!.listen(ScopeId.MouseDevice, MouseEvent_Internal.Leave, handler);
     }
 
     export function onMouseButtonEvent(button: MouseButton, event: MouseButtonEvent, handler: pxsim.RefAction) {
-        singletonWorldBoard().events!.listen(mouseScopeIdFromButton(button), event, handler);
+        worldBoard().events!.listen(mouseScopeIdFromButton(button), event, handler);
     }
 }

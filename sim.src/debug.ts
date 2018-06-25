@@ -8,7 +8,7 @@
 
 const dbg = require('debug')('pxt-impetus');
 
-import { singletonWorldBoard } from './_board';
+import { worldBoard } from './_board';
 
 namespace pxsimImpetus.debug {
     export function log(args: any) {
@@ -16,7 +16,7 @@ namespace pxsimImpetus.debug {
     }
 
     export function renderStatistics(shown: boolean) {
-        const world = singletonWorldBoard().world;
+        const world = worldBoard().world;
 
         if (world) {
             const renderer = world.renderer;
