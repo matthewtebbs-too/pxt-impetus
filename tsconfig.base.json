@@ -10,6 +10,7 @@
     "sourceMap": false,
 
     "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
     "noEmitHelpers": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
