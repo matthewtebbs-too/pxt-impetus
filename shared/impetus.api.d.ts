@@ -552,7 +552,7 @@ declare class User {
      */
     //% blockCombine block="name"
     //% blockCombineShadow=world_current_user,
-    //% shim=user.name property
+    //% shim=.name property
     name: string;
 }
 
@@ -564,7 +564,7 @@ declare namespace user {
     //% blockId=world_current_user
     //% block="current user"
     //% group="User"
-    //% shim=world::currentUser
+    //% shim=user::currentUser
     function currentUser(): User;
 
     /**
