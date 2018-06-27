@@ -225,6 +225,7 @@
   "Torus.Circle|block": "torus",
   "Torus.Knot|block": "torus knot",
   "User.name|block": "name",
+  "User.setName|block": "set %user=world_current_user name|to %name",
   "console.logValue|block": "console|log value %name|= %value",
   "console.log|block": "console|log %text",
   "console|block": "Console",

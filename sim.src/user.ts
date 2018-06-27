@@ -13,45 +13,41 @@ import {
 } from './_events';
 
 export class User implements PxtCloudClient.UserData {
-    public get name(): string {
-        return this.name;
-    }
-}
+    private static _singleton = new User(true /* is self */);
 
-export class CurrentUser extends User {
-    private static _singleton = new User();
-
-    protected _isClean = true;
+    public name: string = 'Anonymous';
 
     public static get singleton(): User {
         return this._singleton;
     }
 
-    public set name(name: string) {
-        this.name = name;
-        this._isClean = false;
-    }
+    constructor(protected _isSelf = false) { }
 
-    public clean() {
-        if (!this._isClean) {
-            const cldapi = cloudAPI();
+    public async setName(name_: string) {
+        if (!this._isSelf) {
+            return;
+        }
 
-            if (cldapi) {
-                cldapi.users.addSelf(this).then(success => this._isClean = success);
-            }
+        const cldapi = cloudAPI();
+
+        if (cldapi) {
+            await cldapi.users.addSelf({ name: name_ });
+            this.name = name_;
         }
     }
 }
 
 namespace pxsimImpetus.user {
     export function currentUser(): User {
-        return CurrentUser.singleton;
+        return User.singleton;
     }
 
-    export function messageEveryone(message: string): PromiseLike<void> {
+    export async function messageEveryone(message: string) {
         const cldapi = cloudAPI();
 
-        return cldapi ? cldapi.chat.newMessage(message) : Promise.resolve();
+        if (cldapi) {
+            await cldapi.chat.newMessage(message);
+        }
     }
 
     export function onNewMessage(handler: pxsim.RefAction) {

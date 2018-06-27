@@ -548,12 +548,22 @@ declare namespace world { /* globe icon */
 //% blockNamespace=world
 declare class User {
     /**
-     * Name.
+     * Get name.
      */
     //% blockCombine block="name"
     //% blockCombineShadow=world_current_user,
     //% shim=.name property
-    name: string;
+    readonly name: string;
+
+
+    /**
+     * Set name.
+    */
+    //% blockId=user_set_name
+    //% block="set %user=world_current_user name|to %name"
+    //% group="User"
+    //% promise shim=.setName
+    setName(name: string): void;
 }
 
 //% blockNamespace=world
@@ -566,7 +576,6 @@ declare namespace user {
     //% group="User"
     //% shim=user::currentUser
     function currentUser(): User;
-
     /**
      * Message user.
     */
