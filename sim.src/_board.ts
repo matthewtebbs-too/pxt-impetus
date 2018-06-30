@@ -8,6 +8,7 @@
 
 import * as THREE from 'three';
 
+import * as PxtCloudAPI from 'pxt-cloud-api';
 import * as PxtCloudClient from 'pxt-cloud-client';
 
 import {
@@ -64,20 +65,21 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
         return this._events;
     }
 
-    public get cloudAPI(): PxtCloudClient.PublicAPI | null {
-        return this._cloudAPI;
+    public get cloudAPI(): PxtCloudAPI.PublicAPI | null {
+        return this._cldapi;
     }
 
     private _world3d: World3d | null = null;
     private _events: WorldEventBus | null = null;
-    private _cloudAPI: PxtCloudClient.PublicAPI | null = null;
+    private _cldapi: PxtCloudAPI.PublicAPI | null = null;
 
     public async initAsync(msg: pxsim.SimulatorRunMessage) {
         this._world3d = new World3d();
         this._events = new WorldEventBus(pxsim.runtime);
-        this._cloudAPI = await PxtCloudClient.makeAPIConnection();
 
-        this._cloudAPI.chat!.on('new message', this._onCloudNewMessage);
+        const cldapi = this._cldapi = await PxtCloudClient.makeAPIConnection();
+
+        cldapi.chat.on('new message', this._onCloudNewMessage);
 
         this._runCloudLoop();
     }
@@ -89,9 +91,9 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
             this._world3d.renderer.pause = true;
         }
 
-        if (this._cloudAPI) {
-            PxtCloudClient.disposeAPIConnection(this._cloudAPI);
-            this._cloudAPI = null;
+        if (this._cldapi) {
+            PxtCloudClient.disposeAPIConnection(this._cldapi);
+            this._cldapi = null;
         }
     }
 
@@ -112,7 +114,7 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
         /* do nothing */
     }
 
-    protected _onCloudNewMessage(msg: PxtCloudClient.MessageData) {
+    protected _onCloudNewMessage(msg: PxtCloudAPI.MessageData) {
         worldBoard().events!.queue(ScopeId.CloudObject, CloudEvent_Internal.NewMessage, [msg.text, msg.name || '']);
     }
 
@@ -140,6 +142,6 @@ export function worldBoard(): WorldBoard {
     return WorldBoard.singleton;
 }
 
-export function cloudAPI(): PxtCloudClient.PublicAPI | null {
+export function cloudAPI(): PxtCloudAPI.PublicAPI | null {
     return worldBoard().cloudAPI;
 }

@@ -4,7 +4,7 @@
     Copyright (c) 2018 MuddyTummy Software LLC
 */
 
-import * as PxtCloudClient from 'pxt-cloud-client';
+import * as PxtCloudAPI from 'pxt-cloud-api';
 
 import { cloudAPI, worldBoard } from './_board';
 import {
@@ -12,7 +12,7 @@ import {
     ScopeId,
 } from './_events';
 
-export class User implements PxtCloudClient.UserData {
+export class User implements PxtCloudAPI.UserData {
     private static _singleton = new User(true /* is self */);
 
     public name: string = 'Anonymous';
