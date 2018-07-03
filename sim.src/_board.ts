@@ -79,6 +79,11 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
 
         const cldapi = this._cldapi = await PxtCloudClient.makeAPIConnection();
 
+        cldapi.world.addDataSource('globals', {
+            cloner: WorldBoard._clonerGlobals,
+            data: pxsim.runtime.globals,
+        });
+
         cldapi.chat.on('new message', this._onCloudNewMessage);
 
         this._runCloudLoop();
@@ -120,7 +125,7 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
 
     protected _runCloudLoop() {
         this._callbackRequestId = setInterval(async () => {
-            /* do nothing */
+            await this._cldapi!.world.syncData('globals');
         }, WorldBoard._cloudLoopFrequency);
     }
 
