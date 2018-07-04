@@ -125,7 +125,7 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
 
     protected _runCloudLoop() {
         this._callbackRequestId = setInterval(async () => {
-            await this._cldapi!.world.syncData('globals');
+            await this._cldapi!.world.syncDataSource('globals');
         }, WorldBoard._cloudLoopFrequency);
     }
 
