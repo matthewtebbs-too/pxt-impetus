@@ -3,9 +3,6 @@ CACHE MANIFEST
 CACHE:
 /pxt-impetus/bluebird.min.js
 /pxt-impetus/pxtsim.js
-/pxt-impetus/scripts/ammo.js
-/pxt-impetus/scripts/stats.min.js
-/pxt-impetus/scripts/three.min.js
 /pxt-impetus/sim.css
 /pxt-impetus/sim.js
 
