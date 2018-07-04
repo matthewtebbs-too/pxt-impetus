@@ -50,7 +50,7 @@
     "@types/node": "^8.10.20",
     "@types/object-hash": "^1.2.0",
     "@types/stats": "^0.16.30",
-    "@types/three": "^0.92.11",
+    "@types/three": "^0.92.8",
     "dat.gui": "^0.7.2",
     "debug": "^3.1.0",
     "dotenv": "^5.0.1",
