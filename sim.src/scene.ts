@@ -104,12 +104,12 @@ export class Scene3d extends Object3dMixin(THREE.Scene) {
         worldBoard().events!.queue(ScopeId.SceneObject, SceneEvent_Internal.Animate, timeStep);
     }
 
-    public intersectedObjects(x_: number, y_: number): Object3d[] | null {
+    public intersectedObjects(x: number, y: number): Object3d[] | null {
         if (!this._camera) {
             return null;
         }
 
-        this._raycaster.setFromCamera({x: x_, y: y_}, this._camera);
+        this._raycaster.setFromCamera({ x, y }, this._camera);
         const intersections = this._raycaster.intersectObjects(this.children);
 
         return intersections ? intersections.map(intersection => intersection.object as any) : null;

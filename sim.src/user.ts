@@ -23,7 +23,7 @@ export class User implements PxtCloudAPI.UserData {
 
     constructor(protected _isSelf = false) { }
 
-    public async setName(name_: string) {
+    public async setName(name: string) {
         if (!this._isSelf) {
             return;
         }
@@ -31,8 +31,8 @@ export class User implements PxtCloudAPI.UserData {
         const cldapi = cloudAPI();
 
         if (cldapi) {
-            await cldapi.users.addSelf({ name: name_ });
-            this.name = name_;
+            await cldapi.users.addSelf({ name });
+            this.name = name;
         }
     }
 }
