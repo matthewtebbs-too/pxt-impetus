@@ -87,16 +87,18 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
         this._world3d = new World3d();
         this._events = new WorldEventBus(pxsim.runtime);
 
-        const cldapi = this._cldapi = await PxtCloudClient.makeAPIConnection();
+        this._cldapi = await PxtCloudClient.makeAPIConnection();
 
-        cldapi.world.addDataSource('globals', {
-            cloner: WorldBoard._clonerGlobals,
-            data: pxsim.runtime.globals,
-        });
+        if (this._cldapi) {
+            this._cldapi.world.addDataSource('globals', {
+                cloner: WorldBoard._clonerGlobals,
+                data: pxsim.runtime.globals,
+            });
 
-        cldapi.chat.on('new message', this._onCloudNewMessage);
+            this._cldapi.chat.on('new message', this._onCloudNewMessage);
 
-        this._runCloudLoop();
+            this._runCloudLoop();
+        }
     }
 
     public kill() {
