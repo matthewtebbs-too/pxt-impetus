@@ -61,7 +61,7 @@
     "pxt-cloud-client": "github:muddytummy/pxt-cloud-client",
     "pxt-core": "^3.21.6",
     "stats.js": "^0.17.0",
-    "three": "^0.93.0",
+    "three": "^0.94.0",
     "tslib": "^1.9.3"
   },
   "devDependencies": {
