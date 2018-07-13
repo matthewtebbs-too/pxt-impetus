@@ -73,6 +73,16 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
     private _events: WorldEventBus | null = null;
     private _cldapi: PxtCloudAPI.PublicAPI | null = null;
 
+    constructor() {
+        super();
+
+        pxsim.initCurrentRuntime = () => {
+            worldBoard().dispose();                     /* dispose now */
+
+            return pxsim.runtime.board = worldBoard();   /* will be initialized by runtime */
+        };
+    }
+
     public async initAsync(msg: pxsim.SimulatorRunMessage) {
         this._world3d = new World3d();
         this._events = new WorldEventBus(pxsim.runtime);
@@ -136,12 +146,6 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
         }
     }
 }
-
-pxsim.initCurrentRuntime = (msg: pxsim.SimulatorMessage) => {
-    worldBoard().dispose();                     /* dispose now */
-
-    return pxsim.runtime.board = worldBoard();   /* will be initialized by runtime */
-};
 
 export function worldBoard(): WorldBoard {
     return WorldBoard.singleton;

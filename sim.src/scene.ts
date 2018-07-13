@@ -54,7 +54,7 @@ export class Scene3d extends Object3dMixin(THREE.Scene) {
     }
 
     public get backgroundColor(): Color {
-        return this.background;
+        return this.background as Color;
     }
 
     public set backgroundColor(color: Color) {
@@ -83,13 +83,17 @@ export class Scene3d extends Object3dMixin(THREE.Scene) {
             super.add(...objects3d);
             objects3d.forEach(object3d => object3d.onAdded(this));
         }
+
+        return this;
     }
 
-    public remove(object3d: Object3d) {
-        if (object3d) {
-            object3d.onRemoved(this);
-            super.remove(object3d);
+    public remove(...objects3d: Object3d[]) {
+        if (objects3d) {
+            objects3d.forEach(object3d => object3d.onRemoved(this));
+            super.remove(...objects3d);
         }
+
+        return this;
     }
 
     public animate(timeStep: number) {
