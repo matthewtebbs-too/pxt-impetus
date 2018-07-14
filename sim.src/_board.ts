@@ -90,7 +90,7 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
         this._cldapi = await PxtCloudClient.makeAPIConnection();
 
         if (this._cldapi) {
-            this._cldapi.world.addDataSource('globals', {
+            this._cldapi.world.setDataSource('globals', {
                 cloner: WorldBoard._clonerGlobals,
                 data: pxsim.runtime.globals,
             });
