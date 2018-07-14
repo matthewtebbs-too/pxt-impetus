@@ -512,7 +512,7 @@ var pxtTargetBundle = {
   },
   "versions": {
     "target": "0.1.0",
-    "pxt": "3.21.4"
+    "pxt": "3.21.6"
   },
   "blocksprj": {
     "id": "blocksprj",
