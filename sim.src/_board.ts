@@ -25,30 +25,20 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
 
     private static _singleton = new WorldBoard();
 
-    private static _clonerGlobals(value: any, deepclone: any): any {
-        if (value === pxsim.runtime.globals) {
-            const globalsCloned = new value.constructor();
+    private static _cloner(value: object): object | undefined {
+        let valueClone;
 
-            for (const key in value) {
-                if (value.hasOwnProperty(key)) {
-                    const valueCloned = deepclone(value[key], WorldBoard._clonerGlobals);
-
-                    if (undefined !== valueCloned) {
-                        globalsCloned[key] = valueCloned;
-                    }
-                }
+        if (RT.isCloneable(value)) {
+            if (value instanceof THREE.Vector3) {
+                valueClone = value.clone();
             }
-
-            return globalsCloned;
         }
 
-        if (!RT.isCloneable(value)) {
-            return;
-        }
+        return valueClone;
+    }
 
-        if (value instanceof THREE.Vector3) {
-            return value.clone();
-        }
+    private static _filter(path: string[], key: string): boolean {
+        return false;
     }
 
     private _callbackRequestId: NodeJS.Timer | null = null;
@@ -91,8 +81,9 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
 
         if (this._cldapi) {
             this._cldapi.world.setDataSource('globals', {
-                cloner: WorldBoard._clonerGlobals,
+                cloner: WorldBoard._cloner,
                 data: pxsim.runtime.globals,
+                filter: WorldBoard._filter,
             });
 
             this._cldapi.chat.on('new message', this._onCloudNewMessage);
