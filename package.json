@@ -59,7 +59,7 @@
     "pxt": "^0.5.1",
     "pxt-cloud-api": "github:muddytummy/pxt-cloud-api",
     "pxt-cloud-client": "github:muddytummy/pxt-cloud-client",
-    "pxt-core": "^3.21.6",
+    "pxt-core": "^3.22.1",
     "stats.js": "^0.17.0",
     "three": "^0.94.0",
     "tslib": "^1.9.3"
@@ -83,8 +83,8 @@
     "watchify": "^3.11.0"
   },
   "engines": {
-    "node": ">=8.11.0",
-    "npm": ">=5.6.0"
+    "node": ">=8.11.3",
+    "npm": ">=6.2.0"
   },
   "browserify-shim": {
     "pxsim": "global:pxsim"
