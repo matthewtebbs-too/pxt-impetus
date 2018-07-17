@@ -6,6 +6,7 @@
 
 /// <reference types='pxt-core/built/pxtsim'/>
 
+import * as Lo from 'lodash';
 import * as THREE from 'three';
 
 import * as PxtCloudAPI from 'pxt-cloud-api';
@@ -25,20 +26,20 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
 
     private static _singleton = new WorldBoard();
 
-    private static _filter(path: string[], key: string | number | undefined): boolean {
-        return false;
-    }
+    private static _filter(key: string | number | undefined, value?: any): boolean {
+        let filter = false;
 
-    private static _cloner(value: object): object | undefined {
-        let valueClone;
+        if (undefined !== key) {
+            value = value || Lo.get(pxsim.runtime.globals, key.toString());
 
-        if (RT.isCloneable(value)) {
-            if (value instanceof THREE.Vector3) {
-                valueClone = value.clone();
+            if (Lo.isObject(value)) {
+                if (!(value instanceof THREE.Vector3)) {
+                    filter = true;
+                }
             }
         }
 
-        return valueClone;
+        return filter;
     }
 
     private _callbackRequestId: NodeJS.Timer | null = null;
@@ -84,8 +85,7 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
                 data: pxsim.runtime.globals,
                 options: {
                     filter: WorldBoard._filter,
-                    cloner: WorldBoard._cloner,
-                }
+                },
             });
 
             this._cldapi.chat.on('new message', this._onCloudNewMessage);
