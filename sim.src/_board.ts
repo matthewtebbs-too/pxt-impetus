@@ -25,6 +25,10 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
 
     private static _singleton = new WorldBoard();
 
+    private static _filter(path: string[], key: string | number | undefined): boolean {
+        return false;
+    }
+
     private static _cloner(value: object): object | undefined {
         let valueClone;
 
@@ -35,10 +39,6 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
         }
 
         return valueClone;
-    }
-
-    private static _filter(path: string[], key: string): boolean {
-        return false;
     }
 
     private _callbackRequestId: NodeJS.Timer | null = null;
@@ -81,9 +81,11 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
 
         if (this._cldapi) {
             this._cldapi.world.setDataSource('globals', {
-                cloner: WorldBoard._cloner,
                 data: pxsim.runtime.globals,
-                filter: WorldBoard._filter,
+                options: {
+                    filter: WorldBoard._filter,
+                    cloner: WorldBoard._cloner,
+                }
             });
 
             this._cldapi.chat.on('new message', this._onCloudNewMessage);
