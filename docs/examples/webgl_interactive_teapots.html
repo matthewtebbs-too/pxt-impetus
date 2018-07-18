@@ -453,21 +453,50 @@
             </button>
          
     <div class="ui text">
-        <h1 id="examples">Examples</h1><p>Here are some fun examples!</p>
-<h2 id="various-examples">Various examples</h2><pre><code class="lang-codecard">[
-  {
-    &quot;name&quot;: &quot;Interactive Teapots&quot;,
-    &quot;description&quot;: &quot;Interactive Teapots&quot;,
-    &quot;url&quot;:&quot;/examples/webgl_interactive_teapots&quot;,
-    &quot;cardType&quot;: &quot;example&quot;
-  },
-  {
-    &quot;name&quot;: &quot;Falling Teapots&quot;,
-    &quot;description&quot;: &quot;Falling Teapots&quot;,
-    &quot;url&quot;:&quot;/examples/webgl_falling_teapots&quot;,
-    &quot;cardType&quot;: &quot;example&quot;
-  }
-]</code></pre>
+        <h1 id="interactive-cubes">Interactive Cubes</h1><p>Hover over a floating teapot.</p>
+<pre><code class="lang-blocks">    let teapotobject: Mesh3d = null
+    let intersected: Object3d = null
+    let teapotshape: Shape3d = null
+    let mouseY = 0
+    let mouseIn = false
+    let mouseX = 0
+    let theta = 0
+    theta = 0
+    world.scene().camera = design.perspectiveCamera()
+    world.scene().camera.position = Math.vector(0, 20, 20)
+    world.scene().camera.lookAtPosition(Math.zeroVector())
+    world.scene().backgroundColor = design.standardColor(Palette.LightCyan)
+    world.scene().addAt(design.directionalLight(design.colorPicker(0xffffff), 1), Math.vector(5, 20, 0))
+    teapotshape = design.teapotShape(12)
+    for (let i = 0; i &lt; 2000; i++) {
+        teapotobject = object.fromShapeAndMaterial(teapotshape, design.materialOfColor(design.randomColor()))
+        world.scene().addAt(teapotobject, scene.randomPositionInCube(800));
+    }
+    scene.onAnimate(function (msec) {
+        theta += 0.1 * msec / (1 / 60)
+        world.scene().camera.position = Math.vector(100 * Math.sin(Math.degreesInRadians(theta)), 100 * Math.sin(Math.degreesInRadians(theta)), 100 * Math.cos(Math.degreesInRadians(theta)))
+        world.scene().camera.lookAtPosition(Math.zeroVector())
+        if (intersected) {
+            object.materialOf(intersected).emissive = design.standardColor(Palette.Black)
+        }
+        if (mouseIn) {
+            intersected = scene.intersectedObjectAt(mouseX, mouseY)
+            if (intersected) {
+                object.materialOf(intersected).emissive = design.standardColor(Palette.Red)
+            }
+        }
+    })
+    input.onMouseMove(function (x, y) {
+        mouseX = x
+        mouseY = y
+    })
+    input.onMouseEnter(function () {
+        mouseIn = true
+    })
+    input.onMouseLeave(function () {
+        mouseIn = false
+    })</code></pre>
+<pre><code class="lang-package"></code></pre>
 
     </div>
 
