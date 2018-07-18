@@ -1,11 +1,11 @@
 # Interactive Cubes
 
-Hover over a floating cube.
+Hover over a floating teapot.
 
 ```blocks
-    let boxobject: Mesh3d = null
+    let teapotobject: Mesh3d = null
     let intersected: Object3d = null
-    let boxshape: Shape3d = null
+    let teapotshape: Shape3d = null
     let mouseY = 0
     let mouseIn = false
     let mouseX = 0
@@ -16,10 +16,10 @@ Hover over a floating cube.
     world.scene().camera.lookAtPosition(Math.zeroVector())
     world.scene().backgroundColor = design.standardColor(Palette.LightCyan)
     world.scene().addAt(design.directionalLight(design.colorPicker(0xffffff), 1), Math.vector(5, 20, 0))
-    boxshape = design.boxShape(20, 20, 20)
+    teapotshape = design.teapotShape(12)
     for (let i = 0; i < 2000; i++) {
-        boxobject = object.fromShapeAndMaterial(boxshape, design.materialOfColor(design.randomColor()))
-        world.scene().addAt(boxobject, scene.randomPositionInCube(800));
+        teapotobject = object.fromShapeAndMaterial(teapotshape, design.materialOfColor(design.randomColor()))
+        world.scene().addAt(teapotobject, scene.randomPositionInCube(800));
     }
     scene.onAnimate(function (msec) {
         theta += 0.1 * msec / (1 / 60)

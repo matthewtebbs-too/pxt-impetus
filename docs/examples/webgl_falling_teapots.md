@@ -1,6 +1,6 @@
 # Falling Spheres
 
-Watch the spheres fall.
+Watch the teapots fall.
 
 ```blocks
     let sphereshape: Shape3d = null
@@ -23,7 +23,7 @@ Watch the spheres fall.
     world.scene().camera.attachController(CameraController.Orbit)
     world.scene().addAt(design.directionalLight(design.colorPicker(0xffffff), 1), Math.vector(5, 20, 0))
     world.scene().addAt(object.fromShapeAndMaterial(design.planeShape(100, 100), design.materialOfColor(design.colorPicker(0xffffff))), Math.zeroVector())
-    sphereshape = design.sphereShape(2)
+    sphereshape = design.teapotShape(2)
 ```
 
 ```package
