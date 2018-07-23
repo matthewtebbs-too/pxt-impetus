@@ -39,6 +39,9 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
             }
         }
 
+        // tslint:disable
+        console.log(`${key} is ${filter}`);
+
         return filter;
     }
 
@@ -88,6 +91,8 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
                 },
             });
 
+            await this._cldapi.world.syncDataSources();
+
             this._cldapi.chat.on('new message', this._onCloudNewMessage);
 
             this._runCloudLoop();
@@ -130,7 +135,7 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
 
     protected _runCloudLoop() {
         this._callbackRequestId = setInterval(async () => {
-            await this._cldapi!.world.syncDataSource('globals');
+            await this._cldapi!.world.pushAllData();
         }, WorldBoard._cloudLoopFrequency);
     }
 

@@ -75,7 +75,7 @@
     "gulp": "^4.0.0",
     "gulp-replace": "^1.0.0",
     "gulp-typescript": "^4.0.2",
-    "less": "^3.7.1",
+    "less": "^3.8.0",
     "merge2": "^1.2.2",
     "semantic-ui-less": "~2.2.14",
     "tslint": "^5.11.0",
