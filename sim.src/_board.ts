@@ -39,9 +39,6 @@ export class WorldBoard extends pxsim.BaseBoard implements RT.IDisposableObject 
             }
         }
 
-        // tslint:disable
-        console.log(`${key} is ${filter}`);
-
         return filter;
     }
 
