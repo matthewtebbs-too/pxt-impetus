@@ -39,7 +39,7 @@ var pxtTargetBundle = {
     "cardLogo": "docs/static/icons/android-chrome-192x192.png",
     "docsLogo": "docs/static/logo.square.white.svg",
     "portraitLogo": "docs/static/logo.square.white.svg",
-    "logoUrl": "/pxt-impetus/",
+    "logoUrl": "https://github.com/muddytummy/pxt-impetus#readme",
     "homeUrl": "/pxt-impetus/",
     "betaUrl": "https://github.com/muddytummy/pxt-impetus#readme",
     "privacyUrl": "https://makecode.com/privacy",
@@ -512,7 +512,7 @@ var pxtTargetBundle = {
   },
   "versions": {
     "target": "0.1.0",
-    "pxt": "3.22.1"
+    "pxt": "3.22.6"
   },
   "blocksprj": {
     "id": "blocksprj",
