@@ -86,7 +86,7 @@ declare class Object3d {
      * @param angle number, eg: 0
      */
     //% blockId=object3d_set_rotation_from_axis_angle
-    //% block="set %object3|rotation around %axis=math_vector|by %angle"
+    //% block="set %object3|rotation around %axis=math_up_vector|by %angle"
     //% shim=.setRotationFromAxisAngle
     setRotationFromAxisAngle(axis: Vector, angle: number): void;
 
@@ -199,26 +199,26 @@ declare namespace design {
 declare namespace design {
     /**
      * Plane shape.
-     * @param width number, eg: 100
-     * @param height number, eg: 100
+     * @param width number, eg: 25
+     * @param depth number, eg: 25
      */
     //% blockId=shape3d_plane
-    //% block="plane of width %radius|height %height"
+    //% block="plane of width %radius|depth %depth"
     //% group="Shape"
     //% shim=shape::planeShape
-    function planeShape(width?: number, height?: number): Shape3d;
+    function planeShape(width?: number, depth?: number): Shape3d;
 
     /**
      * Box shape.
      * @param width number, eg: 1
-     * @param height number, eg: 1
      * @param depth number, eg: 1
+     * @param height number, eg: 1
      */
     //% blockId=shape3d_box
-    //% block="box of width %width|height %height|depth %depth"
+    //% block="box of width %width|depth %depth|height %height"
     //% group="Shape"
     //% shim=shape::boxShape
-    function boxShape(width?: number, height?: number, depth?: number): Shape3d;
+    function boxShape(width?: number, depth?: number, height?: number): Shape3d;
 
     /**
      * Cylinder shape.

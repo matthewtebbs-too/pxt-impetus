@@ -53,6 +53,33 @@ declare namespace Math {
     function unitVector(): Vector;
 
     /**
+     * Up vector.
+     */
+    //% blockId=math_up_vector
+    //% block="up vector"
+    //% group="Vector"
+    //% shim=math3d::upVector
+    function upVector(): Vector;
+
+    /**
+     * Forward vector.
+     */
+    //% blockId=math_forward_vector
+    //% block="forward vector"
+    //% group="Vector"
+    //% shim=math3d::forwardVector
+    function forwardVector(): Vector;
+
+    /**
+     * Right vector.
+     */
+    //% blockId=math_right_vector
+    //% block="right vector"
+    //% group="Vector"
+    //% shim=math3d::rightVector
+    function rightVector(): Vector;
+
+    /**
      * Vector operations.
      * @param a vector operand
      * @param op vector operation

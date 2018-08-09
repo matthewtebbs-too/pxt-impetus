@@ -206,17 +206,17 @@ export class TeapotShape3d extends ShapeMixin(THREEX.TeapotBufferGeometry) {
 }
 
 namespace pxsimImpetus.shape {
-    export function planeShape(width?: number, height?: number): PlaneShape3d {
-        width = width || 100;
-        height = height || 100;
+    export function planeShape(width?: number, depth?: number): PlaneShape3d {
+        width = width || 25;
+        depth = depth || 25;
 
-        return new PlaneShape3d(width, height);
+        return new PlaneShape3d(width, depth);
     }
 
-    export function boxShape(width?: number, height?: number, depth?: number): BoxShape3d {
+    export function boxShape(width?: number, depth?: number, height?: number): BoxShape3d {
         width = width || 1;
-        height = height || 1;
         depth = depth || 1;
+        height = height || 1;
 
         return new BoxShape3d(width, height, depth);
     }

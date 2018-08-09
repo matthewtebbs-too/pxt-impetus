@@ -51,13 +51,15 @@ namespace pxsimImpetus.math3d {
         return new VectorConstructor(x, y, z);
     }
 
-    export function zeroVector(): Vector  {
-        return vector(0, 0, 0);
-    }
+    export function zeroVector(): Vector        { return vector(0, 0, 0); }
 
-    export function unitVector(): Vector  {
-        return vector(1, 1, 1);
-    }
+    export function unitVector(): Vector        { return vector(1, 1, 1); }
+
+    export function upVector(): Vector          { return vector(0, 1, 0); }
+
+    export function forwardVector(): Vector     { return vector(0, 0, 1); }
+
+    export function rightector(): Vector        { return vector(1, 0, 0); }
 
     export function vectorOp(a: Vector, op: MathOp, b: Vector): Vector {
         const result: Vector = zeroVector();
