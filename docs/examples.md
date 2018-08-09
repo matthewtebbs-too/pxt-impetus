@@ -7,15 +7,15 @@ Here are some fun examples!
 ```codecard
 [
   {
-    "name": "Interactive Teapots",
-    "description": "Interactive Teapots",
-    "url":"/examples/webgl_interactive_teapots",
+    "name": "Interactive Cubes",
+    "description": "Interactive Cubes",
+    "url":"/examples/webgl_interactive_cubes",
     "cardType": "example"
   },
   {
-    "name": "Falling Teapots",
-    "description": "Falling Teapots",
-    "url":"/examples/webgl_falling_teapots",
+    "name": "Falling Spheres",
+    "description": "Falling Spheres",
+    "url":"/examples/webgl_falling_spheres",
     "cardType": "example"
   }
 ]
