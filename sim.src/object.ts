@@ -74,7 +74,7 @@ export function Object3dMixin<T extends RT.ObjectConstructor<THREE.Object3D>>(ba
                 return;
             }
 
-            this.setRotationFromAxisAngle(axis, THREE.Math.degToRad(angle));
+            super.setRotationFromAxisAngle(axis, THREE.Math.degToRad(angle));
         }
 
         public setPhysicsEnabled(enable: boolean) {
