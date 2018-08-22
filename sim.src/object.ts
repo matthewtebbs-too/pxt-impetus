@@ -46,6 +46,7 @@ export function Object3dMixin<T extends RT.ObjectConstructor<THREE.Object3D>>(ba
 
         public get rotation_(): Vector {
             const rotation = this.rotation.toVector3();
+
             return new VectorConstructor(THREE.Math.radToDeg(rotation.x), THREE.Math.radToDeg(rotation.y), THREE.Math.radToDeg(rotation.z));
         }
 
