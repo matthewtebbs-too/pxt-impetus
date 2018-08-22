@@ -422,7 +422,7 @@ declare class Camera extends Object3d {
      * @param type value, eg: CameraController.Orbit
      */
     //% blockId=camera_attachcontroller
-    //% block="attach to %camera|%type controller"
+    //% block="attach to %camera=world_camera|%type controller"
     //% group="Camera"
     //% shim=.attachController
     attachController(type: CameraController): void;
@@ -539,10 +539,19 @@ declare namespace world { /* globe icon */
      * Get current scene.
      */
     //% blockId=world_scene
-    //% block="scene"
+    //% block="world scene"
     //% group="World"
     //% shim=world::scene
     function scene(): Scene3d;
+
+    /**
+     * Get current camera.
+     */
+    //% blockId=world_camera
+    //% block="scene camera"
+    //% group="World"
+    //% shim=world::camera
+    function camera(): Camera;
 }
 
 //% blockNamespace=world

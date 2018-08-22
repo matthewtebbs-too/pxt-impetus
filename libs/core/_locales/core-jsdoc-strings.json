@@ -234,5 +234,6 @@
   "user.currentUser": "Get current user.",
   "user.messageEveryone": "Message user.",
   "user.onNewMessage": "Code to run when a message is received.",
+  "world.camera": "Get current camera.",
   "world.scene": "Get current scene."
 }

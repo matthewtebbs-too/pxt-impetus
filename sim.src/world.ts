@@ -16,6 +16,7 @@ import {
 import * as Helper from './_helper';
 import { Renderer } from './_renderer';
 import * as RT from './_runtime';
+import { Camera } from './camera';
 import { Scene3d } from './scene';
 
 export class World3d extends RT.DisposableObject {
@@ -104,5 +105,10 @@ namespace pxsimImpetus.world {
     export function scene(): Scene3d | null {
         const world3d = world();
         return world3d ? world3d.scene : null;
+    }
+
+    export function camera(): Camera | null {
+        const scene3d = scene();
+        return scene3d ? scene3d.camera : null;
     }
 }
