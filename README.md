@@ -50,7 +50,7 @@ _No formal releses yet._
 ## Open Source Software Usage and Licenses
 
 - Impetus renders using WebGL via the [three.js](https://threejs.org) JavaScript library.
-- Physics is simulated via the [Ammo.js](https://github.com/kripken/ammo.js/) Emscripten port of Bullet Physics .
+- Physics is simulated via the [Ammo.js](https://github.com/kripken/ammo.js/) Emscripten port of Bullet Physics.
 - The Blockly interface and Monaco Strict TypeScript coding environment is provided by the [Microsoft MakeCode (PXT - Programming eXperience Toolkit)](https://github.com/Microsoft/pxt).
 
 Please refer to this project's LICENSE and THIRD_PARTY_LICENSES files for more details.
