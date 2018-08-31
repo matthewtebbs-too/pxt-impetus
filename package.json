@@ -48,7 +48,7 @@
     "@types/es6-shim": "^0.31.37",
     "@types/lodash": "^4.14.116",
     "@types/marked": "^0.4.1",
-    "@types/node": "^8.10.28",
+    "@types/node": "^8.10.29",
     "@types/object-hash": "^1.2.0",
     "@types/stats": "^0.16.30",
     "@types/three": "^0.92.18",
@@ -64,7 +64,7 @@
     "pxt-core": "^3.22.14",
     "request": "^2.88.0",
     "stats.js": "^0.17.0",
-    "three": "^0.95.0",
+    "three": "^0.96.0",
     "tslib": "^1.9.3"
   },
   "devDependencies": {
