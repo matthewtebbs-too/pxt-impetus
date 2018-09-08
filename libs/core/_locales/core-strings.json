@@ -269,6 +269,7 @@
   "object.fromShapeAndMaterial|block": "object with shape %shape=shape3d_box|and material %material=material_of_color",
   "object.materialOf|block": "material of %object3d",
   "object|block": "Object",
+  "parseFloat|block": "parse to number %text",
   "parseInt|block": "parse to integer %text",
   "scene.intersectedObjectAt|block": "intersected object at %x|%y",
   "scene.onAnimate|block": "on scene animate",
