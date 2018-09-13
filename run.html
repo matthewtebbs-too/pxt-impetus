@@ -85,7 +85,7 @@
     "verprefix": "",
     "workerjs": "/pxt-impetus/worker.js",
     "monacoworkerjs": "/pxt-impetus/monacoworker.js",
-    "pxtVersion": "3.22.14",
+    "pxtVersion": "3.22.18",
     "pxtRelId": "",
     "pxtCdnUrl": "/pxt-impetus/",
     "commitCdnUrl": "/pxt-impetus/",
@@ -125,6 +125,8 @@
         }
 
         function initAppCache() {
+            if (!window.applicationCache)
+                return;
             if (window.applicationCache.status === window.applicationCache.UPDATEREADY)
                     window.location.reload();
             window.applicationCache.addEventListener('updateready', function () {
